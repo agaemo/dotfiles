@@ -116,6 +116,7 @@ require("lazy").setup({
           layout_strategy = "horizontal",
           sorting_strategy = "ascending",
           layout_config = { prompt_position = "top" },
+          preview = { treesitter = false },
         },
       })
       pcall(telescope.load_extension, "fzf")
