@@ -77,6 +77,40 @@ require("lazy").setup({
     end,
   },
 
+  -- 括弧・クォートの自動補完
+  {
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
+    config = function()
+      require("nvim-autopairs").setup()
+    end,
+  },
+
+  -- コメントアウト
+  {
+    "numToStr/Comment.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    config = function()
+      require("Comment").setup()
+    end,
+  },
+
+  -- キーガイド
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("which-key").setup({
+        delay = 500,
+      })
+      require("which-key").add({
+        { "<leader>f", group = "ファイル検索" },
+        { "<leader>h", group = "Git hunk" },
+        { "<leader>c", group = "コード" },
+      })
+    end,
+  },
+
   -- ステータスライン
   {
     "nvim-lualine/lualine.nvim",
