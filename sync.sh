@@ -13,4 +13,10 @@ echo "  ✓ neovim/init.lua"
 cp ~/.config/ghostty/config "$DOTFILES_DIR/ghostty/config"
 echo "  ✓ ghostty/config"
 
+cp ~/.claude/CLAUDE.md "$DOTFILES_DIR/claude/CLAUDE.md"
+echo "  ✓ claude/CLAUDE.md"
+
+cp ~/.claude/statusline-command.sh "$DOTFILES_DIR/claude/statusline-command.sh"
+echo "  ✓ claude/statusline-command.sh"
+
 echo "Done."
