@@ -17,3 +17,4 @@
 | ディレクトリ | 対象ツール | 詳細 |
 |-------------|-----------|------|
 | [neovim/](neovim/README.md) | Neovim | プラグイン・キーマップ |
+| [ghostty/](ghostty/config) | Ghostty | テーマ・フォント・ウィンドウ設定 |
