@@ -7,6 +7,7 @@ used=$(echo "$input" | jq -r '.context_window.used_percentage // empty')
 total_in=$(echo "$input" | jq -r '.context_window.total_input_tokens // empty')
 total_out=$(echo "$input" | jq -r '.context_window.total_output_tokens // empty')
 five_hour=$(echo "$input" | jq -r '.rate_limits.five_hour.used_percentage // empty')
+five_hour_resets_at=$(echo "$input" | jq -r '.rate_limits.five_hour.resets_at // empty')
 seven_day=$(echo "$input" | jq -r '.rate_limits.seven_day.used_percentage // empty')
 seven_day_resets_at=$(echo "$input" | jq -r '.rate_limits.seven_day.resets_at // empty')
 
@@ -99,7 +100,16 @@ if [ -n "$five_hour" ]; then
   five_int=$(printf '%.0f' "$five_hour")
   color=$(pct_color "$five_int")
   b=$(bar "$five_int")
-  out="${out} ${SEP} ${color}${b} 5h ${five_int}%%${RESET}"
+  hours_left_str=""
+  if [ -n "$five_hour_resets_at" ]; then
+    now=$(date +%s)
+    secs_left=$(( five_hour_resets_at - now ))
+    if [ "$secs_left" -gt 0 ]; then
+      hours_left=$(awk "BEGIN { printf \"%d\", ($secs_left / 3600) }")
+      hours_left_str=" (${hours_left}h left)"
+    fi
+  fi
+  out="${out} ${SEP} ${color}${b} 5h${hours_left_str} ${five_int}%%${RESET}"
 fi
 if [ -n "$seven_day" ]; then
   seven_int=$(printf '%.0f' "$seven_day")
