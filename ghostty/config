@@ -1,0 +1,26 @@
+theme = TokyoNight Night
+
+font-family = JetBrainsMono Nerd Font
+font-size = 14
+font-feature = -calt
+font-feature = -dlig
+font-feature = -liga
+
+window-inherit-working-directory = true
+background-opacity = 0.95
+
+window-padding-x = 10
+window-padding-y = 10
+
+link-url = true
+window-new-tab-position = end
+
+macos-option-as-alt = true
+shell-integration = detect
+scrollback-limit = 10000
+copy-on-select = clipboard
+
+# Split pane visibility
+split-divider-color = #888888
+unfocused-split-opacity = 0.7
+unfocused-split-fill = #1a1a2e

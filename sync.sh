@@ -10,4 +10,7 @@ echo "Syncing dotfiles to $DOTFILES_DIR ..."
 cp ~/.config/nvim/init.lua "$DOTFILES_DIR/neovim/init.lua"
 echo "  ✓ neovim/init.lua"
 
+cp ~/.config/ghostty/config "$DOTFILES_DIR/ghostty/config"
+echo "  ✓ ghostty/config"
+
 echo "Done."
