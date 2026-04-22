@@ -1,7 +1,7 @@
 # claude/commands
 
 Claude Code のカスタムスラッシュコマンド定義ディレクトリ。
-`~/.claude/commands/` にシムリンクされ、どのプロジェクトからでも利用できる。
+`~/.claude/commands/` にシンボリックリンクされ、どのプロジェクトからでも利用できる。
 
 ## コマンド一覧
 

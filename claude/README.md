@@ -1,6 +1,6 @@
 # claude/
 
-Claude Code のグローバル設定ディレクトリ。`~/.claude/` にシムリンクされる。
+Claude Code のグローバル設定ディレクトリ。`~/.claude/` にシンボリックリンクされる。
 
 ## 構成
 

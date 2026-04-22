@@ -19,7 +19,7 @@ echo "  ✓ claude/CLAUDE.md"
 cp ~/.claude/statusline-command.sh "$DOTFILES_DIR/claude/statusline-command.sh"
 echo "  ✓ claude/statusline-command.sh"
 
-# ~/.claude/commands/ 内のファイル・ディレクトリをシムリンクで管理
+# ~/.claude/commands/ 内のファイル・ディレクトリをシンボリックリンクで管理
 mkdir -p "$DOTFILES_DIR/claude/commands"
 mkdir -p ~/.claude/commands
 for entry in "$DOTFILES_DIR/claude/commands/"*; do
