@@ -28,6 +28,8 @@ for f in "$DOTFILES_DIR/claude/commands/"*.md; do
   if [ ! -L "$target" ]; then
     ln -sf "$f" "$target"
     echo "  ✓ symlinked $(basename "$f")"
+  else
+    echo "  - skipped $(basename "$f") (already linked)"
   fi
 done
 
