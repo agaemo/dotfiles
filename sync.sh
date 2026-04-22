@@ -20,9 +20,9 @@ cp ~/.claude/statusline-command.sh "$DOTFILES_DIR/claude/statusline-command.sh"
 echo "  ✓ claude/statusline-command.sh"
 
 # ~/.claude/commands/ 内のファイルをシムリンクで管理
-mkdir -p "$DOTFILES_DIR/.claude/commands"
+mkdir -p "$DOTFILES_DIR/claude/commands"
 mkdir -p ~/.claude/commands
-for f in "$DOTFILES_DIR/.claude/commands/"*.md; do
+for f in "$DOTFILES_DIR/claude/commands/"*.md; do
   [ -e "$f" ] || continue
   target=~/.claude/commands/$(basename "$f")
   if [ ! -L "$target" ]; then
