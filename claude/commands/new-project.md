@@ -25,46 +25,56 @@ description: 新規プロジェクトにハーネス一式（agents・hooks・se
 
 `$ARGUMENTS` がある場合はプロジェクト名としてそのまま使い、フロントエンドの有無のみ確認する。
 
-### ステップ 2: ディレクトリ作成
+### ステップ 2〜3: ディレクトリ作成 + ファイル書き出し（サブエージェントで実行）
 
-Bash で実行する（`<project-name>` は確認したプロジェクト名に置き換える）:
+**Agent ツール**を使ってサブエージェントを起動し、以下のプロンプトを渡す。
+サブエージェントが完了したら結果のみ受け取り、続きに進む。
 
-```bash
-mkdir <project-name> && git -C <project-name> init
+---
+
+**サブエージェントへのプロンプト（変数を展開してから渡すこと）:**
+
+```
+以下の作業を実行してください。
+
+## 作業内容
+
+### 1. ディレクトリ作成
+Bash で実行する:
+mkdir -p <絶対パス/project-name>/.claude/hooks && git -C <絶対パス/project-name> init
+
+### 2. ファイル書き出し
+テンプレートディレクトリ `~/.claude/commands/new-project/` 内の各ファイルを
+Read ツールで読み込み、Write ツールで書き出す。
+書き出し先は `<絶対パス/project-name>/` を起点とした絶対パスを使うこと。
+
+| 読み込み元（~/.claude/commands/new-project/ からの相対パス） | 書き出し先（<project-name>/ からの相対パス） |
+|---|---|
+| gitignore | .gitignore |
+| mcp.json | .mcp.json |
+| settings.json | .claude/settings.json |
+| hooks/on-session-start.js | .claude/hooks/on-session-start.js |
+| hooks/pre-bash.js | .claude/hooks/pre-bash.js |
+| hooks/post-write.js | .claude/hooks/post-write.js |
+| hooks/on-stop.js | .claude/hooks/on-stop.js |
+| CLAUDE.md | CLAUDE.md |
+| agents/intake.md | agents/intake.md |
+| agents/refiner.md | agents/refiner.md |
+| agents/planner.md | agents/planner.md |
+| agents/verify.md | agents/verify.md |
+| agents/security-reviewer.md | agents/security-reviewer.md |
+| agents/qa.md | agents/qa.md |
+| agents/code-reviewer.md | agents/code-reviewer.md |
+| agents/release-planner.md | agents/release-planner.md |
+| commands/git-workflow.md | .claude/commands/git-workflow.md |
+| templates/architecture/db-design.md | templates/architecture/db-design.md |
+<フロントエンドありの場合のみ: | agents/designer.md | agents/designer.md |>
+
+### 3. 完了報告
+すべて書き出したら「完了しました」とだけ返してください。
 ```
 
-### ステップ 3: ファイルを書き出す
-
-テンプレートディレクトリは `~/.claude/commands/new-project/` にある。
-各ファイルを **Read ツール** で読み込み、**Write ツール** で書き出す。
-書き出し先のパスは `<現在の作業ディレクトリ>/<project-name>/` を起点にした **絶対パス** を使うこと。
-
-| 読み込み元（`~/.claude/commands/new-project/` からの相対パス） | 書き出し先（`<project-name>/` からの相対パス） |
-|---|---|
-| `gitignore` | `.gitignore` |
-| `mcp.json` | `.mcp.json` |
-| `settings.json` | `.claude/settings.json` |
-| `hooks/on-session-start.js` | `.claude/hooks/on-session-start.js` |
-| `hooks/pre-bash.js` | `.claude/hooks/pre-bash.js` |
-| `hooks/post-write.js` | `.claude/hooks/post-write.js` |
-| `hooks/on-stop.js` | `.claude/hooks/on-stop.js` |
-| `CLAUDE.md` | `CLAUDE.md` |
-| `agents/intake.md` | `agents/intake.md` |
-| `agents/refiner.md` | `agents/refiner.md` |
-| `agents/planner.md` | `agents/planner.md` |
-| `agents/verify.md` | `agents/verify.md` |
-| `agents/security-reviewer.md` | `agents/security-reviewer.md` |
-| `agents/qa.md` | `agents/qa.md` |
-| `agents/code-reviewer.md` | `agents/code-reviewer.md` |
-| `agents/release-planner.md` | `agents/release-planner.md` |
-| `commands/git-workflow.md` | `.claude/commands/git-workflow.md` |
-| `templates/architecture/db-design.md` | `templates/architecture/db-design.md` |
-
-フロントエンドありの場合のみ追加:
-
-| 読み込み元 | 書き出し先 |
-|---|---|
-| `agents/designer.md` | `agents/designer.md` |
+---
 
 ### ステップ 4: mise.toml の確認
 
