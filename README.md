@@ -24,4 +24,4 @@
 |-------------|-----------|------|
 | [neovim/](neovim/README.md) | Neovim | プラグイン・キーマップ |
 | [ghostty/](ghostty/config) | Ghostty | テーマ・フォント・ウィンドウ設定 |
-| [claude/](claude/) | Claude Code | グローバル設定・ステータスライン |
+| [claude/](claude/) | Claude Code | グローバル設定・ステータスライン・スラッシュコマンド |
