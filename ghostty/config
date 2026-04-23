@@ -1,27 +1,41 @@
+# テーマ
 theme = TokyoNight Night
 
+# フォント設定（日本語はHiragino Sans W4にフォールバック）
 font-family = Menlo
 font-family = Hiragino Sans W4
 font-size = 14
+# 合字を無効化
 font-feature = -calt
 font-feature = -dlig
 font-feature = -liga
 
+# 新しいウィンドウを開いたとき、元のウィンドウのカレントディレクトリを引き継ぐ
 window-inherit-working-directory = true
+# 背景の透明度
 background-opacity = 0.95
 
+# ウィンドウ内側の余白
 window-padding-x = 10
 window-padding-y = 10
 
+# URLをクリック可能にする
 link-url = true
+# 新しいタブを末尾に追加する
 window-new-tab-position = end
 
+# Option キーを Alt として扱う（ターミナルのキーバインドで使うため）
 macos-option-as-alt = true
+# シェル統合（zsh/bash/fishを自動検出）
 shell-integration = detect
+# スクロールバックの行数
 scrollback-limit = 10000
+# テキスト選択時にシステムクリップボードへ自動コピー
 copy-on-select = clipboard
 
-# Split pane visibility
+# スプリットペイン（画面分割）の区切り線の色
 split-divider-color = #888888
+# フォーカスしていないペインの透明度
 unfocused-split-opacity = 0.7
+# フォーカスしていないペインの背景色
 unfocused-split-fill = #1a1a2e
