@@ -1,6 +1,7 @@
 theme = TokyoNight Night
 
-font-family = JetBrainsMono Nerd Font
+font-family = Menlo
+font-family = Hiragino Sans W4
 font-size = 14
 font-feature = -calt
 font-feature = -dlig
