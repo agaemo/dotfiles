@@ -1,6 +1,6 @@
 ---
 name: new-project
-description: 新規プロジェクトにハーネス一式（agents・hooks・settings・commands）をセットアップする。
+description: アプリ・API・管理画面など動的機能を持つプロジェクトにハーネス一式（agents・hooks・settings・commands）をセットアップする。LP・静的ページなら /new-lp を使うこと。
 ---
 
 # /new-project
@@ -11,6 +11,7 @@ description: 新規プロジェクトにハーネス一式（agents・hooks・se
 ## 使い方
 
 - `/new-project` — カレントディレクトリにセットアップする
+- LP・静的ページは `/new-lp` を使うこと（intake / planner 不要のシンプルなフロー）
 
 ---
 
