@@ -32,11 +32,10 @@ ENDIF
 
 ASSERT EXISTS(docs/design-brief.md)
 
-RUN: Agent ツールで designer エージェントを起動する
+RUN: Agent ツールで designer エージェントを起動する（完了まで待機）
   designer はヒアリングを行い、docs/design-brief.md の TODO を埋める
   コンポーネント構成・カラーパレット・タイポグラフィを決める
 
-WAIT_FOR: designer の完了
 THEN: デザインブリーフの内容を確認する
 ```
 
@@ -119,8 +118,6 @@ FOREACH row IN 以下の対応表:
   IF row.dest == ".gitignore":
     READ TEMPLATE/gitignore
     MERGE INTO CWD/.gitignore （既存の Astro 生成内容に追記。上書き禁止）
-  ELIF row.dest == "docs/design-brief.md":
-    SKIP （すでに存在するため書き出し不要）
   ELSE:
     READ  TEMPLATE/row.src
     WRITE CWD/row.dest
@@ -151,6 +148,10 @@ ASSERT EXISTS(.git/)
 RUN:
   mise exec -- pnpm approve-builds --all
 NOTE: esbuild・sharp などの postinstall を承認しないと dev サーバー起動時にエラーになる
+
+IF FAILED:
+  REPORT: エラー内容を報告してユーザーに確認を求める
+  STOP
 
 --- STEP 6: ビルド確認 ---
 
@@ -188,14 +189,7 @@ REPORT: "完了しました"
 ```
 REPORT TO USER:
   LP プロジェクトのセットアップが完了しました。
-
-  作成したファイル:
-  - .gitignore / .mcp.json / .claude/settings.json
-  - .claude/hooks/ （4ファイル）
-  - .claude/commands/git-workflow.md
-  - CLAUDE.md
-  - agents/designer.md
-  - docs/design-brief.md（designer が作成済み）
+  （詳細はサブエージェントの報告を参照）
 
   次のステップ:
   1. CLAUDE.md の TODO をプロジェクトの内容で埋める
@@ -209,15 +203,8 @@ IF 未完了タスクがある状態でセッションを終了する場合:
 
 ---
 
-## ワークフロー
+## 注意事項
 
-`intake` / `planner` / `security-reviewer` / `qa` は不要。
-
-1. `designer` エージェントで UI 設計・コンポーネント構成を決める（docs/design-brief.md を作成）
-2. 理解度チェック（5項目・全て4以上）→ ユーザー承認
-3. セットアップを実行する
-4. セクション単位で `.astro` コンポーネントに分割して実装する
-5. Puppeteer MCP で画面確認して完了
-
-※ 単一 HTML ファイルで実装しない（メンテナンス性が著しく低下するため）
-※ フレームワークのインストール手順は必ず公式ドキュメントを確認すること
+- `intake` / `planner` / `security-reviewer` / `qa` は不要
+- 単一 HTML ファイルで実装しない（メンテナンス性が著しく低下するため）
+- フレームワークのインストール手順は必ず公式ドキュメントを確認すること

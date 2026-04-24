@@ -96,25 +96,27 @@ FOREACH row IN 以下の対応表:
 --- STEP 4: settings.json の書き出し（絶対パス埋め込み） ---
 
 READ TEMPLATE/settings.json
-REPLACE: ".claude/hooks/" → "CWD/.claude/hooks/" （全箇所）
+REPLACE ALL: ".claude/hooks/" → "<絶対パス>/.claude/hooks/"  # <絶対パス> は CWD の実際の値（例: /Users/alice/myproject）
 WRITE CWD/.claude/settings.json
 
-例:
+例 (CWD = /Users/alice/myproject の場合):
   変換前: "command": "node .claude/hooks/on-stop.js"
-  変換後: "command": "node CWD/.claude/hooks/on-stop.js"
+  変換後: "command": "node /Users/alice/myproject/.claude/hooks/on-stop.js"
 
 ASSERT EXISTS(CWD/.claude/settings.json)
 
---- STEP 5: セットアップ確認 ---
+--- STEP 5: セットアップ確認（安全網） ---
 
-FOREACH path IN [
-  .claude/settings.json,
-  .claude/hooks/on-stop.js,
-  CLAUDE.md,
-  agents/intake.md
+NOTE: 通常は発火しない。STEP 2〜4で書き出し済みのため
+
+FOREACH (path, src) IN [
+  (.claude/settings.json,    settings.json),
+  (.claude/hooks/on-stop.js, hooks/on-stop.js),
+  (CLAUDE.md,                CLAUDE.md),
+  (agents/intake.md,         agents/intake.md)
 ]:
   IF NOT EXISTS(CWD/path):
-    READ  TEMPLATE/<対応する src>
+    READ  TEMPLATE/src
     WRITE CWD/path
   ENDIF
   ASSERT EXISTS(CWD/path)
@@ -178,17 +180,7 @@ mise install
 ```
 REPORT TO USER:
   セットアップが完了しました。
-
-  作成したファイル:
-  - .gitignore / .mcp.json / .mise.toml
-  - .claude/settings.json（hooks は絶対パス設定済み）
-  - .claude/hooks/ （4ファイル）
-  - .claude/commands/git-workflow.md
-  - CLAUDE.md
-  - agents/ （intake / refiner / planner / verify / security-reviewer / qa / code-reviewer / release-planner）
-  - templates/architecture/db-design.md
-  IF HAS_FRONTEND == true:
-    - agents/designer.md
+  （詳細はサブエージェントの報告を参照）
 
   次のステップ:
   1. CLAUDE.md の TODO をプロジェクトの内容で埋めること
