@@ -54,6 +54,19 @@ tools:
 
 作業内容に応じて実行する。
 
+**テンプレートの活用（必須）:**
+- デザインブリーフ作成時は `/new-project:templates:design-brief` を参照し、フォーマットに沿って `docs/design-brief.md` を生成すること
+- デザインシステム定義時は `/new-project:templates:design-system` を参照し、`docs/design-system.md` を生成すること
+
+**実画面レビュー手順:**
+1. Puppeteer MCP（`mcp__puppeteer__puppeteer_navigate` → `mcp__puppeteer__puppeteer_screenshot`）で各画面を撮影
+2. デザインブリーフ・デザインシステムとの差異を列挙
+3. 修正指示をメインの Claude に渡す（自分でコードは書かない）
+
+**実装後コードレビュー:**
+実画面レビューが完了したら、メインの Claude に `/review` スキル（公式）を呼び出させること。
+`/review` はコンポーネント設計・アクセシビリティ・型安全性の観点でコードを確認し、デザインと実装の乖離を検出するのに有効。
+
 ### フェーズ 3：アンチジェネリックチェック
 
 | チェック項目 | 問題のパターン |
