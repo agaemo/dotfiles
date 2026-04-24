@@ -12,83 +12,123 @@ description: 新規プロジェクトにハーネス一式（agents・hooks・se
 
 - `/new-project` — カレントディレクトリにセットアップする
 
+---
+
 ## 手順
 
 ### ステップ 1: フロントエンドの確認
 
-以下を確認する:
+```
+ASK USER: "フロントエンドUI（画面）はありますか？（あり / なし）"
+WAIT_FOR: ユーザーの回答
 
+SET has_frontend = (回答が "あり" の場合 true、"なし" の場合 false)
 ```
-フロントエンドUI（画面）はありますか？（あり / なし）
-```
+
+---
 
 ### ステップ 2: ファイル書き出し（サブエージェントで実行）
 
-**Agent ツール**を使ってサブエージェントを起動し、以下のプロンプトを渡す。
+Agent ツールでサブエージェントを起動し、以下のプロンプトを渡す。
+**変数 `<cwd>` と `<has_frontend>` は実際の値に展開してから渡すこと。**
 サブエージェントが完了したら結果のみ受け取り、続きに進む。
 
 ---
 
-**サブエージェントへのプロンプト（変数を展開してから渡すこと）:**
+**サブエージェントへのプロンプト:**
 
 ```
-以下の作業を実行してください。
+以下の STEP を上から順に実行してください。スキップ禁止。
 
-## 作業内容
+CWD          = <現在の作業ディレクトリの絶対パス>
+TEMPLATE     = ~/.claude/commands/new-project
+HAS_FRONTEND = <true または false>
 
-### 1. git 初期化
-カレントディレクトリ（<現在の作業ディレクトリの絶対パス>）で実行する:
-git init
+--- STEP 1: git 初期化 ---
 
-### 2. ファイル書き出し
-テンプレートディレクトリ `~/.claude/commands/new-project/` 内の各ファイルを
-Read ツールで読み込み、Write ツールで書き出す。
-書き出し先は `<現在の作業ディレクトリの絶対パス>/` を起点とした絶対パスを使うこと。
+REQUIRE: カレントディレクトリが CWD であること
 
-| 読み込み元（~/.claude/commands/new-project/ からの相対パス） | 書き出し先（カレントディレクトリからの相対パス） |
-|---|---|
-| gitignore | .gitignore |
-| mcp.json | .mcp.json |
-| CLAUDE.md | CLAUDE.md |
-| agents/intake.md | agents/intake.md |
-| agents/refiner.md | agents/refiner.md |
-| agents/planner.md | agents/planner.md |
-| agents/verify.md | agents/verify.md |
-| agents/security-reviewer.md | agents/security-reviewer.md |
-| agents/qa.md | agents/qa.md |
-| agents/code-reviewer.md | agents/code-reviewer.md |
-| agents/release-planner.md | agents/release-planner.md |
-| commands/git-workflow.md | .claude/commands/git-workflow.md |
-| templates/architecture/db-design.md | templates/architecture/db-design.md |
-<フロントエンドありの場合のみ: | agents/designer.md | agents/designer.md |>
+RUN:
+  git init
 
-### 3. hooks ファイルの書き出し
-hooks は以下のファイルを書き出す（内容はテンプレートをそのままコピー）:
-- `~/.claude/commands/new-project/hooks/on-session-start.js` → `<現在の作業ディレクトリの絶対パス>/.claude/hooks/on-session-start.js`
-- `~/.claude/commands/new-project/hooks/pre-bash.js` → `<現在の作業ディレクトリの絶対パス>/.claude/hooks/pre-bash.js`
-- `~/.claude/commands/new-project/hooks/post-write.js` → `<現在の作業ディレクトリの絶対パス>/.claude/hooks/post-write.js`
-- `~/.claude/commands/new-project/hooks/on-stop.js` → `<現在の作業ディレクトリの絶対パス>/.claude/hooks/on-stop.js`
+ASSERT EXISTS(.git/)
 
-### 4. settings.json の書き出し（絶対パス埋め込み）
-テンプレート `~/.claude/commands/new-project/settings.json` を **そのままコピーせず**、
-hook コマンドの `.claude/hooks/` を `<現在の作業ディレクトリの絶対パス>/.claude/hooks/` に置換してから
-`<現在の作業ディレクトリの絶対パス>/.claude/settings.json` に書き出す。
+--- STEP 2: ファイル書き出し ---
 
-例: `"command": "node .claude/hooks/on-stop.js"` →
-    `"command": "node <現在の作業ディレクトリの絶対パス>/.claude/hooks/on-stop.js"`
+FOREACH row IN 以下の対応表:
+  IF row.frontend_only == true AND HAS_FRONTEND == false:
+    SKIP
+  ELSE:
+    READ  TEMPLATE/row.src
+    WRITE CWD/row.dest
+  ENDIF
 
-### 5. セットアップ確認
-`CLAUDE.md` が存在することを確認する。存在しなければ再度書き出すこと。
+  | src                                      | dest                                  | frontend_only |
+  |------------------------------------------|---------------------------------------|---------------|
+  | gitignore                                | .gitignore                            | false         |
+  | mcp.json                                 | .mcp.json                             | false         |
+  | CLAUDE.md                                | CLAUDE.md                             | false         |
+  | agents/intake.md                         | agents/intake.md                      | false         |
+  | agents/refiner.md                        | agents/refiner.md                     | false         |
+  | agents/planner.md                        | agents/planner.md                     | false         |
+  | agents/verify.md                         | agents/verify.md                      | false         |
+  | agents/security-reviewer.md              | agents/security-reviewer.md           | false         |
+  | agents/qa.md                             | agents/qa.md                          | false         |
+  | agents/code-reviewer.md                  | agents/code-reviewer.md               | false         |
+  | agents/release-planner.md                | agents/release-planner.md             | false         |
+  | commands/git-workflow.md                 | .claude/commands/git-workflow.md      | false         |
+  | templates/architecture/db-design.md      | templates/architecture/db-design.md   | false         |
+  | agents/designer.md                       | agents/designer.md                    | true          |
 
-### 6. 完了報告
-すべて書き出したら「完了しました」とだけ返してください。
+--- STEP 3: hooks ファイルの書き出し ---
+
+FOREACH row IN 以下の対応表:
+  READ  TEMPLATE/row.src
+  WRITE CWD/row.dest
+
+  | src                        | dest                                    |
+  |----------------------------|-----------------------------------------|
+  | hooks/on-session-start.js  | .claude/hooks/on-session-start.js       |
+  | hooks/pre-bash.js          | .claude/hooks/pre-bash.js               |
+  | hooks/post-write.js        | .claude/hooks/post-write.js             |
+  | hooks/on-stop.js           | .claude/hooks/on-stop.js                |
+
+--- STEP 4: settings.json の書き出し（絶対パス埋め込み） ---
+
+READ TEMPLATE/settings.json
+REPLACE: ".claude/hooks/" → "CWD/.claude/hooks/" （全箇所）
+WRITE CWD/.claude/settings.json
+
+例:
+  変換前: "command": "node .claude/hooks/on-stop.js"
+  変換後: "command": "node CWD/.claude/hooks/on-stop.js"
+
+ASSERT EXISTS(CWD/.claude/settings.json)
+
+--- STEP 5: セットアップ確認 ---
+
+FOREACH path IN [
+  .claude/settings.json,
+  .claude/hooks/on-stop.js,
+  CLAUDE.md,
+  agents/intake.md
+]:
+  IF NOT EXISTS(CWD/path):
+    READ  TEMPLATE/<対応する src>
+    WRITE CWD/path
+  ENDIF
+  ASSERT EXISTS(CWD/path)
+
+--- STEP 6: 完了報告 ---
+
+REPORT: "完了しました"
 ```
 
 ---
 
 ### ステップ 3: mise.toml の作成と `mise install`
 
-ランタイムと pnpm を mise で管理する。以下を参考に `.mise.toml` を作成し、`mise install` を実行すること。
+ランタイムと pnpm を mise で管理する。以下を参考に `.mise.toml` を作成し、`mise install` を実行する。
 
 ```bash
 # Bun プロジェクトの場合（推奨）
@@ -99,7 +139,6 @@ node = "lts"       # pnpm が内部で使う Node.js
 pnpm = "9"
 
 [env]
-# プロジェクト内のバイナリを優先
 _.path = ["./node_modules/.bin"]
 EOF
 
@@ -132,28 +171,34 @@ mise install
 > - `drizzle-kit` は `bunx` ではなく `bun node_modules/.bin/drizzle-kit` で実行すること
 > - `vite` は `bunx --bun vite` で実行すること（`--bun` フラグで Bun ネイティブランタイムを強制）
 
+---
+
 ### ステップ 4: 完了報告
 
 ```
-セットアップが完了しました。
+REPORT TO USER:
+  セットアップが完了しました。
 
-作成したファイル:
-- .gitignore / .mcp.json / .mise.toml
-- .claude/settings.json（hooks は絶対パス設定済み）
-- .claude/hooks/ （4ファイル）
-- .claude/commands/git-workflow.md
-- CLAUDE.md
-- agents/ （intake / refiner / planner / verify / security-reviewer / qa / code-reviewer / release-planner）
-- templates/architecture/db-design.md
-[フロントエンドありの場合] - agents/designer.md
+  作成したファイル:
+  - .gitignore / .mcp.json / .mise.toml
+  - .claude/settings.json（hooks は絶対パス設定済み）
+  - .claude/hooks/ （4ファイル）
+  - .claude/commands/git-workflow.md
+  - CLAUDE.md
+  - agents/ （intake / refiner / planner / verify / security-reviewer / qa / code-reviewer / release-planner）
+  - templates/architecture/db-design.md
+  IF HAS_FRONTEND == true:
+    - agents/designer.md
 
-次のステップ:
-1. CLAUDE.md の TODO をプロジェクトの内容で埋めること
-2. 何を作るか決まっていない場合は「ideatorエージェントを呼び出してください」
-3. 要件が決まっている場合は「intakeエージェントを呼び出してください」
+  次のステップ:
+  1. CLAUDE.md の TODO をプロジェクトの内容で埋めること
+  2. 何を作るか決まっていない場合は「ideatorエージェントを呼び出してください」
+  3. 要件が決まっている場合は「intakeエージェントを呼び出してください」
+
+IF 未完了タスクがある状態でセッションを終了する場合:
+  SAVE TO MEMORY: 残タスクの一覧
+  NOTE: 保存しないと次のセッションで「続きをお願いします」が機能しない
 ```
-
-**未完了タスクがある状態でセッションを終了する場合は、必ず残タスクをメモリに保存してから終了すること。**
 
 ---
 
@@ -163,56 +208,66 @@ mise install
 各エージェント呼び出しにはプロジェクトルートの絶対パスと前フェーズの成果物パスを明示すること。
 
 ```
-1. intake
-   → docs/requirements.md を生成
-   → ユーザーに内容を提示して確認を得ること
+STEP 1: intake
+  OUTPUT: docs/requirements.md
+  GATE: ユーザーに内容を提示し、承認を得ること
+  PROHIBITED: 承認前に次ステップへ進むこと
 
-2. refiner
-   → docs/stories.md を生成
-   → ユーザーに内容を提示して確認を得ること
+STEP 2: refiner
+  INPUT:  docs/requirements.md
+  OUTPUT: docs/stories.md
+  GATE: ユーザーに内容を提示し、承認を得ること
+  PROHIBITED: 承認前に次ステップへ進むこと
 
-3. planner
-   → docs/plan.md を生成
-   → ★ 必ずユーザーに計画を提示し、承認を得てから次に進むこと ★
-   → 承認前に実装を開始してはいけない
+STEP 3: planner
+  INPUT:  docs/stories.md
+  OUTPUT: docs/plan.md
+  GATE: ユーザーに計画を提示し、承認を得ること
+  PROHIBITED: 承認前に実装を開始すること
 
-3.5. 理解度チェック（Early Stop）← 実装着手前の最終確認ゲート
-   ※ planner の承認後でも、AI が自己判断で埋めた仮定が残っている可能性がある。
-     コードを1行も書く前にここで潰す。
+STEP 3.5: 理解度チェック（Early Stop）← 実装着手前の最終確認ゲート
 
-   → 以下の5項目を1〜5で自己評価し、スコアを記入する
-   → スケール: 1=全く不明 / 2=断片的 / 3=概ね把握 / 4=ほぼ確信 / 5=完全に理解
-   → **1項目でも4未満なら実装を止め、不明点をユーザーに質問すること**
+  REPEAT:
+    SELF_EVALUATE: 以下の5項目を 1〜5 で採点する
+      スケール: 1=全く不明 / 2=断片的 / 3=概ね把握 / 4=ほぼ確信 / 5=完全に理解
 
-   | # | 評価項目 | スコア |
-   |---|---------|--------|
-   | 1 | 目的・ゴール（何を達成するプロジェクトか） | |
-   | 2 | ユーザー・利用シーン（誰が・どう使うか） | |
-   | 3 | 主要機能・要件（何を作るか、スコープの境界線） | |
-   | 4 | 技術的制約・設計判断（認証・DB・API など後から変えにくい部分） | |
-   | 5 | 完了条件・受け入れ基準（何をもって完成とするか） | |
+      | # | 評価項目                                                 | スコア |
+      |---|----------------------------------------------------------|--------|
+      | 1 | 目的・ゴール（何を達成するプロジェクトか）                |        |
+      | 2 | ユーザー・利用シーン（誰が・どう使うか）                  |        |
+      | 3 | 主要機能・要件（何を作るか、スコープの境界線）            |        |
+      | 4 | 技術的制約・設計判断（認証・DB・API など後から変えにくい部分）|     |
+      | 5 | 完了条件・受け入れ基準（何をもって完成とするか）          |        |
 
-   全項目4以上になってから次へ進む。ユーザーが「先に進めていい」と明示した場合のみ例外を認める。
+    IF ANY(score < 4):
+      ASK USER: スコアが4未満の項目について不明点を質問する
+    ENDIF
+  UNTIL ALL(score >= 4)
 
-4. [フロントエンドありの場合] designer ← 省略禁止
-   → 以下の順で実行すること:
-     a. /new-project:templates:design-brief を参照してデザインブリーフを生成
-     b. /new-project:templates:design-system を参照してデザインシステムを定義
-     c. 画面構成・コンポーネント構成を docs/design.md に記録
-     d. ユーザーに提示して承認を得ること
-   → ★ デザイン承認前にコンポーネントを1行も書いてはいけない ★
+IF HAS_FRONTEND == true:
+  STEP 4: designer ← 省略禁止
+    a. /new-project:templates:design-brief を参照してデザインブリーフを生成
+    b. /new-project:templates:design-system を参照してデザインシステムを定義
+    c. 画面構成・コンポーネント構成を docs/design.md に記録
+    GATE: ユーザーに提示し、承認を得ること
+    PROHIBITED: デザイン承認前にコンポーネントを1行も書くこと
+ENDIF
 
-5. 実装
+STEP 5: 実装
 
-6. [フロントエンドありの場合] designer による実画面レビュー
-   → Puppeteer MCP でスクリーンショットを撮影
-   → デザインブリーフ・デザインシステムとの差異を確認・修正
+IF HAS_FRONTEND == true:
+  STEP 6: designer による実画面レビュー
+    RUN: Puppeteer MCP でスクリーンショットを撮影
+    CHECK: デザインブリーフ・デザインシステムとの差異を確認・修正
 
-7. /review（公式スキル）← UIコードの品質確認に使う
-   → コンポーネント設計・アクセシビリティ・型安全性をレビュー
+  STEP 7: /review（公式スキル）
+    CHECK: コンポーネント設計・アクセシビリティ・型安全性
+ENDIF
 
-8. verify → security-reviewer → qa → code-reviewer（Track C）
+STEP 8: verify → security-reviewer → qa → code-reviewer
 ```
+
+---
 
 ### planner へ渡すべき設計判断の確認事項
 
