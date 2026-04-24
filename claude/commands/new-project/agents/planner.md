@@ -65,6 +65,65 @@ tools:
 | ビジネスルールが複雑・長期運用 | Onion |
 | ドメイン語彙が豊富・複数チーム | DDD + Onion |
 
+### フォーマッタ・リンターhookの生成（新規プロジェクト時）
+
+技術スタックが確定したら、以下の対応表に従って `.claude/hooks/` にhookスクリプトを生成し、`settings.json` に登録すること。
+
+| スタック | post-write hook | stop hook |
+|---|---|---|
+| TypeScript / JavaScript | `prettier --write` | `tsc --noEmit` + `eslint` |
+| Go | `gofmt -w` | `go build ./...` + `go vet ./...` |
+| Python | `ruff format` | `ruff check` + `mypy` |
+| その他 | 不要なら省略 | 不要なら省略 |
+
+hookのひな形：
+
+**post-write.js（フォーマッタ）**
+```js
+#!/usr/bin/env node
+const { execSync } = require('child_process');
+let input = '';
+process.stdin.on('data', c => input += c);
+process.stdin.on('end', () => {
+  const data = JSON.parse(input || '{}');
+  const path = data?.tool_input?.file_path ?? '';
+  if (path.endsWith('.ts') || path.endsWith('.tsx')) {
+    try { execSync(`npx prettier --write "${path}"`, { stdio: 'pipe' }); } catch {}
+  }
+  process.exit(0);
+});
+```
+
+**on-stop.js（型チェック・リント）**
+```js
+#!/usr/bin/env node
+const { execSync } = require('child_process');
+let input = '';
+process.stdin.on('data', c => input += c);
+process.stdin.on('end', () => {
+  const data = JSON.parse(input || '{}');
+  if (data?.stop_reason !== 'end_turn') process.exit(0);
+  try {
+    execSync('npx tsc --noEmit', { stdio: 'pipe' });
+  } catch (e) {
+    console.log(JSON.stringify({ type: 'result', content: `型チェック失敗:\n${e.stdout?.toString()}` }));
+    process.exit(2);
+  }
+  process.exit(0);
+});
+```
+
+settings.json への登録例：
+```json
+"PostToolUse": [
+  { "matcher": "Write", "hooks": [{ "type": "command", "command": "node .claude/hooks/post-write.js" }] },
+  { "matcher": "Edit",  "hooks": [{ "type": "command", "command": "node .claude/hooks/post-write.js" }] }
+],
+"Stop": [
+  { "hooks": [{ "type": "command", "command": "node .claude/hooks/on-stop.js" }] }
+]
+```
+
 ### プロジェクト基盤の設定漏れチェック
 
 新規プロジェクト作成時、以下が `.gitignore` に含まれているか確認すること。
