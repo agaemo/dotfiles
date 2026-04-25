@@ -49,7 +49,7 @@
 
 ### コードスタイル
 - <!-- TODO: 言語・フレームワーク固有のスタイルルール -->
-- TypeScript の型チェックは `bunx tsc --noEmit` を使うこと
+- TypeScript の型チェックは `tsc --noEmit` を使うこと（tsc はプロジェクトに devDependency として追加する）
 
 ---
 
