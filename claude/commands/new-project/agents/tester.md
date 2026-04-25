@@ -1,7 +1,7 @@
 ---
 name: tester
 description: テストを書くとき呼び出す。実装前（TDDモード：失敗するテストを先に書く）と実装後（補完モード：カバレッジ追加）の両方に対応。単体テスト・統合テストの実装、テスト環境のセットアップ、既存テストの修正を行う。
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Read
   - Grep

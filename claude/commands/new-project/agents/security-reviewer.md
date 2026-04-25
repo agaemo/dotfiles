@@ -1,7 +1,7 @@
 ---
 name: security-reviewer
 description: 実装完了後、本番リリース前にセキュリティ観点でコードをレビューするとき呼び出す。認証・認可・入力バリデーション・シークレット管理・OWASP Top 10 の観点で脆弱性を検出する。
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Read
   - Grep

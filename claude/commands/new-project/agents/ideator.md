@@ -1,7 +1,7 @@
 ---
 name: ideator
 description: 何を作るか決まっていないとき、またはアイデアを探索・検証したいときに最初に呼び出す。目的・課題・制約を整理し、具体的なプロジェクト方向性を提案する。intake の前段として使う。
-model: claude-opus-4-7
+model: sonnet
 tools:
   - Read
   - WebSearch

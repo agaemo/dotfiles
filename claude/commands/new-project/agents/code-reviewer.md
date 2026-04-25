@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: コード変更・PR・実装のレビュー時に使う。バグ、セキュリティ問題、プロジェクト規約違反を特定する。
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Read
   - Grep

@@ -1,7 +1,7 @@
 ---
 name: designer
 description: フロントエンド開発時にUI/UXの設計・レビューをするとき呼び出す。ヒアリングからデザインブリーフ作成・ビジュアル個性の導出・コンポーネント構成の提案・Puppeteer MCPによる実画面レビューを行う。
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Read
   - Grep

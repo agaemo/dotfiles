@@ -1,7 +1,7 @@
 ---
 name: refiner
 description: intake 完了後・planner 実行前に呼び出す。docs/requirements.md を読み、曖昧な要件を潰してテスト可能なユーザーストーリーと受け入れ条件に分解し、docs/stories.md を生成する。
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Read
   - Write

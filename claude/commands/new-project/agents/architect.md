@@ -1,7 +1,7 @@
 ---
 name: architect
 description: システム全体のアーキテクチャを評価・改善するとき呼び出す。モジュール境界・依存関係・レイヤー構造のテックデットを特定し、大規模リファクタの方針を立てる。コード単位の小改善は refactorer に委ねる。
-model: claude-opus-4-5
+model: sonnet
 tools:
   - Read
   - Grep

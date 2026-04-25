@@ -1,7 +1,7 @@
 ---
 name: scorer
 description: コードベース全体の健全性を6つの観点で定期評価するとき呼び出す。スコアと改善タスクの一覧を返す。実装は行わない。
-model: claude-sonnet-4-6
+model: haiku
 tools:
   - Read
   - Grep

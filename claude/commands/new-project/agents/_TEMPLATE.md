@@ -3,7 +3,7 @@
 name: my-agent
 description: "[いつ使うか]ときに使う。[何をするか]。"
 # model は opus（複雑・計画系）/ sonnet（標準）/ haiku（軽量・高速）から選ぶ
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Read
   - Grep

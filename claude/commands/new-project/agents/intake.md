@@ -1,7 +1,7 @@
 ---
 name: intake
 description: 新規プロジェクト・新機能・曖昧な依頼を受けたとき、実装前に必ず呼び出す。ユーザーにヒアリングして要件を明確化し、docs/requirements.md を生成する。planner はこのファイルを読んでから計画を立てる。
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Write
 ---

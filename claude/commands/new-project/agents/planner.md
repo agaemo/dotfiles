@@ -1,7 +1,7 @@
 ---
 name: planner
 description: 複雑なタスクの開始時、新機能の計画時、曖昧な要件の整理時に使う。コードを書く前に、具体的で実行可能な実装計画を作成する。
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Read
   - Grep

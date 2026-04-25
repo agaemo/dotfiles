@@ -1,7 +1,7 @@
 ---
 name: refactorer
 description: 動いているコードの構造改善・整理・重複排除を行うとき呼び出す。振る舞いを変えずに内部構造を改善する計画を立てる。新機能の追加や仕様変更は行わない。
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Read
   - Grep

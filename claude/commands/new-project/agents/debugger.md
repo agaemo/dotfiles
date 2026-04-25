@@ -1,7 +1,7 @@
 ---
 name: debugger
 description: テスト失敗・型エラー・実行時エラー・ビルドエラーが発生したとき呼び出す。エラーメッセージと関連コードを読んで根本原因を特定し、最小限の修正案を提示する。
-model: claude-sonnet-4-6
+model: sonnet
 tools:
   - Read
   - Grep
