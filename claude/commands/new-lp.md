@@ -179,7 +179,6 @@ FOREACH row IN 以下の対応表:
   | hooks/pre-bash.js             | .claude/hooks/pre-bash.js            |
   | hooks/post-write.js           | .claude/hooks/post-write.js          |
   | hooks/on-stop.js              | .claude/hooks/on-stop.js             |
-  | CLAUDE.md                     | CLAUDE.md                            |
   | agents/designer.md            | agents/designer.md                   |
   | commands/git-workflow.md      | .claude/commands/git-workflow.md     |
 
@@ -215,7 +214,6 @@ ENDIF
 FOREACH path IN [
   .claude/settings.json,
   .claude/hooks/on-stop.js,
-  CLAUDE.md,
   agents/designer.md
 ]:
   IF NOT EXISTS(CWD/path):
@@ -231,7 +229,45 @@ REPORT: "完了しました"
 
 ---
 
-### ステップ 4: 完了報告
+### ステップ 4: CLAUDE.md・README.md 生成（メインClaude自身が実行）
+
+セットアップ完了後、セッション情報をもとに以下を生成する。
+
+```
+--- CLAUDE.md ---
+
+IF NOT EXISTS(CLAUDE.md):
+  WRITE CLAUDE.md based on actual session context.
+
+  INCLUDE（実際の値のみ。プレースホルダー禁止）:
+    - プロジェクト名・目的（1〜2文）
+    - スタック（Astro + 実際に追加したライブラリ）
+    - 開発コマンド: pnpm dev / pnpm build（実際に動くコマンド）
+
+  OMIT（書かない）:
+    - 本番の認証情報・APIキー・パスワード・実在するユーザー情報
+    - DB・API・TDD・リリースプランナーなど LP に不要なルール
+    - TODO・プレースホルダー
+
+  LIMIT: 40行以内
+
+--- README.md ---
+
+IF NOT EXISTS(README.md):
+  WRITE README.md based on actual session context.
+
+  INCLUDE:
+    - 概要（1〜2文）
+    - 前提条件（mise・Node・pnpm の実際のバージョン）
+    - セットアップ手順（git clone 〜 pnpm install）
+    - コマンド一覧（dev / build）
+
+  OMIT: 本番の認証情報・APIキー・パスワード
+```
+
+---
+
+### ステップ 5: 完了報告
 
 ```
 REPORT TO USER:
@@ -239,9 +275,8 @@ REPORT TO USER:
   （詳細はサブエージェントの報告を参照）
 
   次のステップ:
-  1. CLAUDE.md の TODO をプロジェクトの内容で埋める
-  2. セクション単位で .astro コンポーネントに分割して実装する
-  3. Puppeteer MCP で画面確認して完了
+  1. セクション単位で .astro コンポーネントに分割して実装する
+  2. Puppeteer MCP で画面確認して完了
 
 IF 未完了タスクがある状態でセッションを終了する場合:
   SAVE TO MEMORY: 残タスクの一覧

@@ -68,7 +68,6 @@ FOREACH row IN 以下の対応表:
   |------------------------------------------|---------------------------------------|---------------|
   | gitignore                                | .gitignore                            | false         |
   | mcp.json                                 | .mcp.json                             | false         |
-  | CLAUDE.md                                | CLAUDE.md                             | false         |
   | agents/intake.md                         | agents/intake.md                      | false         |
   | agents/refiner.md                        | agents/refiner.md                     | false         |
   | agents/planner.md                        | agents/planner.md                     | false         |
@@ -113,7 +112,6 @@ NOTE: 通常は発火しない。STEP 2〜4で書き出し済みのため
 FOREACH (path, src) IN [
   (.claude/settings.json,    settings.json),
   (.claude/hooks/on-stop.js, hooks/on-stop.js),
-  (CLAUDE.md,                CLAUDE.md),
   (agents/intake.md,         agents/intake.md)
 ]:
   IF NOT EXISTS(CWD/path):
@@ -176,7 +174,49 @@ mise install
 
 ---
 
-### ステップ 4: 完了報告
+### ステップ 4: CLAUDE.md・README.md 生成（メインClaude自身が実行）
+
+セットアップ完了後、セッション情報をもとに以下を生成する。
+
+```
+--- CLAUDE.md ---
+
+IF NOT EXISTS(CLAUDE.md):
+  WRITE CLAUDE.md based on actual session context.
+
+  INCLUDE（実際の値のみ。プレースホルダー禁止）:
+    - プロジェクト名・目的（1〜2文）
+    - スタック（実際に使う言語・フレームワーク・主要ライブラリ）
+    - 開発コマンド（dev / test / build の実際のコマンド）
+    - アーキテクチャ（ディレクトリ構造のポイントのみ。全列挙不要）
+    - プロジェクト固有の制約（あれば。DBエンジン・実行環境の制限など）
+
+  OMIT（書かない）:
+    - 本番の認証情報・APIキー・パスワード・実在するユーザー情報
+    - 本番DBのホスト・接続文字列（開発用ダミー値は可）
+    - 汎用ルール（グローバル CLAUDE.md と重複する内容）
+    - TODO・プレースホルダー
+
+  LIMIT: 60行以内
+
+--- README.md ---
+
+IF NOT EXISTS(README.md):
+  WRITE README.md based on actual session context.
+
+  INCLUDE:
+    - 概要（1〜2文）
+    - 前提条件（mise・Node・pnpm/bun の実際のバージョン）
+    - セットアップ手順（git clone 〜 依存インストール 〜 .env 設定）
+    - コマンド一覧（dev / test / build / migrate など）
+    - 環境変数（キー名と説明のみ。実際の値・本番の値は書かない）
+
+  OMIT: 本番の認証情報・APIキー・パスワード・接続文字列
+```
+
+---
+
+### ステップ 5: 完了報告
 
 ```
 REPORT TO USER:
@@ -184,9 +224,8 @@ REPORT TO USER:
   （詳細はサブエージェントの報告を参照）
 
   次のステップ:
-  1. CLAUDE.md の TODO をプロジェクトの内容で埋めること
-  2. 何を作るか決まっていない場合は「ideatorエージェントを呼び出してください」
-  3. 要件が決まっている場合は「intakeエージェントを呼び出してください」
+  1. 何を作るか決まっていない場合は「ideatorエージェントを呼び出してください」
+  2. 要件が決まっている場合は「intakeエージェントを呼び出してください」
 
 IF 未完了タスクがある状態でセッションを終了する場合:
   SAVE TO MEMORY: 残タスクの一覧
