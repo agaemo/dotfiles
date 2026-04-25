@@ -33,32 +33,23 @@
 ## 必ず守るルール
 
 ### コンテキスト管理
-- 各エージェントの作業が完了し次のエージェントに引き継ぐ前に、必ず `/compact` を実行すること。
-- `/compact` を実行した後、引き継ぎ内容（完了した作業・次のエージェントへの指示）を簡潔にまとめてから次のエージェントを呼び出すこと。
+- エージェント引き継ぎ前に `/compact` を実行し、完了内容と次の指示をまとめること。
 
 ### ワークフロー
-- **新規プロジェクト・新機能・曖昧な依頼を受けたとき、最初に必ず `intake` エージェントを呼び出してヒアリングし、`docs/requirements.md` を生成すること。**
-- `intake` 完了後、`refiner` エージェントで要件をユーザーストーリー・受け入れ条件に精緻化し `docs/stories.md` を生成すること。
-- `refiner` 完了後、`planner` エージェントで計画を立て、承認を得てからコードを書くこと。計画は `plans/<topic>.md` に保存すること。
-- **フロントエンドUIを含む計画の場合、実装開始前に `designer` エージェントでUI設計・デザインシステムを確定すること。**
-- 実装完了後は `planner` が宣言したトラックに従ってレビューを実施すること。すべて通るまで「完了」と報告しないこと。
-  - **Track A（軽量）** リファクタリング・バグ修正・テスト追加: `verify` → `code-reviewer`
-  - **Track B（標準）** 既存機能への追加・改善: `verify` → `qa` → `code-reviewer`
-  - **Track C（フル）** 新規プロジェクト・新規機能・セキュリティ関連・DBスキーマ変更: `verify` → `security-reviewer` → `qa` → `code-reviewer`
-- 本番リリース前は `release-planner` エージェントでリリース計画・ロールバック手順を策定すること。
-- `on-stop` フックがファイル変更を報告した場合、次のタスクの前に `code-reviewer` を実行すること。
-- 新規プロジェクト作成時は必ず `README.md` を作成すること（前提条件・セットアップ・実行・テスト・エンドポイント一覧を含めること）。
+- 新規プロジェクト・新機能・曖昧な依頼: `intake` → `refiner` → `planner`（承認後に実装）
+- フロントエンドUI含む場合: 実装前に `designer` でUI設計・デザインシステムを確定すること
+- ビジネスロジック・API・DB操作の実装: `tester`（TDDモード）→ 実装 → `tester`（補完モード）
+- 実装後: `planner` が宣言したトラックに従いレビューを実施すること
+- 本番リリース前: `release-planner` でリリース計画・ロールバック手順を策定すること
+- 新規プロジェクト時: `README.md` を作成すること（前提条件・セットアップ・実行・テスト）
 
-### DBスキーマ設計
-- DBスキーマを新規作成・変更するときは必ず `templates/architecture/db-design.md` を参照すること。
-- INSERT/UPDATE/DELETE は必ず `changes` を確認すること。`changes === 0` なら例外をthrowすること。
-- 正規化（第1〜3正規形）を守ること。
-- すべてのテーブルに `id`（UUID推奨）・`created_at`・`updated_at` を含めること。
-- 外部キーには必ずインデックスを張ること。
+### DB
+- スキーマ設計は `templates/architecture/db-design.md` を参照すること
+- INSERT/UPDATE/DELETE は `changes === 0` なら例外をthrowすること
 
 ### コードスタイル
 - <!-- TODO: 言語・フレームワーク固有のスタイルルール -->
-- TypeScript の型チェックは `bunx tsc --noEmit` を使うこと。
+- TypeScript の型チェックは `bunx tsc --noEmit` を使うこと
 
 ---
 
