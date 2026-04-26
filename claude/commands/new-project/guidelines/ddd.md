@@ -41,6 +41,41 @@ src/domain/
 - `new Email("invalid")` のようにコンストラクタでバリデーションを行う
 - テーブル設計は Aggregate 単位を意識する（集約内は結合クエリOK、集約間は JOIN しすぎない）
 
+## CQRS（Command Query Responsibility Segregation）
+
+DDDと組み合わせることで効果が出る。書き込み（Command）と読み込み（Query）のモデルを分離する。
+
+### 適用場面
+
+- 読み込みクエリが複雑で、ドメインモデルをそのまま返すと非効率
+- 読み書きの負荷が大きく異なる
+
+### 構造
+
+```
+src/application/
+├── commands/           # 状態を変える操作
+│   ├── PlaceOrder.ts   # Command（入力データ）
+│   └── PlaceOrderHandler.ts  # ドメインモデルを操作して永続化
+└── queries/            # 状態を読む操作
+    ├── GetOrderDetail.ts      # Query（検索条件）
+    └── GetOrderDetailHandler.ts  # DBを直接クエリして返す（ドメインモデルを経由しない）
+```
+
+### ルール
+
+- Command はドメインモデル経由で操作し、ビジネスルールを守る
+- Query はドメインモデルを経由せず、必要な形に最適化したSQLで直接取得してよい
+- Command と Query でリポジトリを共有しない
+
+### 導入タイミング
+
+最初から CQRS を入れない。以下の順で検討すること：
+
+1. まず Onion + DDD で作る
+2. 読み込みクエリが複雑になったタイミングで Query 側だけ分離する
+3. 書き込みと読み込みの負荷差が顕著になったら完全分離を検討する
+
 ## 軽量DDDの現実解
 
 フルDDDは重い。以下の順で段階的に導入すること：
