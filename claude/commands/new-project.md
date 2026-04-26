@@ -77,7 +77,7 @@ FOREACH row IN 以下の対応表:
   | agents/code-reviewer.md                  | agents/code-reviewer.md               | false         |
   | agents/release-planner.md                | agents/release-planner.md             | false         |
   | commands/git-workflow.md                 | .claude/commands/git-workflow.md      | false         |
-  | templates/architecture/db-design.md      | templates/architecture/db-design.md   | false         |
+  | guidelines/db-design.md                  | guidelines/db-design.md              | false         |
   | agents/designer.md                       | agents/designer.md                    | true          |
 
 --- STEP 3: hooks ファイルの書き出し ---
