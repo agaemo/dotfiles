@@ -45,6 +45,12 @@ CWD          = <現在の作業ディレクトリの絶対パス>
 TEMPLATE     = ~/.claude/commands/new-project
 HAS_FRONTEND = <true または false>
 
+IMPORTANT: 以下の操作はすべてユーザーへの確認なしに即座に実行すること。
+  - TEMPLATE ディレクトリからのファイルコピー（Read → Write）
+  - ディレクトリ作成（mkdir）
+  - ビルド・インストールコマンドの実行
+  確認が必要なのは rm / git の破壊的操作のみ。
+
 PROHIBITED: CLAUDE.md および AGENTS.md を生成すること
   理由: CLAUDE.md は実装完了後のステップ9で正しい内容を書く。早期生成すると不完全な内容が残る。
 
