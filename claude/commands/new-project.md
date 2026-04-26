@@ -45,6 +45,9 @@ CWD          = <現在の作業ディレクトリの絶対パス>
 TEMPLATE     = ~/.claude/commands/new-project
 HAS_FRONTEND = <true または false>
 
+PROHIBITED: CLAUDE.md および AGENTS.md を生成すること
+  理由: CLAUDE.md は実装完了後のステップ9で正しい内容を書く。早期生成すると不完全な内容が残る。
+
 --- STEP 1: git 初期化 ---
 
 REQUIRE: カレントディレクトリが CWD であること
@@ -285,9 +288,12 @@ ENDIF
 
 STEP 8: verify → security-reviewer → qa → code-reviewer
 
-STEP 9: CLAUDE.md・README.md 生成
+STEP 9: CLAUDE.md・README.md 生成 + クリーンアップ
   実装完了後、確定したスタック・コマンド・構造をもとに生成する。
   （実装前に生成するとプレースホルダーになるため、このタイミングで行う）
+
+  PROHIBITED: CLAUDE.md および AGENTS.md を実装完了前に生成すること
+    理由: 早期生成すると不完全な内容が残り、Claude Code が誤った文脈で動作する。
 
   CLAUDE.md に含めること:
     - プロジェクト名・目的（1〜2文）
@@ -304,6 +310,19 @@ STEP 9: CLAUDE.md・README.md 生成
     - セットアップ手順（git clone 〜 依存インストール 〜 .env 設定）
     - コマンド一覧（dev / test / build / migrate など）
     - 環境変数（キー名と説明のみ。実際の値は書かない）
+
+  --- public/ クリーンアップ（HAS_FRONTEND == true の場合） ---
+
+  IF HAS_FRONTEND == true:
+    FOREACH file IN [vercel.svg, next.svg, window.svg, file.svg, globe.svg]:
+      IF EXISTS(public/file):
+        IF NOT REFERENCED IN src/:
+          DELETE public/file
+        ENDIF
+      ENDIF
+    ENDFOREACH
+    NOTE: 要件検討中にロゴ等を public/ に置いている場合があるため、参照チェックを必ず行ってから削除すること
+  ENDIF
 ```
 
 ---
