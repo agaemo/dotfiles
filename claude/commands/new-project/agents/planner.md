@@ -74,6 +74,25 @@ UIコンポーネント・外部サービスの薄いラッパーは実装後で
 > 「Tailwind CSS のクラスのみ」で実現できる場合は導入しないことを推奨する。
 > 採用する場合は必ずユーザーに確認し、承認を得てから計画に含めること。
 
+## 既知のライブラリ破壊的変更（採用時に必ず確認）
+
+| ライブラリ | 変更内容 | コード上の影響 |
+|-----------|---------|--------------|
+| **shadcn/ui v4+** | Radix UI → Base UI へ移行。`asChild` プロップが廃止 | `<Button asChild><Link>` → `<Link className={buttonVariants({...})}>` に書き換え。`Select.onValueChange` の型が `(value: string \| null) => void` に変更 |
+| **zod v4** | `ZodError.errors` → `ZodError.issues` に変更 | `.errors[0].message` → `.issues[0].message` |
+| **next-auth v5 (Auth.js)** | `session.strategy = "jwt"` 推奨、`auth()` ヘルパー関数に変更 | Credentials provider の設定・セッション取得方法が変わる |
+
+## pnpm ネイティブモジュール設定
+
+`better-sqlite3`・`bcrypt` 等のネイティブアドオンを使う場合、pnpm はビルドスクリプトをデフォルトでブロックする。
+`package.json` に以下を追加してから `pnpm install` を実行すること:
+
+```json
+"pnpm": {
+  "onlyBuiltDependencies": ["better-sqlite3", "esbuild"]
+}
+```
+
 ## ADR（アーキテクチャ決定記録）
 
 後から変更コストが高い設計判断は `docs/adr/` に記録すること。

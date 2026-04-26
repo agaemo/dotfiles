@@ -83,8 +83,11 @@ FOREACH row IN 以下の対応表:
 --- STEP 3: hooks ファイルの書き出し ---
 
 FOREACH row IN 以下の対応表:
-  READ  TEMPLATE/row.src
-  WRITE CWD/row.dest
+  IF EXISTS(TEMPLATE/row.src):
+    READ  TEMPLATE/row.src
+    WRITE CWD/row.dest
+  ELSE:
+    SKIP  # テンプレートに存在しないファイルはエラーではなくスキップ
 
   | src                        | dest                                    |
   |----------------------------|-----------------------------------------|
@@ -145,7 +148,7 @@ pnpm = "latest"
 _.path = ["./node_modules/.bin"]
 EOF
 
-mise install
+mise trust && mise install   # 新規ディレクトリでは mise trust が必要
 ```
 
 ```bash
@@ -161,7 +164,7 @@ pnpm = "latest"
 _.path = ["./node_modules/.bin"]
 EOF
 
-mise install
+mise trust && mise install
 ```
 
 ```bash
@@ -175,7 +178,7 @@ uv = "latest"
 _.path = ["./node_modules/.bin"]
 EOF
 
-mise install
+mise trust && mise install
 
 # 仮想環境の作成と依存インストール
 uv venv
@@ -301,6 +304,20 @@ STEP 9: CLAUDE.md・README.md 生成
     - セットアップ手順（git clone 〜 依存インストール 〜 .env 設定）
     - コマンド一覧（dev / test / build / migrate など）
     - 環境変数（キー名と説明のみ。実際の値は書かない）
+```
+
+---
+
+### Next.js プロジェクト初期化（ハーネス設置済みディレクトリ）
+
+`new-project` ハーネス設置後のディレクトリには `.gitignore`・`agents/` 等が既存のため、
+`pnpm create next-app .` は競合エラーになる。**カレントディレクトリ内**に一時サブディレクトリを作ってマージすること。
+
+```bash
+# NG: /tmp など外部ディレクトリは使わない（スキルの「カレントディレクトリで実行」原則に反する）
+# OK: カレントディレクトリ内に _tmp を作成してマージ
+pnpm create next-app _tmp --typescript --tailwind --app --src-dir --import-alias "@/*" --no-git --yes
+cp -r _tmp/. . && rm -rf _tmp
 ```
 
 ---
