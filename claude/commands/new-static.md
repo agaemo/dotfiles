@@ -1,25 +1,25 @@
 ---
-name: new-lp
+name: new-static
 description: Astro + Node.js で静的サイト・LP・PoC・フロントエンドのみの実装を新規作成する。/new-project の静的特化版（デザインファーストで開始、intake・planner・qa 不要）。動的機能・バックエンドが必要なら /new-project を使うこと。
 ---
 
-# /new-lp
+# /new-static
 
 Astro + Node.js で静的サイト（LP・PoC・管理画面モック等）プロジェクトをセットアップする。
 **プロジェクトディレクトリを作成して `cd` で移動した後に実行すること。**
 
 ## 使い方
 
-- `/new-lp` — カレントディレクトリに静的サイトをセットアップする
+- `/new-static` — カレントディレクトリに静的サイトをセットアップする
 - 動的機能・バックエンドが必要なら `/new-project` を使うこと（intake → planner → 実装のフルチェーン）
 
 ## いつ使うか
 
 | ケース | スキル |
 |--------|--------|
-| LP・静的ページ | `/new-lp` |
-| PoC・画面モック（フロントのみ） | `/new-lp` |
-| 管理画面・ダッシュボード（静的） | `/new-lp` |
+| LP・静的ページ | `/new-static` |
+| PoC・画面モック（フロントのみ） | `/new-static` |
+| 管理画面・ダッシュボード（静的） | `/new-static` |
 | API・DB・認証が必要 | `/new-project` |
 
 ---
