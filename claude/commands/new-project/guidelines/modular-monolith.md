@@ -29,23 +29,43 @@ src/
 ```
 src/
 ├── order/
-│   ├── routes.ts       # HTTPハンドラ
-│   ├── service.ts      # ビジネスロジック
-│   ├── repository.ts   # DB操作
-│   └── index.ts        # モジュール外に公開するAPIのみをexport
+│   ├── routes.ts              # HTTPハンドラ
+│   ├── service.ts             # ビジネスロジック
+│   ├── repository.interface.ts # リポジトリインターフェース
+│   ├── repository.ts          # DB実装
+│   └── index.ts               # モジュール外に公開するAPIのみをexport
 ├── user/
 │   ├── routes.ts
 │   ├── service.ts
+│   ├── repository.interface.ts
 │   ├── repository.ts
 │   └── index.ts
-└── shared/             # モジュール間で共有する型・ユーティリティ
+└── shared/                    # モジュール間で共有する型・ユーティリティ
     └── types.ts
+```
+
+## リポジトリインターフェース
+
+サービスは実装ではなくインターフェースに依存させる。DBエンジンの切り替え（SQLite → MySQL/PostgreSQL など）が実装ファイルの差し替えだけで完結する。
+
+```ts
+// order/repository.interface.ts
+export interface OrderRepository {
+  findById(id: string): Promise<Order | null>;
+  save(order: Order): Promise<void>;
+}
+
+// order/service.ts
+export class OrderService {
+  constructor(private readonly repo: OrderRepository) {}
+}
 ```
 
 ## ルール
 
 - モジュール内部のファイルを他モジュールから直接 import しない（`index.ts` 経由のみ）
 - モジュール間の依存は `shared/` に置いた型・インターフェース経由にする
+- サービスはコンストラクタインジェクションでリポジトリを受け取る（`new` で直接生成しない）
 - DB トランザクションはモジュール内で完結させる（モジュールをまたぐトランザクションは設計を見直す）
 - 循環依存を作らない（`order → user` は OK、`order ↔ user` は NG）
 
