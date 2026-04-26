@@ -139,7 +139,7 @@ REPORT: "完了しました"
 cat > .mise.toml << 'EOF'
 [tools]
 node = "22"
-pnpm = "9"
+pnpm = "latest"
 
 [env]
 _.path = ["./node_modules/.bin"]
@@ -155,7 +155,7 @@ cat > .mise.toml << 'EOF'
 [tools]
 bun = "1.3"
 node = "lts"   # ネイティブモジュール実行用
-pnpm = "9"
+pnpm = "latest"
 
 [env]
 _.path = ["./node_modules/.bin"]
@@ -164,11 +164,30 @@ EOF
 mise install
 ```
 
+```bash
+# Python プロジェクト（uv をパッケージマネージャーとして使用）
+cat > .mise.toml << 'EOF'
+[tools]
+python = "3.12"
+uv = "latest"
+
+[env]
+_.path = ["./node_modules/.bin"]
+EOF
+
+mise install
+
+# 仮想環境の作成と依存インストール
+uv venv
+uv sync
+```
+
 > **パッケージマネージャーは pnpm を標準として使うこと。**
 > pnpm はサプライチェーン攻撃への耐性が高く（`--frozen-lockfile` / `onlyBuiltDependencies` 等）、
 > ディスク効率も良い。インストールは `pnpm install`、追加は `pnpm add` を使うこと。
 
-> **バージョンは必ず固定すること。** `"latest"` はビルド再現性がなく、本番との差異が生じる原因になる。
+> **ランタイム（Node.js・Bun・Python）のバージョンは必ず固定すること。** `"latest"` はビルド再現性がなく、本番との差異が生じる原因になる。
+> パッケージマネージャー（pnpm・uv 等）は `"latest"` で構わない。
 > mise 管理下なので `mise upgrade` で意図的にアップグレードできる。
 
 > **Apple Silicon (M1/M2/M3) の注意:**

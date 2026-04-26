@@ -142,9 +142,9 @@ TEMPLATE   = ~/.claude/commands/new-project
 REQUIRE: カレントディレクトリが CWD であること
 
 RUN:
-  mise use --path mise.toml node@lts
-  mise use --path mise.toml pnpm@latest
-NOTE: --path mise.toml を必ず付けること（付けないと上位の mise.toml が更新される）
+  mise use --path .mise.toml node@lts
+  mise use --path .mise.toml pnpm@latest
+NOTE: --path .mise.toml を必ず付けること（付けないと上位の .mise.toml が更新される）
 
 RUN:
   mise install
@@ -174,13 +174,24 @@ FOREACH row IN 以下の対応表:
   |-------------------------------|--------------------------------------|
   | gitignore                     | .gitignore                           |
   | mcp.json                      | .mcp.json                            |
-  | settings.json                 | .claude/settings.json                |
   | hooks/on-session-start.js     | .claude/hooks/on-session-start.js    |
   | hooks/pre-bash.js             | .claude/hooks/pre-bash.js            |
   | hooks/post-write.js           | .claude/hooks/post-write.js          |
   | hooks/on-stop.js              | .claude/hooks/on-stop.js             |
   | agents/designer.md            | agents/designer.md                   |
   | commands/git-workflow.md      | .claude/commands/git-workflow.md     |
+
+--- STEP 3.5: settings.json の書き出し（絶対パス埋め込み） ---
+
+READ TEMPLATE/settings.json
+REPLACE ALL: ".claude/hooks/" → "<CWD>/.claude/hooks/"  # <CWD> は実際の絶対パス（例: /Users/alice/myproject）
+WRITE CWD/.claude/settings.json
+
+例 (CWD = /Users/alice/myproject の場合):
+  変換前: "command": "node .claude/hooks/on-session-start.js"
+  変換後: "command": "node /Users/alice/myproject/.claude/hooks/on-session-start.js"
+
+ASSERT EXISTS(CWD/.claude/settings.json)
 
 --- STEP 4: git 初期化 ---
 
