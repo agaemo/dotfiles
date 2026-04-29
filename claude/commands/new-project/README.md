@@ -30,12 +30,12 @@ flowchart TD
         S4["STEP 4: planner\n→ docs/plan.md\n（クリティカルパス + 並列トラック定義）"]
         S4 -->|承認 4/5| S45
 
-        S45["STEP 4.5: 統合設計書生成\n→ docs/01_requirements_doc.md\n→ docs/02_specifications_doc.md\n→ docs/03_basic_design_doc.md"]
-        S45 -->|承認 5/5| S5
+        S45["STEP 4.5: 理解度チェック\n（5項目すべて ≥4 になるまでループ）"]
+        S45 --> S5
     end
 
-    S5["STEP 5: 理解度チェック\n（5項目すべて ≥4 になるまでループ）"]
-    S5 --> S6
+    S5["STEP 5: 統合設計書生成\n→ docs/01_requirements_doc.md\n→ docs/02_specifications_doc.md\n→ docs/03_basic_design_doc.md"]
+    S5 -->|承認 5/5| S6
 
     subgraph IMPL["実装フェーズ（3フェーズ）"]
         S6["STEP 6: 実装"]
