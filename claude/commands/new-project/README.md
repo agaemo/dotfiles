@@ -152,7 +152,7 @@ new-project/
 ├── templates/    # ドキュメント・設計書のひな形
 ├── guidelines/   # 開発ガイドライン（アーキテクチャ・設計手法・DB設計）
 ├── hooks/        # ツール実行前後に自動で動くスクリプト
-├── CLAUDE.md     # プロジェクト向けの Claude 指示
+├── gitignore     # プロジェクトの .gitignore ひな形
 ├── mcp.json      # MCP サーバー設定（Puppeteer など）
 └── settings.json # Claude Code 設定（権限・フック登録など）
 ```
