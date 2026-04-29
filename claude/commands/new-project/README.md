@@ -3,6 +3,132 @@
 新規プロジェクト作成時に `/new-project` スキルでコピーされる一式。
 プロジェクトルートの `.claude/` 以下に展開される。
 
+---
+
+## /new-project スキル 全体フロー
+
+```mermaid
+flowchart TD
+    START([/new-project 起動]) --> Q1{フロントエンドUI\nはあるか？}
+    Q1 -->|あり| SETUP
+    Q1 -->|なし| SETUP
+
+    SETUP["ハーネスセットアップ\n（サブエージェント）\n.gitignore / mcp.json / agents/ / hooks/ / settings.json"]
+    SETUP --> MISE["mise.toml 作成 → mise install"]
+
+    MISE --> S1
+
+    subgraph DESIGN["ウォーターフォール設計フェーズ（承認ゲートあり）"]
+        S1["STEP 1: intake\n→ docs/requirements.md"]
+        S1 -->|承認 1/5| S2
+        S2["STEP 2: refiner\n→ docs/stories.md\n※未解決の疑問は回答後も残す"]
+        S2 -->|承認 2/5| S3_CHECK
+
+        S3_CHECK{フロントあり?}
+        S3_CHECK -->|Yes| S3["STEP 3: designer\n→ docs/design-brief.md\n→ docs/design-system.md"]
+        S3 -->|承認 3/5| S4
+        S3_CHECK -->|No| S4
+
+        S4["STEP 4: planner\n→ docs/plan.md\n（クリティカルパス + 並列トラック定義）"]
+        S4 -->|承認 4/5| S45
+
+        S45["STEP 4.5: 統合設計書生成\n→ docs/01_requirements_doc.md\n→ docs/02_specifications_doc.md\n→ docs/03_basic_design_doc.md"]
+        S45 -->|承認 5/5| S5
+    end
+
+    S5["STEP 5: 理解度チェック\n（5項目すべて ≥4 になるまでループ）"]
+    S5 --> S6
+
+    subgraph IMPL["実装フェーズ（3フェーズ）"]
+        S6["STEP 6: 実装"]
+
+        subgraph PH1["Phase 1: シリアル・クリティカルパス"]
+            PH1A["DB スキーマ・認証基盤\nAppShell・共通コンポーネント"]
+            PH1A --> PH1B["pnpm dev で動作確認\n→ git commit"]
+        end
+
+        subgraph PH2["Phase 2: 並列トラック（worktree 分離）"]
+            direction LR
+            TA["Agent: track-A\nisolation: worktree\nbackground: true"]
+            TB["Agent: track-B\nisolation: worktree\nbackground: true"]
+            TC["Agent: track-C\nisolation: worktree\nbackground: true"]
+        end
+
+        subgraph PH3["Phase 3: 統合"]
+            PH3A["各ブランチをマージ\nコンフリクト解消"]
+            PH3A --> PH3B["pnpm dev で実機確認\n→ git commit"]
+        end
+
+        S6 --> PH1A
+        PH1B --> TA & TB & TC
+        TA & TB & TC --> PH3A
+    end
+
+    PH3B --> S7_CHECK
+
+    S7_CHECK{フロントあり?}
+    S7_CHECK -->|Yes| S7["STEP 7: designer 実画面レビュー\n（Puppeteer スクリーンショット）"]
+    S7 --> S8["STEP 8: /review\nコンポーネント・アクセシビリティ・型安全性"]
+    S8 --> S9
+    S7_CHECK -->|No| S9
+
+    S9["STEP 9: verify → security-reviewer\n→ qa → code-reviewer"]
+    S9 --> S10["STEP 10: CLAUDE.md・README.md 生成\npublic/ クリーンアップ"]
+    S10 --> END([完了])
+```
+
+---
+
+## 各フィーチャートラックの処理
+
+フェーズ2で並列起動される各トラックエージェントの内部フロー。
+
+```mermaid
+flowchart LR
+    subgraph Track["track-[name]（worktree 分離済み）"]
+        direction TB
+        R["docs/stories.md の\n担当 US を読む"]
+        R --> I["所有ファイルを実装\n（依存ファイルは読み取り専用）"]
+        I --> B{"pnpm build\n成功？"}
+        B -->|失敗| I
+        B -->|成功| V["受け入れ条件を\n1件ずつ確認"]
+        V --> REP["完了レポート\n・実装ファイル一覧\n・受け入れ条件充足状況\n・未解決問題"]
+    end
+```
+
+---
+
+## エージェントの呼び出しタイミング
+
+```mermaid
+flowchart LR
+    subgraph AUTO["Claude が自律呼び出し"]
+        intake --> refiner --> planner
+        planner --> designer
+        designer --> verify
+        verify --> security-reviewer
+        security-reviewer --> qa
+        qa --> code-reviewer
+    end
+
+    subgraph MANUAL["ユーザーが手動呼び出し\n（/コマンド名）"]
+        git-workflow
+        db-migration
+    end
+
+    subgraph OPT["状況に応じて追加"]
+        ideator
+        debugger
+        tester
+        refactorer
+        sre
+        scorer
+        release-planner
+    end
+```
+
+---
+
 ## mise の役割
 
 | 管理するもの | 管理しないもの |
