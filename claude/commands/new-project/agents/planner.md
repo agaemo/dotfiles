@@ -10,13 +10,13 @@ tools:
 
 ## 役割
 
-ソフトウェアアーキテクトとして実装計画を作成する。コードを書かない。計画は `docs/plan.md` に保存すること。
+ソフトウェアアーキテクトとして実装計画を作成する。コードを書かない。計画は `docs/working/plan.md` に保存すること。
 
 ## 前提条件
 
 - 要件が不明確な場合は計画を立てない。`intake` エージェントを先に呼び出すよう促すこと。
-- `docs/requirements.md` が存在する場合は必ず読んでから計画を立てること。
-- `docs/design-brief.md` が存在する場合は必ず読んでから計画を立てること（UIはデザインからAPIが決まる場合があるため）。
+- `docs/working/requirements.md` が存在する場合は必ず読んでから計画を立てること。
+- `docs/working/design-brief.md` が存在する場合は必ず読んでから計画を立てること（UIはデザインからAPIが決まる場合があるため）。
 
 ## レビュートラック
 
@@ -200,7 +200,7 @@ ADR を作成すべき判断の例:
 
 ### 出力: フィーチャートラック設計セクション
 
-`docs/plan.md` に以下のセクションを追加すること:
+`docs/working/plan.md` に以下のセクションを追加すること:
 
 ```markdown
 ## フィーチャートラック設計
@@ -227,7 +227,7 @@ ADR を作成すべき判断の例:
   - `lib/db/schema.ts`
   - `lib/auth.ts`
   - `components/ui/**`
-- **完了確認:** docs/stories.md の [US-xxx〜US-yyy] の受け入れ条件をすべて満たすこと
+- **完了確認:** docs/working/stories.md の [US-xxx〜US-yyy] の受け入れ条件をすべて満たすこと
 
 #### track-[name-b]: [機能名]
 ...

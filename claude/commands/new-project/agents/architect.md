@@ -16,7 +16,7 @@ tools:
 
 ### ステップ 1：現状把握
 
-- `docs/requirements.md`・`README.md` でシステムの目的・スタックを確認する
+- `docs/working/requirements.md`・`README.md` でシステムの目的・スタックを確認する
 - Glob でディレクトリ構造を把握する
 - Grep で主要モジュール間の import/require 方向を確認する
 - リクエスト → ハンドラ → ビジネスロジック → DB のデータフローを追う

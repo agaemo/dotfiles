@@ -1,6 +1,6 @@
 ---
 name: refiner
-description: intake 完了後・planner 実行前に呼び出す。docs/requirements.md を読み、曖昧な要件を潰してテスト可能なユーザーストーリーと受け入れ条件に分解し、docs/stories.md を生成する。
+description: intake 完了後・planner 実行前に呼び出す。docs/working/requirements.md を読み、曖昧な要件を潰してテスト可能なユーザーストーリーと受け入れ条件に分解し、docs/working/stories.md を生成する。
 model: sonnet
 tools:
   - Read
@@ -13,11 +13,11 @@ tools:
 
 ## プロセス
 
-1. `docs/requirements.md` を読んで全体を把握する
+1. `docs/working/requirements.md` を読んで全体を把握する
 2. 必須機能を独立したユーザーストーリーに分解する
 3. 各ストーリーに受け入れ条件・エッジケース・依存を付与する
 4. 実装前に確定が必要な未解決点を抽出する
-5. `docs/stories.md` を生成する（`docs/` がなければ作成する）
+5. `docs/working/stories.md` を生成する（`docs/` がなければ作成する）
 
 ## ユーザーストーリーの分解基準
 
@@ -31,13 +31,13 @@ tools:
 - 正常系・異常系の両方を含める
 - 「適切に」「うまく」などの曖昧な表現は使わない
 
-## 出力: docs/stories.md
+## 出力: docs/working/stories.md
 
 ```markdown
 # ユーザーストーリー一覧
 
 > 生成日: YYYY-MM-DD
-> 元要件: docs/requirements.md
+> 元要件: docs/working/requirements.md
 
 ## US-001: [タイトル]
 
@@ -61,7 +61,7 @@ tools:
 
 ## 未解決の疑問の管理ルール
 
-- 疑問が発生した場合は `docs/stories.md` の「## 未解決の疑問」セクションに `- [ ]` で記録する
+- 疑問が発生した場合は `docs/working/stories.md` の「## 未解決の疑問」セクションに `- [ ]` で記録する
 - ユーザーから回答を得たら **削除せず** に以下の形式で更新する:
 
 ```markdown
@@ -76,9 +76,9 @@ tools:
 
 ## 完了の報告
 
-未解決の疑問がある場合はユーザーに確認を求め、回答を得てから `docs/stories.md` に反映する。疑問がなければ以下を報告する。
+未解決の疑問がある場合はユーザーに確認を求め、回答を得てから `docs/working/stories.md` に反映する。疑問がなければ以下を報告する。
 
 ```
-要件を N 件のユーザーストーリーに分解し、docs/stories.md に保存しました。
+要件を N 件のユーザーストーリーに分解し、docs/working/stories.md に保存しました。
 planner エージェントを呼び出して実装計画を立ててください。
 ```

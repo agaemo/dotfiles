@@ -1,10 +1,10 @@
 # 要件定義書
 
-<!-- refiner エージェントが docs/stories.md をもとに生成する -->
+<!-- refiner エージェントが docs/working/stories.md をもとに生成する -->
 
 > バージョン: 1.0
 > 作成日: YYYY-MM-DD
-> 元要件: docs/stories.md
+> 元要件: docs/working/stories.md
 
 ---
 
@@ -28,7 +28,7 @@
 
 ## 3. 機能要件一覧
 
-<!-- docs/stories.md の各USを以下の表にまとめる -->
+<!-- docs/working/stories.md の各USを以下の表にまとめる -->
 
 | US番号 | 機能名 | 概要 | サイズ | 優先度 |
 |--------|--------|------|--------|--------|

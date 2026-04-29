@@ -1,10 +1,10 @@
 # 要求定義書
 
-<!-- designer エージェントが docs/requirements.md をもとに生成する -->
+<!-- designer エージェントが docs/working/requirements.md をもとに生成する -->
 
 > バージョン: 1.0
 > 作成日: YYYY-MM-DD
-> 元要件: docs/requirements.md
+> 元要件: docs/working/requirements.md
 
 ---
 

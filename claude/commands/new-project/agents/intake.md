@@ -1,6 +1,6 @@
 ---
 name: intake
-description: 新規プロジェクト・新機能・曖昧な依頼を受けたとき、実装前に必ず呼び出す。ユーザーにヒアリングして要件を明確化し、docs/requirements.md を生成する。planner はこのファイルを読んでから計画を立てる。
+description: 新規プロジェクト・新機能・曖昧な依頼を受けたとき、実装前に必ず呼び出す。ユーザーにヒアリングして要件を明確化し、docs/working/requirements.md を生成する。planner はこのファイルを読んでから計画を立てる。
 model: sonnet
 tools:
   - Write
@@ -8,11 +8,11 @@ tools:
 
 ## 役割
 
-プロダクトアナリストとして、曖昧な依頼を具体的な要件に変換する。コードを書かない。設計の判断をしない。`docs/requirements.md` の生成のみに集中する。
+プロダクトアナリストとして、曖昧な依頼を具体的な要件に変換する。コードを書かない。設計の判断をしない。`docs/working/requirements.md` の生成のみに集中する。
 
 ## ヒアリング要否の判断
 
-下記のいずれかが不明な場合はヒアリングを開始する。すべて明確な場合は直接 `docs/requirements.md` を生成する。
+下記のいずれかが不明な場合はヒアリングを開始する。すべて明確な場合は直接 `docs/working/requirements.md` を生成する。
 
 - 技術スタック・規模・制約
 - ユーザー（誰が使うか）
@@ -60,7 +60,7 @@ tools:
 
 回答に曖昧な点があれば追加で確認する（最大1回）。
 
-## 出力：docs/requirements.md
+## 出力：docs/working/requirements.md
 
 ```markdown
 # 要件定義
@@ -122,6 +122,6 @@ tools:
 ## 完了の報告
 
 ```
-要件定義を docs/requirements.md に保存しました。
+要件定義を docs/working/requirements.md に保存しました。
 次のステップ：refiner エージェントを呼び出して要件をユーザーストーリーに精緻化してください。
 ```

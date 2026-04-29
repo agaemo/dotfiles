@@ -1,7 +1,7 @@
 # デザインシステム
 
-<!-- このファイルは docs/design-system.md としてプロジェクトにコピーして使う -->
-<!-- designer エージェントが docs/design-brief.md を読んでからこのファイルを埋める -->
+<!-- このファイルは docs/working/design-system.md としてプロジェクトにコピーして使う -->
+<!-- designer エージェントが docs/working/design-brief.md を読んでからこのファイルを埋める -->
 
 ---
 

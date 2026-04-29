@@ -256,13 +256,13 @@ IF 未完了タスクがある状態でセッションを終了する場合:
 
 ```
 STEP 1: intake
-  OUTPUT: docs/requirements.md
+  OUTPUT: docs/working/requirements.md
   GATE: 承認進捗を表示してからユーザーに内容を提示し、承認を得ること
   PROHIBITED: 承認前に次ステップへ進むこと
 
 STEP 2: refiner
-  INPUT:  docs/requirements.md
-  OUTPUT: docs/stories.md
+  INPUT:  docs/working/requirements.md
+  OUTPUT: docs/working/stories.md
   NOTE: 未解決の疑問はユーザーから回答を得た後も削除しない。
         以下の形式でチェック済みにして残すこと（意思決定の根拠として保持）:
         - [x] [疑問の内容]
@@ -272,8 +272,8 @@ STEP 2: refiner
 
 IF HAS_FRONTEND == true:
   STEP 3: designer ← 省略禁止・planner より先に実施すること
-    a. /new-project:templates:design-brief を参照してデザインブリーフを生成 → docs/design-brief.md
-    b. /new-project:templates:design-system を参照してデザインシステムを定義 → docs/design-system.md
+    a. /new-project:templates:design-brief を参照してデザインブリーフを生成 → docs/working/design-brief.md
+    b. /new-project:templates:design-system を参照してデザインシステムを定義 → docs/working/design-system.md
     c. 画面構成・コンポーネント構成を docs/design.md に記録
     GATE: 承認進捗を表示してからユーザーに提示し、承認を得ること
     PROHIBITED: デザイン承認前にコンポーネントを1行も書くこと
@@ -281,8 +281,8 @@ IF HAS_FRONTEND == true:
 ENDIF
 
 STEP 4: planner
-  INPUT:  docs/stories.md（+ docs/design-brief.md があれば）
-  OUTPUT: docs/plan.md
+  INPUT:  docs/working/stories.md（+ docs/working/design-brief.md があれば）
+  OUTPUT: docs/working/plan.md
   GATE: 承認進捗を表示してからユーザーに計画を提示し、承認を得ること
   PROHIBITED: 承認前に実装を開始すること
 
@@ -312,11 +312,11 @@ STEP 5: 統合設計書生成 ← 理解度確認後の総合確認ゲート
 
   生成する3文書:
     a. /new-project:templates:doc-requirements を参照 → docs/01_requirements_doc.md
-       入力: docs/requirements.md
+       入力: docs/working/requirements.md
     b. /new-project:templates:doc-specifications を参照 → docs/02_specifications_doc.md
-       入力: docs/stories.md
+       入力: docs/working/stories.md
     c. /new-project:templates:doc-basic-design を参照 → docs/03_basic_design_doc.md
-       入力: docs/plan.md（+ docs/design-system.md があれば）
+       入力: docs/working/plan.md（+ docs/working/design-system.md があれば）
 
   GATE: 3文書を生成後、以下の形式でユーザーに一括提示し、承認を得ること:
 
@@ -343,7 +343,7 @@ STEP 5: 統合設計書生成 ← 理解度確認後の総合確認ゲート
 
 STEP 6: 実装
 
-  docs/plan.md の「フィーチャートラック設計」セクションを読んでから実装を開始すること。
+  docs/working/plan.md の「フィーチャートラック設計」セクションを読んでから実装を開始すること。
   トラック設計がある場合は以下の3フェーズで進める。
   トラック設計がない場合（小規模）は「フェーズ1のみ・逐次確認サイクル」で進める。
 
@@ -351,7 +351,7 @@ STEP 6: 実装
 
   ### フェーズ1: クリティカルパス（シリアル）
 
-  docs/plan.md の「フェーズ1」ステップを順番に実装する。
+  docs/working/plan.md の「フェーズ1」ステップを順番に実装する。
   各ステップ完了ごとに `pnpm build` で型エラーがないことを確認する。
 
   フェーズ1完了後:
@@ -367,7 +367,7 @@ STEP 6: 実装
 
   ### フェーズ2: 並列フィーチャートラック（worktree 分離）
 
-  docs/plan.md の「フェーズ2」に定義された各トラックを、
+  docs/working/plan.md の「フェーズ2」に定義された各トラックを、
   **isolation: "worktree" + run_in_background: true** でバックグラウンド並列実行する。
 
   各トラックに渡すプロンプト（下記テンプレートを使用・変数を展開して渡すこと）:
@@ -378,16 +378,16 @@ STEP 6: 実装
   プロジェクトルート: [ABSOLUTE_PATH]
 
   担当ユーザーストーリー:
-  [US番号とタイトルのリスト（docs/stories.md の該当USを転記）]
+  [US番号とタイトルのリスト（docs/working/stories.md の該当USを転記）]
 
   所有ファイル（このトラックだけが作成・編集する）:
-  [docs/plan.md のトラック定義から転記]
+  [docs/working/plan.md のトラック定義から転記]
 
   依存ファイル（読み取り専用・編集禁止）:
-  [docs/plan.md のトラック定義から転記]
+  [docs/working/plan.md のトラック定義から転記]
 
   実装手順:
-  1. docs/stories.md の担当 US の受け入れ条件をすべて読む
+  1. docs/working/stories.md の担当 US の受け入れ条件をすべて読む
   2. 依存ファイルを読んで型・インターフェースを把握する
   3. 所有ファイルを実装する（所有ファイル以外は絶対に編集しない）
   4. `pnpm build` を実行し、型エラー・コンパイルエラーがないことを確認する
@@ -452,7 +452,7 @@ STEP 10: CLAUDE.md・README.md 生成 + クリーンアップ
     - 開発コマンド（dev / test / build の実際のコマンド）
     - アーキテクチャ（採用パターン名・ディレクトリ構造のポイント・レイヤー間の依存の向き）
     - プロジェクト固有の制約（DBエンジン・実行環境の制限など）
-    - docs/plan.md を参照するよう一言書く
+    - docs/working/plan.md を参照するよう一言書く
     上限: 60行以内
 
   README.md に含めること:
@@ -512,7 +512,7 @@ planner を呼び出す前に、以下の判断をユーザーに確認するこ
 - 公開エンドポイント（認証不要）と保護エンドポイント（認証必要）の境界線
   - 特に「ログイン前の顧客がアクセスできる情報」を明確にする
 
-> **設計判断の記録:** 確認した内容は `docs/plan.md` の「設計判断」セクションに記録すること。
+> **設計判断の記録:** 確認した内容は `docs/working/plan.md` の「設計判断」セクションに記録すること。
 
 ---
 

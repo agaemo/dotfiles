@@ -1,10 +1,10 @@
 # 基本設計書
 
-<!-- planner エージェントが docs/plan.md + docs/design-system.md をもとに生成する -->
+<!-- planner エージェントが docs/working/plan.md + docs/working/design-system.md をもとに生成する -->
 
 > バージョン: 1.0
 > 作成日: YYYY-MM-DD
-> 元要件: docs/plan.md
+> 元要件: docs/working/plan.md
 
 ---
 
@@ -110,7 +110,7 @@ project-root/
 
 ## 8. デザインシステム概要
 
-<!-- docs/design-system.md の要約 -->
+<!-- docs/working/design-system.md の要約 -->
 
 **ブランドカラー:**
 **フォント:**

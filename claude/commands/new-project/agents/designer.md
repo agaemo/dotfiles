@@ -24,16 +24,16 @@ tools:
 | フェーズ | 成果物 |
 |--------|--------|
 | 0 | ヒアリング完了（口頭回答） |
-| 1 | カラーパレット・タイポ・レイアウト方針（`docs/design-brief.md` に記録） |
-| 2a | `docs/design-brief.md`（テンプレート準拠） |
-| 2b | `docs/design-system.md`（テンプレート準拠） |
+| 1 | カラーパレット・タイポ・レイアウト方針（`docs/working/design-brief.md` に記録） |
+| 2a | `docs/working/design-brief.md`（テンプレート準拠） |
+| 2b | `docs/working/design-system.md`（テンプレート準拠） |
 | 2c | 画面差異リスト → メインのClaudeへ渡す修正指示（箇条書き） |
 
 ## プロセス
 
 ### フェーズ 0：ヒアリング
 
-`docs/design-brief.md` が存在しない、またはTODOが残っている場合に実行する。以下を **1つのメッセージ** で質問する：
+`docs/working/design-brief.md` が存在しない、またはTODOが残っている場合に実行する。以下を **1つのメッセージ** で質問する：
 
 1. 業種とターゲットユーザー
 2. 画面の明暗（ダーク / ライト / どちらでも）
@@ -77,18 +77,18 @@ tools:
 
 ### フェーズ 2a：デザインブリーフ作成
 
-`/new-project:templates:design-brief` を参照し、フォーマットに沿って `docs/design-brief.md` を生成する。
+`/new-project:templates:design-brief` を参照し、フォーマットに沿って `docs/working/design-brief.md` を生成する。
 
 ### フェーズ 2b：デザインシステム策定
 
-`/new-project:templates:design-system` を参照し、`docs/design-system.md` を生成する。
+`/new-project:templates:design-system` を参照し、`docs/working/design-system.md` を生成する。
 
 ### フェーズ 2c：実画面レビュー
 
 開発サーバーが起動していることを確認してから実行する。
 
 1. `mcp__puppeteer__puppeteer_navigate` → `mcp__puppeteer__puppeteer_screenshot` で各画面を撮影
-2. `docs/design-brief.md` と `docs/design-system.md` との差異を列挙
+2. `docs/working/design-brief.md` と `docs/working/design-system.md` との差異を列挙
 3. 差異を箇条書きにまとめ、修正指示としてメインのClaudeに渡す
 
 ### フェーズ 3：アンチジェネリックチェック

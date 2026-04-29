@@ -17,17 +17,17 @@ flowchart TD
     MISE --> S1
 
     subgraph DESIGN["ウォーターフォール設計フェーズ（承認ゲートあり）"]
-        S1["STEP 1: intake\n→ docs/requirements.md"]
+        S1["STEP 1: intake\n→ docs/working/requirements.md"]
         S1 -->|承認 1/5| S2
-        S2["STEP 2: refiner\n→ docs/stories.md\n※未解決の疑問は回答後も残す"]
+        S2["STEP 2: refiner\n→ docs/working/stories.md\n※未解決の疑問は回答後も残す"]
         S2 -->|承認 2/5| S3_CHECK
 
         S3_CHECK{フロントあり?}
-        S3_CHECK -->|Yes| S3["STEP 3: designer\n→ docs/design-brief.md\n→ docs/design-system.md"]
+        S3_CHECK -->|Yes| S3["STEP 3: designer\n→ docs/working/design-brief.md\n→ docs/working/design-system.md"]
         S3 -->|承認 3/5| S4
         S3_CHECK -->|No| S4
 
-        S4["STEP 4: planner\n→ docs/plan.md\n（クリティカルパス + 並列トラック定義）"]
+        S4["STEP 4: planner\n→ docs/working/plan.md\n（クリティカルパス + 並列トラック定義）"]
         S4 -->|承認 4/5| S45
 
         S45["STEP 4.5: 理解度チェック\n（5項目すべて ≥4 になるまでループ）"]
@@ -85,7 +85,7 @@ flowchart TD
 flowchart LR
     subgraph Track["track-[name]（worktree 分離済み）"]
         direction TB
-        R["docs/stories.md の\n担当 US を読む"]
+        R["docs/working/stories.md の\n担当 US を読む"]
         R --> I["所有ファイルを実装\n（依存ファイルは読み取り専用）"]
         I --> B{"pnpm build\n成功？"}
         B -->|失敗| I
@@ -167,10 +167,10 @@ Claude が状況に応じて自律呼び出しするサブエージェント。
 | エージェント | 生成物 | 役割 |
 |---|---|---|
 | `ideator` | — | アイデア探索・プロジェクト方向性の提案。intake の前段。 |
-| `intake` | `docs/requirements.md` | 新機能・曖昧な依頼のヒアリングと要件定義。 |
-| `refiner` | `docs/stories.md` | requirements.md をユーザーストーリーと受け入れ条件に分解。 |
-| `designer` | `docs/design-brief.md`<br>`docs/design-system.md` | UI/UX 設計・デザインブリーフ作成・Puppeteer での実画面レビュー。 |
-| `planner` | `docs/plan.md` | 実装計画の立案。requirements.md / stories.md を読んでから動く。 |
+| `intake` | `docs/working/requirements.md` | 新機能・曖昧な依頼のヒアリングと要件定義。 |
+| `refiner` | `docs/working/stories.md` | requirements.md をユーザーストーリーと受け入れ条件に分解。 |
+| `designer` | `docs/working/design-brief.md`<br>`docs/working/design-system.md` | UI/UX 設計・デザインブリーフ作成・Puppeteer での実画面レビュー。 |
+| `planner` | `docs/working/plan.md` | 実装計画の立案。requirements.md / stories.md を読んでから動く。 |
 
 ### 完了チェック（STEP 9 / 自動・順次）
 
@@ -212,8 +212,8 @@ Claude が状況に応じて自律呼び出しするサブエージェント。
 | エージェント | 役割 |
 |---|---|
 | `ideator` | アイデア探索・プロジェクト方向性の提案。intake の前段。 |
-| `intake` | 新機能・曖昧な依頼のヒアリング → `docs/requirements.md` 生成。 |
-| `refiner` | requirements.md をユーザーストーリーと受け入れ条件に分解 → `docs/stories.md` 生成。 |
+| `intake` | 新機能・曖昧な依頼のヒアリング → `docs/working/requirements.md` 生成。 |
+| `refiner` | requirements.md をユーザーストーリーと受け入れ条件に分解 → `docs/working/stories.md` 生成。 |
 | `designer` | UI/UX 設計・デザインブリーフ作成・Puppeteer での実画面レビュー。 |
 | `planner` | 実装計画の立案。requirements.md / stories.md を読んでから動く。 |
 | `verify` | 要件定義と実装の照合。要件漏れ・スコープ外の混入を検出。 |
