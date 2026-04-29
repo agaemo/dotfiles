@@ -28,6 +28,7 @@ sync_claude() {
   mkdir -p ~/.claude/commands
   for entry in "$DOTFILES_DIR/claude/commands/"*; do
     [ -e "$entry" ] || continue
+    [ "$(basename "$entry")" = "README.md" ] && continue
     target=~/.claude/commands/$(basename "$entry")
     if [ ! -L "$target" ]; then
       ln -sf "$entry" "$target"
