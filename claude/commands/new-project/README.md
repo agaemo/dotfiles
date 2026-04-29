@@ -9,9 +9,7 @@
 
 ```mermaid
 flowchart TD
-    START([/new-project 起動]) --> Q1{フロントエンドUI\nはあるか？}
-    Q1 -->|あり| SETUP
-    Q1 -->|なし| SETUP
+    START([/new-project 起動]) --> SETUP
 
     SETUP["ハーネスセットアップ\n（サブエージェント）\n.gitignore / mcp.json / agents/ / hooks/ / settings.json"]
     SETUP --> MISE["mise.toml 作成 → mise install"]
