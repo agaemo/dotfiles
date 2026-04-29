@@ -147,6 +147,11 @@ IMPORTANT: 以下の操作はすべてユーザーへの確認なしに即座に
   - ビルド・インストールコマンドの実行
   確認が必要なのは rm / git の破壊的操作のみ。
 
+NOTE: .mcp.json と .claude/commands/git-workflow.md への Write は
+  settings.json の permissions.allow に登録されているため自動承認される。
+  初回セットアップ中（settings.json 書き出し前）に確認が表示された場合は
+  「はい」を選択して続行すること。
+
 CWD        = <現在の作業ディレクトリの絶対パス>
 TEMPLATE   = ~/.claude/commands/new-project
 
@@ -169,6 +174,10 @@ ASSERT: `mise exec -- pnpm --version` が成功すること
 
 RUN:
   mise exec -- pnpm create astro@latest . --template minimal --no-git --yes
+
+NOTE: `pnpm create astro@latest` は常に最新版をインストールする。
+  メジャーバージョンが変わるとコンポーネント構文・設定ファイルの形式が変わる場合がある。
+  インストール後、生成された package.json でバージョンを確認すること。
 
 ASSERT EXISTS(package.json)
 
@@ -310,8 +319,9 @@ REPORT TO USER:
 
   次のステップ:
   1. デザインブリーフをもとにページ構成・コンポーネント分割を計画する
-  2. セクション単位で .astro コンポーネントに分割して実装する
-  3. ブラウザで動作確認（`pnpm dev`）。Puppeteer MCP が使える場合はスクリーンショットで確認
+  2. セクション単位で .astro コンポーネントを実装し、各セクション完了後に `pnpm dev` で表示確認する
+     （一気に全セクションを実装しない。問題の原因特定が困難になるため）
+  3. 全セクション完了後、Puppeteer MCP が使える場合はスクリーンショットで最終確認する
 
 IF 未完了タスクがある状態でセッションを終了する場合:
   SAVE TO MEMORY: 残タスクの一覧

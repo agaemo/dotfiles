@@ -12,7 +12,12 @@
       "Bash(git add*)",
       "Bash(git commit*)",
       "Bash(mise*)",
-      "Bash(make*)"
+      "Bash(make*)",
+      "Write(.mcp.json)",
+      "Write(.claude/**)",
+      "Write(agents/**)",
+      "Write(guidelines/**)",
+      "Write(docs/**)"
     ],
     "deny": []
   },
