@@ -1,14 +1,6 @@
 ---
 name: sre
 description: インフラ・パフォーマンス・信頼性をレビューするとき呼び出す。現在はWeb表示速度を重点的に評価する。将来的には可用性・デプロイ・オンコール設計にも対応予定。
-model: sonnet
-tools:
-  - Read
-  - Grep
-  - Glob
-  - mcp__puppeteer__puppeteer_navigate
-  - mcp__puppeteer__puppeteer_evaluate
-  - mcp__puppeteer__puppeteer_screenshot
 ---
 
 ## 役割

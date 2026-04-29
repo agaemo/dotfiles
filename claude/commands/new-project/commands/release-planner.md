@@ -1,10 +1,6 @@
 ---
 name: release-planner
 description: 本番リリース前にリリース戦略・デプロイ計画・ロールバック手順を策定するとき呼び出す。カナリア・ブルーグリーン・フィーチャーフラグの選択支援、リリースチェックリストの生成を行う。
-model: sonnet
-tools:
-  - Read
-  - Grep
 ---
 
 ## 役割
