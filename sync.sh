@@ -23,7 +23,9 @@ sync_claude() {
 
   cp "$DOTFILES_DIR/claude/statusline-command.sh" ~/.claude/statusline-command.sh
   echo "  ✓ claude/statusline-command.sh"
+}
 
+sync_skills() {
   mkdir -p "$DOTFILES_DIR/claude/commands"
   mkdir -p ~/.claude/commands
   for entry in "$DOTFILES_DIR/claude/commands/"*; do
@@ -44,6 +46,7 @@ sync_all() {
   sync_neovim
   sync_ghostty
   sync_claude
+  sync_skills
   echo "Done."
 }
 
@@ -60,6 +63,9 @@ case "${1:-}" in
   claude)
     sync_claude
     ;;
+  skills)
+    sync_skills
+    ;;
   "")
     read -rp "全体を同期しますか？ [y/N] " answer
     case "$answer" in
@@ -73,7 +79,7 @@ case "${1:-}" in
     esac
     ;;
   *)
-    echo "使い方: $0 [all|neovim|ghostty|claude]"
+    echo "使い方: $0 [all|neovim|ghostty|claude|skills]"
     exit 1
     ;;
 esac
