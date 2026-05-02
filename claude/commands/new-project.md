@@ -144,7 +144,7 @@ REPORT: "完了しました"
 
 ---
 
-### ステップ 3: mise.toml の作成と `mise install`
+### ステップ 3: mise.toml の作成と `mise install`（メインClaude が実行）
 
 ランタイムと pnpm を mise で管理する。
 
@@ -196,7 +196,7 @@ python = "3.12"
 uv = "latest"
 
 [env]
-_.path = ["./node_modules/.bin"]
+_.path = [".venv/bin"]
 EOF
 
 mise trust && mise install
@@ -243,7 +243,6 @@ REPORT TO USER:
 ## 標準エージェントチェーン（新規プロジェクト・新機能）
 
 セットアップ完了後は以下の順で必ず実行すること。
-各エージェント呼び出しにはプロジェクトルートの絶対パスと前フェーズの成果物パスを明示すること。
 
 > **注意:** `intake`・`designer` はユーザーとの対話が必要なエージェントである。
 > Agent ツール（サブエージェント）として起動してはならない。
@@ -293,6 +292,8 @@ ENDIF
 STEP 4: planner
   INPUT:  docs/working/stories.md（+ docs/working/design-brief.md があれば）
   OUTPUT: docs/working/plan.md
+  NOTE: 呼び出し前に「planner へ渡すべき設計判断の確認事項」セクションを参照し、
+        ユーザーに確認すること
   GATE: 承認進捗を表示してからユーザーに計画を提示し、承認を得ること
   PROHIBITED: 承認前に実装を開始すること
 
@@ -410,7 +411,7 @@ STEP 7: 実装
 
   PROHIBITED:
   - 所有ファイル以外のファイルを編集すること
-  - DB スキーマ（lib/db/schema.ts）を変更すること
+  - DB スキーマ（[スキーマファイルのパス: 例 lib/db/schema.ts]）を変更すること
   - フェーズ1の共通コンポーネントを新規作成・変更すること
 
   完了後に報告すること:
@@ -474,7 +475,7 @@ STEP 11: CLAUDE.md・README.md 生成 + クリーンアップ
 
   IF HAS_FRONTEND == true:
     FOREACH file IN [vercel.svg, next.svg, window.svg, file.svg, globe.svg]:
-      IF EXISTS(public/file):
+      IF EXISTS(public/<file>):
         IF NOT REFERENCED IN src/:
           DELETE public/file
         ENDIF
@@ -503,6 +504,7 @@ ASSERT:  `mise exec -- pnpm --version` が成功すること
 # OK: カレントディレクトリ内に _tmp を作成してマージ
 mise exec -- pnpm create next-app _tmp --typescript --tailwind --app --src-dir=false --import-alias "@/*" --no-git --yes
 cp -r _tmp/. . && rm -rf _tmp
+mise exec -- pnpm install
 ```
 
 > **バージョン管理の注意:**
