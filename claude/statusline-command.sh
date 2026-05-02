@@ -88,7 +88,7 @@ fi
 
 # ── Context window bar
 if [ -n "$used" ]; then
-  used_int=$(printf '%.0f' "$used")
+  used_int=$(awk "BEGIN { printf \"%d\", int($used + 0.5) }")
   color=$(pct_color "$used_int")
   b=$(bar "$used_int")
   out="${out} ${SEP} ${color}${b} ctx ${used_int}%%${RESET}"
@@ -97,7 +97,7 @@ fi
 
 # ── Rate limits
 if [ -n "$five_hour" ]; then
-  five_int=$(printf '%.0f' "$five_hour")
+  five_int=$(awk "BEGIN { printf \"%d\", int($five_hour + 0.5) }")
   color=$(pct_color "$five_int")
   b=$(bar "$five_int")
   hours_left_str=""
@@ -112,7 +112,7 @@ if [ -n "$five_hour" ]; then
   out="${out} ${SEP} ${color}${b} 5h${hours_left_str} ${five_int}%%${RESET}"
 fi
 if [ -n "$seven_day" ]; then
-  seven_int=$(printf '%.0f' "$seven_day")
+  seven_int=$(awk "BEGIN { printf \"%d\", int($seven_day + 0.5) }")
   color=$(pct_color "$seven_int")
   b=$(bar "$seven_int")
   days_left_str=""
