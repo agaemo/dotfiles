@@ -55,6 +55,8 @@ FOREACH row IN 以下の対応表:
 IF EXISTS(CWD/.claude/settings.json):
   READ TEMPLATE/settings.json
   REPLACE ALL: ".claude/hooks/" → "<CWD>/.claude/hooks/"
+  # <CWD> は実際の絶対パスに展開すること（例: /Users/alice/myproject）
+  # 例: 変換前 "node .claude/hooks/on-stop.js" → 変換後 "node /Users/alice/myproject/.claude/hooks/on-stop.js"
   WRITE CWD/.claude/settings.json
 ENDIF
 

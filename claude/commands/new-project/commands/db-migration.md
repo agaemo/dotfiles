@@ -35,6 +35,8 @@ ALTER TABLE users DROP COLUMN phone;
 
 ### ステップ2: ローカルで検証する
 
+NOTE: `<migration-tool>`、`<db-client>`、`<backup-tool>` はプロジェクトの CLAUDE.md または README を確認して実際のコマンドに置き換えること
+
 ```bash
 # 適用
 <migration-tool> up

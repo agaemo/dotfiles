@@ -12,9 +12,9 @@ description: コードベース全体の健全性を6つの観点で定期評価
 ### ステップ 1：コードベースを把握する
 
 ```bash
-find . -type f -name "*.ts" | head -50
+find . -type f \( -name "*.ts" -o -name "*.py" -o -name "*.go" \) | head -50
 find . -name "*.test.*" -o -name "*.spec.*" | head -20
-cat package.json
+cat package.json 2>/dev/null || cat pyproject.toml 2>/dev/null || cat go.mod 2>/dev/null || true
 ```
 
 ### ステップ 2：6軸で評価する
@@ -80,5 +80,6 @@ cat package.json
 
 ## ルール
 
+PROHIBITED: コードを実装・修正すること（評価と改善タスクの提示のみ行う）
 - スコアは根拠なしに高くつけない。具体的なファイルパス・行番号を示すこと。
 - 良い点も必ず列挙すること。問題の列挙だけでは改善の優先判断ができない。

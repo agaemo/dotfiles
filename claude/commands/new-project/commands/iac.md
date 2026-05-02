@@ -157,8 +157,10 @@ terraform init
 # 変更内容の確認（apply の前に必ず実行）
 terraform plan -out=tfplan
 
-# 内容を確認してから apply を実行する
-# ↑ ここでユーザーに plan 結果を見せて確認を取ること
+# plan 結果をユーザーに提示する（destroy / replace が含まれる場合は赤字で警告）
+GATE: plan の内容をユーザーに提示し、承認を得ること
+WAIT_FOR: ユーザーの承認
+PROHIBITED: 承認前に terraform apply を実行すること
 
 terraform apply tfplan
 
