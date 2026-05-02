@@ -483,10 +483,16 @@ STEP 10: CLAUDE.md・README.md 生成 + クリーンアップ
 `new-project` ハーネス設置後のディレクトリには `.gitignore`・`agents/` 等が既存のため、
 `pnpm create next-app .` は競合エラーになる。**カレントディレクトリ内**に一時サブディレクトリを作ってマージすること。
 
+```
+REQUIRE: ステップ 3（mise install）が完了していること
+ASSERT: `mise exec -- node --version` が成功すること
+ASSERT: `mise exec -- pnpm --version` が成功すること
+```
+
 ```bash
 # NG: /tmp など外部ディレクトリは使わない（スキルの「カレントディレクトリで実行」原則に反する）
 # OK: カレントディレクトリ内に _tmp を作成してマージ
-pnpm create next-app _tmp --typescript --tailwind --app --src-dir=false --import-alias "@/*" --no-git --yes
+mise exec -- pnpm create next-app _tmp --typescript --tailwind --app --src-dir=false --import-alias "@/*" --no-git --yes
 cp -r _tmp/. . && rm -rf _tmp
 ```
 
