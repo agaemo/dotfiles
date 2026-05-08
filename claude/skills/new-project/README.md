@@ -153,7 +153,6 @@ new-project/
 ├── SKILL.md      # エントリポイント（静的 / 動的の種別選択ルーター）
 ├── agents/       # サブエージェント定義（Claude が自律的に呼び出す）
 ├── skills/       # サブスキル定義（ユーザーが手動で呼び出す）
-├── templates/    # ドキュメント・設計書のひな形
 ├── guidelines/   # 開発ガイドライン（アーキテクチャ・設計手法・DB設計）
 ├── hooks/        # ツール実行前後に自動で動くスクリプト
 ├── gitignore     # プロジェクトの .gitignore ひな形
@@ -254,21 +253,6 @@ Claude が状況に応じて自律呼び出しするサブエージェント。
 | `release-planner` | リリース戦略・デプロイ計画・ロールバック手順の策定。 |
 | `update-harness` | ハーネスファイルを最新テンプレートで上書き更新。既存ファイルのみ対象。 |
 | `_TEMPLATE` | 新規スキル作成用のひな形。 |
-
----
-
-## templates/
-
-直接呼び出すものではない。
-
-| テンプレート | 用途 |
-|---|---|
-| `ideator-input.md` | ideator エージェントへの入力フォーマット。ユーザーがコピーして使う。 |
-
-> **デザイン・設計書テンプレートについて**
-> `design-brief.md` / `design-system.md` は `agents/designer.md` に、
-> `doc-requirements.md` / `doc-specifications.md` / `doc-basic-design.md` は `skills/new-project/SKILL.md` に
-> それぞれインライン化済み。パス依存を排除するため templates/ からは削除した。
 
 ---
 
