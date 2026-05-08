@@ -30,25 +30,25 @@ FOREACH row IN 以下の対応表:
 
   | src                             | dest                                   |
   |---------------------------------|----------------------------------------|
-  | agents/intake.md                | agents/intake.md                       |
-  | agents/refiner.md               | agents/refiner.md                      |
-  | agents/planner.md               | agents/planner.md                      |
-  | agents/designer.md              | agents/designer.md                     |
-  | agents/verify.md                | agents/verify.md                       |
-  | agents/security-reviewer.md     | agents/security-reviewer.md            |
-  | agents/qa.md                    | agents/qa.md                           |
-  | agents/code-reviewer.md         | agents/code-reviewer.md                |
-  | agents/release-planner.md       | agents/release-planner.md              |
-  | agents/debugger.md              | agents/debugger.md                     |
-  | agents/tester.md                | agents/tester.md                       |
-  | agents/architect.md             | agents/architect.md                    |
-  | agents/ideator.md               | agents/ideator.md                      |
+  | agents/intake/SKILL.md                | agents/intake.md                       |
+  | agents/refiner/SKILL.md               | agents/refiner.md                      |
+  | agents/planner/SKILL.md               | agents/planner.md                      |
+  | agents/designer/SKILL.md              | agents/designer.md                     |
+  | agents/verify/SKILL.md                | agents/verify.md                       |
+  | agents/security-reviewer/SKILL.md     | agents/security-reviewer.md            |
+  | agents/qa/SKILL.md                    | agents/qa.md                           |
+  | agents/code-reviewer/SKILL.md         | agents/code-reviewer.md                |
+  | agents/release-planner/SKILL.md       | agents/release-planner.md              |
+  | agents/debugger/SKILL.md              | agents/debugger.md                     |
+  | agents/tester/SKILL.md                | agents/tester.md                       |
+  | agents/architect/SKILL.md             | agents/architect.md                    |
+  | agents/ideator/SKILL.md               | agents/ideator.md                      |
   | hooks/on-session-start.js       | .claude/hooks/on-session-start.js      |
   | hooks/pre-bash.js               | .claude/hooks/pre-bash.js              |
   | hooks/post-write.js             | .claude/hooks/post-write.js            |
   | hooks/on-stop.js                | .claude/hooks/on-stop.js               |
   | skills/git-workflow/SKILL.md    | .claude/commands/git-workflow.md       |
-  | guidelines/db-design.md         | guidelines/db-design.md                |
+  | guidelines/db-design/SKILL.md         | guidelines/db-design.md                |
 
 --- STEP 2: settings.json の更新（絶対パス再埋め込み） ---
 
