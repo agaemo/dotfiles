@@ -76,17 +76,17 @@ FOREACH row IN 以下の対応表:
   |------------------------------------------|---------------------------------------|---------------|
   | gitignore                                | .gitignore                            | false         |
   | mcp.json                                 | .mcp.json                             | false         |
-  | agents/intake/SKILL.md                         | agents/intake.md                      | false         |
-  | agents/refiner/SKILL.md                        | agents/refiner.md                     | false         |
-  | agents/planner/SKILL.md                        | agents/planner.md                     | false         |
-  | agents/verify/SKILL.md                         | agents/verify.md                      | false         |
-  | agents/security-reviewer/SKILL.md              | agents/security-reviewer.md           | false         |
-  | agents/qa/SKILL.md                             | agents/qa.md                          | false         |
-  | agents/code-reviewer/SKILL.md                  | agents/code-reviewer.md               | false         |
-  | agents/release-planner/SKILL.md                | agents/release-planner.md             | false         |
+  | agents/intake.md                         | agents/intake.md                      | false         |
+  | agents/refiner.md                        | agents/refiner.md                     | false         |
+  | agents/planner.md                        | agents/planner.md                     | false         |
+  | agents/verify.md                         | agents/verify.md                      | false         |
+  | agents/security-reviewer.md              | agents/security-reviewer.md           | false         |
+  | agents/qa.md                             | agents/qa.md                          | false         |
+  | agents/code-reviewer.md                  | agents/code-reviewer.md               | false         |
+  | agents/release-planner.md                | agents/release-planner.md             | false         |
   | skills/git-workflow/SKILL.md             | .claude/commands/git-workflow.md      | false         |
-  | guidelines/db-design/SKILL.md                  | guidelines/db-design.md              | false         |
-  | agents/designer/SKILL.md                       | agents/designer.md                    | true          |
+  | guidelines/db-design.md                  | guidelines/db-design.md              | false         |
+  | agents/designer.md                       | agents/designer.md                    | true          |
 
 --- STEP 3: hooks ファイルの書き出し ---
 
@@ -123,7 +123,7 @@ NOTE: 通常は発火しない。STEP 2〜4で書き出し済みのため
 FOREACH (path, src) IN [
   (.claude/settings.json,    settings.json),
   (.claude/hooks/on-stop.js, hooks/on-stop.js),
-  (agents/intake.md,         agents/intake/SKILL.md)
+  (agents/intake.md,         agents/intake.md)
 ]:
   IF NOT EXISTS(CWD/path):
     READ  TEMPLATE/src
