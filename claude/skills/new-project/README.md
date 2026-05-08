@@ -9,7 +9,12 @@
 
 ```mermaid
 flowchart TD
-    START([/new-project 起動]) --> SETUP
+    START([/new-project 起動]) --> ROUTE{種別選択}
+
+    ROUTE -->|静的サイト\nLP・PoC・画面モック| STATIC["skills/new-static/SKILL.md\nヒアリング → デザインブリーフ\n→ Astro セットアップ → 実装"]
+    STATIC --> END_S([完了])
+
+    ROUTE -->|動的アプリ\nAPI・DB・認証あり| SETUP
 
     SETUP["ハーネスセットアップ\n（サブエージェント）\n.gitignore / mcp.json / agents/ / hooks/ / settings.json"]
     SETUP --> MISE["mise.toml 作成 → mise install"]
