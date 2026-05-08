@@ -11,7 +11,7 @@
 flowchart TD
     START([/new-project 起動]) --> ROUTE{種別選択}
 
-    ROUTE -->|静的サイト\nLP・PoC・画面モック| STATIC["skills/new-static/SKILL.md\nヒアリング → デザインブリーフ\n→ Astro セットアップ → 実装"]
+    ROUTE -->|静的サイト\nLP・PoC・画面モック| STATIC["skills/new-static/SKILL.md\nヒアリング → デザインブリーフ生成\n→ Astro セットアップ → 実装"]
     STATIC --> END_S([完了])
 
     ROUTE -->|動的アプリ\nAPI・DB・認証あり| SETUP
@@ -71,7 +71,7 @@ flowchart TD
 
     S7_CHECK{フロントあり?}
     S7_CHECK -->|Yes| S7["STEP 7: designer 実画面レビュー\n（Puppeteer スクリーンショット）"]
-    S7 --> S8["STEP 8: /review\nコンポーネント・アクセシビリティ・型安全性"]
+    S7 --> S8["STEP 8: /ultrareview（オプション）\nコンポーネント・アクセシビリティ・型安全性"]
     S8 --> S9
     S7_CHECK -->|No| S9
 
@@ -259,13 +259,16 @@ Claude が状況に応じて自律呼び出しするサブエージェント。
 
 ## templates/
 
-Claude がドキュメント生成時に参照するひな形。直接呼び出すものではない。
+直接呼び出すものではない。
 
 | テンプレート | 用途 |
 |---|---|
-| `ideator-input.md` | ideator エージェントへの入力フォーマット。 |
-| `design-brief.md` | デザインブリーフの構成。 |
-| `design-system.md` | デザインシステムの定義フォーマット。 |
+| `ideator-input.md` | ideator エージェントへの入力フォーマット。ユーザーがコピーして使う。 |
+
+> **デザイン・設計書テンプレートについて**
+> `design-brief.md` / `design-system.md` は `agents/designer.md` に、
+> `doc-requirements.md` / `doc-specifications.md` / `doc-basic-design.md` は `skills/new-project/SKILL.md` に
+> それぞれインライン化済み。パス依存を排除するため templates/ からは削除した。
 
 ---
 

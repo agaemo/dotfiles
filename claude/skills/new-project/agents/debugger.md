@@ -18,12 +18,20 @@ tools:
 
 ### ステップ 1：エラーを収集する
 
-渡されたエラーメッセージを読む。渡されていない場合は以下で収集する：
+渡されたエラーメッセージを読む。渡されていない場合は `package.json` の `scripts` フィールドを Read して適切なコマンドを実行する：
 
 ```bash
-bun test 2>&1
+# テスト（scripts.test の値に応じて選択）
+pnpm test 2>&1          # Node.js / pnpm プロジェクト
+bun test 2>&1           # Bun プロジェクト
+
+# 型チェック（TypeScript）
+pnpm exec tsc --noEmit 2>&1
 bunx tsc --noEmit 2>&1
-bunx biome check . 2>&1
+
+# リンター（プロジェクトの設定に応じて）
+pnpm exec biome check . 2>&1
+pnpm exec eslint . 2>&1
 ```
 
 実行時エラーはユーザーが貼ったログから読む。
