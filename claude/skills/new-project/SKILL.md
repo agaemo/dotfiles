@@ -20,11 +20,11 @@ ASK USER: どちらを作成しますか？
 WAIT_FOR: ユーザーの選択
 
 IF 静的サイト:
-  READ ~/.claude/skills/new-project/commands/new-static.md
+  READ ~/.claude/skills/new-project/skills/new-static/SKILL.md
   FOLLOW: そこに記述されたすべての手順を実行する
   STOP: 以降のステップは実行しない
 
 IF 動的アプリ:
-  READ ~/.claude/skills/new-project/commands/new-project.md
+  READ ~/.claude/skills/new-project/skills/new-project/SKILL.md
   FOLLOW: そこに記述されたすべての手順を実行する
 ```

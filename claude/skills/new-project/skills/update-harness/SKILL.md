@@ -47,7 +47,7 @@ FOREACH row IN 以下の対応表:
   | hooks/pre-bash.js               | .claude/hooks/pre-bash.js              |
   | hooks/post-write.js             | .claude/hooks/post-write.js            |
   | hooks/on-stop.js                | .claude/hooks/on-stop.js               |
-  | commands/git-workflow.md        | .claude/commands/git-workflow.md       |
+  | skills/git-workflow/SKILL.md    | .claude/commands/git-workflow.md       |
   | guidelines/db-design.md         | guidelines/db-design.md                |
 
 --- STEP 2: settings.json の更新（絶対パス再埋め込み） ---
