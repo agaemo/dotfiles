@@ -25,18 +25,32 @@ sync_claude() {
   echo "  ✓ claude/statusline-command.sh"
 }
 
+cleanup_old_commands() {
+  # 旧 ~/.claude/commands 以下のシンボリックリンクと、commands ディレクトリ自体を削除
+  if [ -L ~/.claude/commands ]; then
+    rm ~/.claude/commands
+    echo "  ✓ removed symlink ~/.claude/commands"
+  elif [ -d ~/.claude/commands ]; then
+    for entry in ~/.claude/commands/*; do
+      [ -L "$entry" ] && rm "$entry"
+    done
+    rmdir ~/.claude/commands 2>/dev/null && echo "  ✓ removed dir ~/.claude/commands" || true
+  fi
+}
+
 sync_skills() {
-  mkdir -p "$DOTFILES_DIR/claude/commands"
-  mkdir -p ~/.claude/commands
-  for entry in "$DOTFILES_DIR/claude/commands/"*; do
-    [ -e "$entry" ] || continue
-    [ "$(basename "$entry")" = "README.md" ] && continue
-    target=~/.claude/commands/$(basename "$entry")
+  cleanup_old_commands
+  mkdir -p ~/.claude/skills
+  for skill_dir in "$DOTFILES_DIR/claude/skills/"*/; do
+    [ -d "$skill_dir" ] || continue
+    skill_name="$(basename "$skill_dir")"
+    [ "$skill_name" = "README.md" ] && continue
+    target=~/.claude/skills/$skill_name
     if [ ! -L "$target" ]; then
-      ln -sf "$entry" "$target"
-      echo "  ✓ symlinked $(basename "$entry")"
+      ln -sfn "$skill_dir" "$target"
+      echo "  ✓ symlinked $skill_name"
     else
-      echo "  - skipped $(basename "$entry") (already linked)"
+      echo "  - skipped $skill_name (already linked)"
     fi
   done
 }
