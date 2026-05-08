@@ -1,23 +1,18 @@
 ---
 name: new-static
-description: Astro + Node.js で静的サイト・LP・PoC・フロントエンドのみの実装を新規作成する。/new-project の静的特化版（デザインファーストで開始、intake・planner・qa 不要）。動的機能・バックエンドが必要なら /new-project を使うこと。
+description: 静的サイト（LP・PoC・画面モック）のセットアップ手順。/new-project から静的サイトを選択したときに実行される。
 ---
 
-# /new-static
+# new-static（静的サイトセットアップ）
 
 Astro + Node.js で静的サイト（LP・PoC・管理画面モック等）プロジェクトをセットアップする。
 **プロジェクトディレクトリを作成して `cd` で移動した後に実行すること。**
-
-## 使い方
-
-- `/new-static` — カレントディレクトリに静的サイトをセットアップする
-- 動的機能・バックエンドが必要なら `/new-project` を使うこと（intake → planner → 実装のフルチェーン）
 
 ## フロー概要
 
 ```mermaid
 flowchart TD
-    START([/new-static 起動]) --> S1
+    START([静的サイトを選択]) --> S1
 
     subgraph DESIGN["設計フェーズ（メインClaude が対話）"]
         S1["STEP 1: ヒアリング\n業種・ページ構成・色・フォント・\n参考デザイン・FEEL/ANTI-FEEL を\n1メッセージで質問"]
@@ -49,15 +44,6 @@ flowchart TD
     IMPL --> REVIEW["全セクション完了後\nPuppeteer スクリーンショットで最終確認"]
     REVIEW --> END([完了])
 ```
-
-## いつ使うか
-
-| ケース | スキル |
-|--------|--------|
-| LP・静的ページ | `/new-static` |
-| PoC・画面モック（フロントのみ） | `/new-static` |
-| 管理画面・ダッシュボード（静的） | `/new-static` |
-| API・DB・認証が必要 | `/new-project` |
 
 ---
 
@@ -351,7 +337,7 @@ IF NOT EXISTS(README.md):
 
 ```
 REPORT TO USER:
-  LP プロジェクトのセットアップが完了しました。
+  静的サイトプロジェクトのセットアップが完了しました。
   （詳細はサブエージェントの報告を参照）
 
   次のステップ:

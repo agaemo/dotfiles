@@ -7,8 +7,7 @@ Claude Code のカスタムスキル定義ディレクトリ。
 
 | スキル | 説明 |
 |--------|------|
-| [`/new-project`](new-project/SKILL.md) | アプリ・API・管理画面など動的機能を持つプロジェクトにハーネス一式をセットアップする |
-| [`/new-static`](new-static/SKILL.md) | LP・PoC・静的ページを Astro + Node.js で新規作成する。`/new-project` の静的特化版（デザインファースト、intake / planner 不要） |
+| [`/new-project`](new-project/SKILL.md) | 新規プロジェクトをセットアップする。起動時に静的サイト（LP・PoC）か動的アプリ（API・DB・認証あり）かを選択する |
 | [`/lp-publish`](lp-publish/SKILL.md) | LP を本番公開するための準備・手順をガイドする。ホスティング・ドメイン・SEO ファイルの知識がなくても進められる |
 | [`/issue-triage`](issue-triage/SKILL.md) | GitHub issue番号を渡すと対応方針を検討し、承認を得てから修正・PR作成まで行う |
 | [`/improve-skill`](improve-skill/SKILL.md) | スキルファイルを静的解析・実行シミュレーションで改善する |
