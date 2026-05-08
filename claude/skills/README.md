@@ -1,41 +1,41 @@
-# claude/commands
+# claude/skills
 
-Claude Code のカスタムスラッシュコマンド定義ディレクトリ。
-`~/.claude/commands/` にシンボリックリンクされ、どのプロジェクトからでも利用できる。
+Claude Code のカスタムスキル定義ディレクトリ。
+`~/.claude/skills/` にシンボリックリンクされ、どのプロジェクトからでも利用できる。
 
-## コマンド一覧
+## スキル一覧
 
-| コマンド | 説明 |
-|---------|------|
-| [`/new-project`](new-project.md) | アプリ・API・管理画面など動的機能を持つプロジェクトにハーネス一式をセットアップする |
-| [`/new-static`](new-static.md) | LP・PoC・静的ページを Astro + Node.js で新規作成する。`/new-project` の静的特化版（デザインファースト、intake / planner 不要） |
-| [`/lp-publish`](lp-publish.md) | LP を本番公開するための準備・手順をガイドする。ホスティング・ドメイン・SEO ファイルの知識がなくても進められる |
-| [`/issue-triage`](issue-triage.md) | GitHub issue番号を渡すと対応方針を検討し、承認を得てから修正・PR作成まで行う |
-| [`/improve-skill`](improve-skill.md) | スキルファイルを静的解析・実行シミュレーションで改善する |
-| [`/improve-agent`](improve-agent.md) | エージェントファイルを静的解析・実行シミュレーションで改善する |
+| スキル | 説明 |
+|--------|------|
+| [`/new-project`](new-project/SKILL.md) | アプリ・API・管理画面など動的機能を持つプロジェクトにハーネス一式をセットアップする |
+| [`/new-static`](new-static/SKILL.md) | LP・PoC・静的ページを Astro + Node.js で新規作成する。`/new-project` の静的特化版（デザインファースト、intake / planner 不要） |
+| [`/lp-publish`](lp-publish/SKILL.md) | LP を本番公開するための準備・手順をガイドする。ホスティング・ドメイン・SEO ファイルの知識がなくても進められる |
+| [`/issue-triage`](issue-triage/SKILL.md) | GitHub issue番号を渡すと対応方針を検討し、承認を得てから修正・PR作成まで行う |
+| [`/improve-skill`](improve-skill/SKILL.md) | スキルファイルを静的解析・実行シミュレーションで改善する |
+| [`/improve-agent`](improve-agent/SKILL.md) | エージェントファイルを静的解析・実行シミュレーションで改善する |
 
 ## 使い方
 
-Claude Code のチャットで `/` + コマンド名を入力するだけで実行できる。
+Claude Code のチャットで `/` + スキル名を入力するだけで実行できる。
 
 ```
 /new-project
 /improve-agent agents/planner.md
 ```
 
-## コマンドの追加方法
+## スキルの追加方法
 
-このディレクトリに `<command-name>.md` を追加するだけで利用可能になる
-（`~/.claude/commands/` へのシンボリックリンクが張られているため再起動不要）。
+`<skill-name>/SKILL.md` を追加するだけで利用可能になる
+（`~/.claude/skills/` へのシンボリックリンクが張られているため再起動不要）。
 フロントマターで `name` と `description` を設定すること。
 
 ```markdown
 ---
-name: command-name
-description: コマンドの説明
+name: skill-name
+description: スキルの説明
 ---
 
-# /command-name
+# /skill-name
 
 ...
 ```

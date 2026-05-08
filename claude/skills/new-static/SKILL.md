@@ -75,7 +75,7 @@ IF NOT EXISTS(docs/):
 ENDIF
 
 IF NOT EXISTS(docs/design-brief.md):
-  COPY ~/.claude/commands/new-project/templates/design-brief.md
+  COPY ~/.claude/skills/new-project/templates/design-brief.md
     → <cwd>/docs/design-brief.md
 ENDIF
 
@@ -190,7 +190,7 @@ NOTE: .mcp.json と .claude/commands/git-workflow.md への Write は
   「はい」を選択して続行すること。
 
 CWD        = <現在の作業ディレクトリの絶対パス>
-TEMPLATE   = ~/.claude/commands/new-project
+TEMPLATE   = ~/.claude/skills/new-project
 
 --- STEP 1: Node / pnpm 環境構築 ---
 
