@@ -1,6 +1,6 @@
 ---
-name: <!-- TODO: スキル名（例: database-migrations） -->
-description: <!-- TODO: いつ使うかを1文で（例: データベーススキーママイグレーションの手順。テーブルやカラムを追加・変更するときに使う。） -->
+name: skill-name          # TODO: ケバブケースで記入（例: database-migrations）
+description: スキルの説明  # TODO: いつ使うかを1文で（例: DBスキーママイグレーションの手順。テーブルやカラムを追加・変更するときに使う。）
 ---
 
 <!-- TODO: スキルの内容を書く -->
