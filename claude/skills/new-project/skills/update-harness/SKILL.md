@@ -38,7 +38,6 @@ FOREACH row IN 以下の対応表:
   | agents/security-reviewer.md     | agents/security-reviewer.md            |
   | agents/qa.md                    | agents/qa.md                           |
   | agents/code-reviewer.md         | agents/code-reviewer.md                |
-  | agents/release-planner.md       | agents/release-planner.md              |
   | agents/debugger.md              | agents/debugger.md                     |
   | agents/tester.md                | agents/tester.md                       |
   | agents/architect.md             | agents/architect.md                    |
