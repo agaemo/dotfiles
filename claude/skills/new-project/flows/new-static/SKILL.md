@@ -246,7 +246,7 @@ FOREACH row IN 以下の対応表:
   | hooks/post-write.js           | .claude/hooks/post-write.js          |
   | hooks/on-stop.js              | .claude/hooks/on-stop.js             |
   | agents/designer.md            | agents/designer.md                   |
-  | skills/git-workflow/SKILL.md  | .claude/commands/git-workflow.md     |
+  | flows/git-workflow/SKILL.md  | .claude/commands/git-workflow.md     |
 
 --- STEP 5: git 初期化 ---
 

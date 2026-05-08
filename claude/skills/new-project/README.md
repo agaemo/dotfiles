@@ -11,7 +11,7 @@
 flowchart TD
     START([/new-project 起動]) --> ROUTE{種別選択}
 
-    ROUTE -->|静的サイト\nLP・PoC・画面モック| STATIC["skills/new-static/SKILL.md\nヒアリング → デザインブリーフ生成\n→ Astro セットアップ → 実装"]
+    ROUTE -->|静的サイト\nLP・PoC・画面モック| STATIC["flows/new-static/SKILL.md\nヒアリング → デザインブリーフ生成\n→ Astro セットアップ → 実装"]
     STATIC --> END_S([完了])
 
     ROUTE -->|動的アプリ\nAPI・DB・認証あり| SETUP
@@ -152,7 +152,7 @@ flowchart LR
 new-project/
 ├── SKILL.md      # エントリポイント（静的 / 動的の種別選択ルーター）
 ├── agents/       # サブエージェント定義（Claude が自律的に呼び出す）
-├── skills/       # サブスキル定義（ユーザーが手動で呼び出す）
+├── flows/        # 実行フロー定義（new-project・new-static 等のサブ手順）
 ├── guidelines/   # 開発ガイドライン（アーキテクチャ・設計手法・DB設計）
 ├── hooks/        # ツール実行前後に自動で動くスクリプト
 ├── gitignore     # プロジェクトの .gitignore ひな形
@@ -234,10 +234,10 @@ Claude が状況に応じて自律呼び出しするサブエージェント。
 
 ---
 
-## skills/
+## flows/
 
-ユーザーが `/new-project:skills:コマンド名` で手動呼び出すサブスキル。
-参照資料・手順書として使われることが多い。
+`/new-project` スキルが内部で READ して実行するサブ手順書。
+Claude Code のスキルとしては認識されず、メインの SKILL.md からの明示的な READ によって動作する。
 
 | スキル | 役割 |
 |---|---|
