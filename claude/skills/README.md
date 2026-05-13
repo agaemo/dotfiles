@@ -9,7 +9,7 @@ Claude Code のカスタムスキル定義ディレクトリ。
 |--------|------|
 | [`/new-project`](new-project/SKILL.md) | 新規プロジェクトをセットアップする。起動時に静的サイト（LP・PoC）か動的アプリ（API・DB・認証あり）かを選択する |
 | [`/lp-publish`](lp-publish/SKILL.md) | LP を本番公開するための準備・手順をガイドする。ホスティング・ドメイン・SEO ファイルの知識がなくても進められる |
-| [`/issue-triage`](issue-triage/SKILL.md) | GitHub issue番号を渡すと対応方針を検討し、承認を得てから修正・PR作成まで行う |
+| [`/issue-triage`](issue-triage/SKILL.md) | issue番号なしで呼ぶと一覧表示・選択、番号指定で直接トリアージ。承認を得てから修正・PR作成まで行う |
 | [`/improve-skill`](improve-skill/SKILL.md) | スキルファイルを静的解析・実行シミュレーションで改善する |
 | [`/improve-agent`](improve-agent/SKILL.md) | エージェントファイルを静的解析・実行シミュレーションで改善する |
 
