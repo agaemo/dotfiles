@@ -121,7 +121,6 @@ flowchart LR
         observability
         iac
         scorer
-        sre
         release-planner
     end
 
