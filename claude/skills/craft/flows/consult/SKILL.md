@@ -222,4 +222,7 @@ CREATE PR:
   # PR 作成後にレビュースキルで自動レビューを実行する
   PR_NUMBER = 作成した PR の番号
   RUN /review {PR_NUMBER}
+
+  # デフォルトブランチに戻す
+  RUN: git checkout {DEFAULT_BRANCH}
 ```
