@@ -20,7 +20,8 @@ flowchart TD
 
 ---
 
-## 静的サイト（new-static）フロー
+<details>
+<summary>静的サイト（new-static）フロー</summary>
 
 ```mermaid
 flowchart TD
@@ -56,9 +57,10 @@ flowchart TD
     REVIEW --> END([完了])
 ```
 
----
+</details>
 
-## 動的アプリ（new-project）フロー
+<details>
+<summary>動的アプリ（new-project）フロー</summary>
 
 ```mermaid
 flowchart TD
@@ -125,9 +127,10 @@ flowchart TD
     S10 --> END([完了])
 ```
 
----
+</details>
 
-## 既存システムの相談（consult）フロー
+<details>
+<summary>既存システムの相談（consult）フロー</summary>
 
 ```mermaid
 flowchart TD
@@ -151,9 +154,12 @@ flowchart TD
     C7 --> END([完了])
 ```
 
+</details>
+
 ---
 
-## 各フィーチャートラックの処理
+<details>
+<summary>各フィーチャートラックの処理</summary>
 
 フェーズ2で並列起動される各トラックエージェントの内部フロー。
 
@@ -170,9 +176,10 @@ flowchart LR
     end
 ```
 
----
+</details>
 
-## エージェントの呼び出しタイミング
+<details>
+<summary>エージェントの呼び出しタイミング</summary>
 
 ```mermaid
 flowchart LR
@@ -202,6 +209,8 @@ flowchart LR
         architect
     end
 ```
+
+</details>
 
 ---
 
