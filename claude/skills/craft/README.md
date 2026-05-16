@@ -5,26 +5,58 @@
 
 ---
 
-## /craft スキル 全体フロー
+## 静的サイト（new-static）フロー
 
 ```mermaid
 flowchart TD
-    START([/craft 起動]) --> ROUTE{種別選択}
+    START([静的サイトを選択]) --> S1
 
-    ROUTE -->|静的サイト\nLP・PoC・画面モック| STATIC["flows/new-static/SKILL.md\nヒアリング → デザインブリーフ生成\n→ Astro セットアップ → 実装"]
-    STATIC --> END_S([完了])
+    subgraph DESIGN["設計フェーズ（メインClaude が対話）"]
+        S1["STEP 1: ヒアリング\n業種・ページ構成・色・フォント・\n参考デザイン・FEEL/ANTI-FEEL を\n1メッセージで質問"]
+        S1 --> S1B["デザインブリーフ生成\n→ docs/design-brief.md"]
+        S1B --> S2["STEP 2: 理解度チェック\n5項目すべて ≥4 になるまでループ"]
+        S2 --> GATE{承認}
+    end
 
-    ROUTE -->|動的アプリ\nAPI・DB・認証あり| SETUP
+    GATE -->|承認| S3
+
+    subgraph SETUP["セットアップ（サブエージェント）"]
+        S3["STEP 3:\nmise → Astro プロジェクト作成\n→ ファイル書き出し\n→ settings.json\n→ git init\n→ pnpm build 確認"]
+    end
+
+    S3 --> S4["STEP 4: CLAUDE.md・README.md 生成"]
+    S4 --> S5["STEP 5: 完了報告"]
+    S5 --> IMPL
+
+    subgraph IMPL["実装フェーズ（セクション単位で繰り返す）"]
+        direction LR
+        IA["セクションを実装\n.astro コンポーネント"] --> IB["pnpm dev で表示確認"]
+        IB --> IC{OK?}
+        IC -->|問題あり| IA
+        IC -->|OK| ID["次のセクションへ"]
+        ID --> IA
+    end
+
+    IMPL --> REVIEW["全セクション完了後\nPuppeteer スクリーンショットで最終確認"]
+    REVIEW --> END([完了])
+```
+
+---
+
+## 動的アプリ（new-project）フロー
+
+```mermaid
+flowchart TD
+    START([動的アプリを選択]) --> SETUP
 
     SETUP["ハーネスセットアップ\n（サブエージェント）\n.gitignore / .mcp.json / hooks/ / settings.json"]
     SETUP --> MISE["mise.toml 作成 → mise install"]
-
     MISE --> S1
 
     subgraph DESIGN["ウォーターフォール設計フェーズ（承認ゲートあり）"]
         S1["STEP 1: intake\n→ docs/working/requirements.md"]
         S1 -->|承認 1/5| S2
-        S2["STEP 2: refiner\n→ docs/working/stories.md\n※未解決の疑問は回答後も残す"]
+        S2["STEP 2: refiner\n→ docs/working/stories.md"]
         S2 -->|承認 2/5| S3_CHECK
 
         S3_CHECK{フロントあり?}
@@ -34,7 +66,6 @@ flowchart TD
 
         S4["STEP 4: planner\n→ docs/working/plan.md\n（クリティカルパス + 並列トラック定義）"]
         S4 -->|承認 4/5| S45
-
         S45["STEP 4.5: 理解度チェック\n（5項目すべて ≥4 になるまでループ）"]
         S45 --> S5
     end
@@ -68,19 +99,41 @@ flowchart TD
     end
 
     PH3B --> S7_CHECK
-
     S7_CHECK{フロントあり?}
     S7_CHECK -->|Yes| S7["STEP 7: designer 実画面レビュー\n（Puppeteer スクリーンショット）"]
-    S7 --> S8["STEP 8: /ultrareview（オプション）\nコンポーネント・アクセシビリティ・型安全性"]
+    S7 --> S8["STEP 8: /ultrareview（オプション）"]
     S8 --> S9
     S7_CHECK -->|No| S9
 
     S9["STEP 9: verify → security-reviewer\n→ qa → code-reviewer"]
-    S9 --> S10["STEP 10: CLAUDE.md・README.md 生成\npublic/ クリーンアップ"]
+    S9 --> S10["STEP 10: CLAUDE.md・README.md 生成"]
     S10 --> END([完了])
+```
 
-    ROUTE -->|既存システムの相談\n課題整理・移行・リファクタ| CONSULT["flows/consult/SKILL.md\n相談 → 現状調査 → 選択肢提示\n→ 実行（任意）"]
-    CONSULT --> END_C([完了])
+---
+
+## 既存システムの相談（consult）フロー
+
+```mermaid
+flowchart TD
+    START([相談を選択]) --> C1["STEP 1: 相談\n気になること・困っていることを聞く"]
+    C1 --> QA_CHECK{テスト・品質の相談?}
+    QA_CHECK -->|Yes| QA["flows/qa/SKILL.md に委譲\nQA基盤構築フローへ"]
+    QA --> END_Q([完了])
+    QA_CHECK -->|No| C2["STEP 2: 現状調査\nコードベース・依存・複雑度を把握"]
+    C2 --> C3["STEP 3: 選択肢の整理・提案\n移行 / リファクタ / 現状維持"]
+    C3 --> GATE{ユーザーの判断}
+    GATE -->|今はしない| END_N([相談のみで完了])
+    GATE -->|実行する| C4
+
+    subgraph EXEC["実行フェーズ"]
+        C4["git pull → ブランチ作成"]
+        C4 --> C5["issue 作成（任意）"]
+        C5 --> C6["フェーズ単位で実装・検証"]
+        C6 --> C7["PR 作成 → /review → main に戻る"]
+    end
+
+    C7 --> END([完了])
 ```
 
 ---
