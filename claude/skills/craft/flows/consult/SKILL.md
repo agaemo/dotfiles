@@ -108,7 +108,17 @@ IF ユーザーが移行・リファクタを選択:
   GATE: 計画の承認を得る
     → 修正要望があれば計画を更新して再提示する
 
-  CREATE GITHUB ISSUE:
+  ASK USER:
+    実行にあたって以下を確認します。
+    1. GitHub issue を作成しますか？（変更の背景・経緯を記録）
+    2. 完了後に PR を作成しますか？
+
+  WAIT_FOR: ユーザーの回答
+
+  CREATE_ISSUE = ユーザーが issue 作成を希望した場合
+  CREATE_PR    = ユーザーが PR 作成を希望した場合
+
+  IF CREATE_ISSUE:
     gh issue create \
       --title "[consult] <課題を端的に>" \
       --body "$(cat <<'BODY'
@@ -129,6 +139,8 @@ IF ユーザーが移行・リファクタを選択:
 BODY
 )"
     ISSUE_NUMBER = 作成した issue の番号
+  ELSE:
+    ISSUE_NUMBER = なし
 
   BRANCH = consult/<slug>
     例: consult/sqlite-to-mysql、consult/auth-refactor
@@ -151,6 +163,10 @@ BODY
 ### ステップ 5: 完了・PR 作成（実行した場合のみ）
 
 ```
+IF CREATE_PR == false:
+  REPORT: 変更内容のサマリーを表示して完了とする
+  STOP
+
 CREATE PR:
   タイトル: [変更内容を端的に]（例: migrate: SQLite → MySQL）
   本文（以下をすべて記載すること）:
@@ -184,5 +200,6 @@ CREATE PR:
     ## 確認方法
     [レビュアーがローカルで動作確認するための手順]
 
-    Closes #ISSUE_NUMBER
+    IF ISSUE_NUMBER != なし:
+      Closes #ISSUE_NUMBER
 ```
