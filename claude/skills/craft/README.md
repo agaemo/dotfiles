@@ -1,15 +1,15 @@
-# new-project ハーネス
+# craft ハーネス
 
-新規プロジェクト作成時に `/new-project` スキルでコピーされる一式。
+新規プロジェクト作成時に `/craft` スキルでコピーされる一式。
 プロジェクトルートの `.claude/` 以下に展開される。
 
 ---
 
-## /new-project スキル 全体フロー
+## /craft スキル 全体フロー
 
 ```mermaid
 flowchart TD
-    START([/new-project 起動]) --> ROUTE{種別選択}
+    START([/craft 起動]) --> ROUTE{種別選択}
 
     ROUTE -->|静的サイト\nLP・PoC・画面モック| STATIC["flows/new-static/SKILL.md\nヒアリング → デザインブリーフ生成\n→ Astro セットアップ → 実装"]
     STATIC --> END_S([完了])
@@ -149,7 +149,7 @@ flowchart LR
 ## ディレクトリ構成
 
 ```
-new-project/
+craft/
 ├── SKILL.md      # エントリポイント（静的 / 動的の種別選択ルーター）
 ├── agents/       # サブエージェント定義（Claude が自律的に呼び出す）
 ├── flows/        # 実行フロー定義（new-project・new-static 等のサブ手順）
@@ -236,7 +236,7 @@ Claude が状況に応じて自律呼び出しするサブエージェント。
 
 ## flows/
 
-`/new-project` スキルが内部で READ して実行するサブ手順書。
+`/craft` スキルが内部で READ して実行するサブ手順書。
 Claude Code のスキルとしては認識されず、メインの SKILL.md からの明示的な READ によって動作する。
 
 | フロー | 役割 |

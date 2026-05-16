@@ -1,6 +1,6 @@
 ---
 name: new-static
-description: 静的サイト（LP・PoC・画面モック）のセットアップ手順。/new-project から静的サイトを選択したときに実行される。
+description: 静的サイト（LP・PoC・画面モック）のセットアップ手順。/craft から静的サイトを選択したときに実行される。
 ---
 
 # new-static（静的サイトセットアップ）
@@ -176,7 +176,7 @@ NOTE: .mcp.json と .claude/commands/git-workflow.md への Write は
   「はい」を選択して続行すること。
 
 CWD        = <現在の作業ディレクトリの絶対パス>
-TEMPLATE   = ~/.claude/skills/new-project
+TEMPLATE   = ~/.claude/skills/craft
 
 --- STEP 1: Node / pnpm 環境構築 ---
 

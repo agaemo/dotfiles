@@ -7,7 +7,7 @@ Claude Code のカスタムスキル定義ディレクトリ。
 
 | スキル | 説明 |
 |--------|------|
-| [`/new-project`](new-project/SKILL.md) | 新規プロジェクトをセットアップする。起動時に静的サイト（LP・PoC）か動的アプリ（API・DB・認証あり）かを選択する |
+| [`/craft`](craft/SKILL.md) | システム開発に関する部品集。新規立ち上げ・維持保守・移行など開発全工程のフローを包含する |
 | [`/lp-publish`](lp-publish/SKILL.md) | LP を本番公開するための準備・手順をガイドする。ホスティング・ドメイン・SEO ファイルの知識がなくても進められる |
 | [`/issue-triage`](issue-triage/SKILL.md) | issue番号なしで呼ぶと一覧表示・選択、番号指定で直接トリアージ。承認を得てから修正・PR作成まで行う |
 | [`/improve-skill`](improve-skill/SKILL.md) | スキルファイルを静的解析・実行シミュレーションで改善する |
@@ -18,7 +18,7 @@ Claude Code のカスタムスキル定義ディレクトリ。
 Claude Code のチャットで `/` + スキル名を入力するだけで実行できる。
 
 ```
-/new-project
+/craft
 /improve-agent agents/planner.md
 ```
 
