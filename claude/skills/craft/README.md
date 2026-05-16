@@ -5,6 +5,21 @@
 
 ---
 
+## /craft 起動フロー
+
+```mermaid
+flowchart TD
+    START([/craft 起動]) --> ROUTE{種別選択}
+    ROUTE -->|1. 静的サイト\nLP・PoC・画面モック| STATIC[new-static フロー]
+    ROUTE -->|2. 動的アプリ\nAPI・DB・認証あり| DYNAMIC[new-project フロー]
+    ROUTE -->|3. 既存システムの相談\n課題整理・移行・品質改善等| CONSULT[consult フロー]
+    STATIC --> END_S([完了])
+    DYNAMIC --> END_D([完了])
+    CONSULT --> END_C([完了])
+```
+
+---
+
 ## 静的サイト（new-static）フロー
 
 ```mermaid
