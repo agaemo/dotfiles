@@ -77,32 +77,18 @@ FOREACH row IN 以下の対応表:
   |------------------------------------------|---------------------------------------|---------------|
   | gitignore                                | .gitignore                            | false         |
   | mcp.json                                 | .mcp.json                             | false         |
-  | agents/intake.md                         | agents/intake.md                      | false         |
-  | agents/refiner.md                        | agents/refiner.md                     | false         |
-  | agents/planner.md                        | agents/planner.md                     | false         |
-  | agents/verify.md                         | agents/verify.md                      | false         |
-  | agents/security-reviewer.md              | agents/security-reviewer.md           | false         |
-  | agents/qa.md                             | agents/qa.md                          | false         |
-  | agents/code-reviewer.md                  | agents/code-reviewer.md               | false         |
   | flows/git-workflow/SKILL.md             | .claude/commands/git-workflow.md      | false         |
-  | guidelines/db-design.md                  | guidelines/db-design.md              | false         |
-  | agents/designer.md                       | agents/designer.md                    | true          |
 
 --- STEP 3: hooks ファイルの書き出し ---
 
 FOREACH row IN 以下の対応表:
-  IF EXISTS(TEMPLATE/row.src):
-    READ  TEMPLATE/row.src
-    WRITE CWD/row.dest
-  ELSE:
-    SKIP  # テンプレートに存在しないファイルはエラーではなくスキップ
+  READ  TEMPLATE/row.src
+  WRITE CWD/row.dest
 
   | src                        | dest                                    |
   |----------------------------|-----------------------------------------|
   | hooks/on-session-start.js  | .claude/hooks/on-session-start.js       |
   | hooks/pre-bash.js          | .claude/hooks/pre-bash.js               |
-  | hooks/post-write.js        | .claude/hooks/post-write.js             |
-  | hooks/on-stop.js           | .claude/hooks/on-stop.js                |
 
 --- STEP 4: settings.json の書き出し（絶対パス埋め込み） ---
 
@@ -121,9 +107,10 @@ ASSERT EXISTS(CWD/.claude/settings.json)
 NOTE: 通常は発火しない。STEP 2〜4で書き出し済みのため
 
 FOREACH (path, src) IN [
-  (.claude/settings.json,    settings.json),
-  (.claude/hooks/on-stop.js, hooks/on-stop.js),
-  (agents/intake.md,         agents/intake.md)
+  (.claude/settings.json,              settings.json),
+  (.claude/hooks/on-session-start.js,  hooks/on-session-start.js),
+  (.claude/hooks/pre-bash.js,          hooks/pre-bash.js),
+  (.claude/commands/git-workflow.md,   flows/git-workflow/SKILL.md)
 ]:
   IF NOT EXISTS(CWD/path):
     READ  TEMPLATE/src

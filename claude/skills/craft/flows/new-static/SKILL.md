@@ -244,9 +244,6 @@ FOREACH row IN 以下の対応表:
   | mcp.json                      | .mcp.json                            |
   | hooks/on-session-start.js     | .claude/hooks/on-session-start.js    |
   | hooks/pre-bash.js             | .claude/hooks/pre-bash.js            |
-  | hooks/post-write.js           | .claude/hooks/post-write.js          |
-  | hooks/on-stop.js              | .claude/hooks/on-stop.js             |
-  | agents/designer.md            | agents/designer.md                   |
   | flows/git-workflow/SKILL.md  | .claude/commands/git-workflow.md     |
 
 --- STEP 5: git 初期化 ---
@@ -280,8 +277,9 @@ ENDIF
 
 FOREACH path IN [
   .claude/settings.json,
-  .claude/hooks/on-stop.js,
-  agents/designer.md
+  .claude/hooks/on-session-start.js,
+  .claude/hooks/pre-bash.js,
+  .claude/commands/git-workflow.md
 ]:
   IF NOT EXISTS(CWD/path):
     READ  TEMPLATE/<対応する src>
