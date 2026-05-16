@@ -22,6 +22,15 @@ ASK USER:
 
 WAIT_FOR: ユーザーの話
 
+# テスト・品質・QAに関する相談であれば qa フローに委譲する
+CRAFT_DIR = このSKILL.mdが存在するディレクトリの2階層上
+  # craft/flows/consult/SKILL.md → craft/
+
+IF 相談内容がテスト・品質・QA基盤・カバレッジに関するもの:
+  READ {CRAFT_DIR}/flows/qa/SKILL.md
+  FOLLOW: そこに記述されたすべての手順を実行する
+  STOP
+
 IF 話が漠然としている・追加情報が必要:
   ASK: 状況を深掘りする質問を1件ずつ行う
     例: 「それはどのくらいの頻度で起きていますか？」
