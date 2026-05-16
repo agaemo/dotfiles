@@ -176,7 +176,8 @@ NOTE: .mcp.json と .claude/commands/git-workflow.md への Write は
   「はい」を選択して続行すること。
 
 CWD        = <現在の作業ディレクトリの絶対パス>
-TEMPLATE   = ~/.claude/skills/craft
+TEMPLATE   = このSKILL.mdが存在するディレクトリの2階層上の絶対パス
+  # craft/flows/new-static/SKILL.md → craft/
 
 --- STEP 1: Node / pnpm 環境構築 ---
 
