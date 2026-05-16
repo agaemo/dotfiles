@@ -142,6 +142,13 @@ BODY
   ELSE:
     ISSUE_NUMBER = なし
 
+  # ブランチ作成前にデフォルトブランチを最新化する
+  DEFAULT_BRANCH = git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'
+  RUN: git checkout {DEFAULT_BRANCH} && git pull
+  IF 失敗:
+    REPORT: pull に失敗した旨を伝え、コンフリクトや認証問題がないか確認を促す
+    STOP
+
   BRANCH = consult/<slug>
     例: consult/sqlite-to-mysql、consult/auth-refactor
 
@@ -202,4 +209,8 @@ CREATE PR:
 
     IF ISSUE_NUMBER != なし:
       Closes #ISSUE_NUMBER
+
+  # PR 作成後にレビュースキルで自動レビューを実行する
+  PR_NUMBER = 作成した PR の番号
+  RUN /review {PR_NUMBER}
 ```
