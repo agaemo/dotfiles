@@ -1,7 +1,7 @@
-# craft ハーネス
+# craft
 
-新規プロジェクト作成時に `/craft` スキルでコピーされる一式。
-プロジェクトルートの `.claude/` 以下に展開される。
+システム開発に関する部品集。新規プロジェクト立ち上げ・既存システムの相談・各種フローを包含する。
+`/craft` スキルで起動し、作業種別を選択して対応するフローに委譲する。
 
 ---
 
@@ -16,7 +16,7 @@ flowchart TD
 
     ROUTE -->|動的アプリ\nAPI・DB・認証あり| SETUP
 
-    SETUP["ハーネスセットアップ\n（サブエージェント）\n.gitignore / mcp.json / agents/ / hooks/ / settings.json"]
+    SETUP["ハーネスセットアップ\n（サブエージェント）\n.gitignore / .mcp.json / hooks/ / settings.json"]
     SETUP --> MISE["mise.toml 作成 → mise install"]
 
     MISE --> S1
@@ -78,6 +78,9 @@ flowchart TD
     S9["STEP 9: verify → security-reviewer\n→ qa → code-reviewer"]
     S9 --> S10["STEP 10: CLAUDE.md・README.md 生成\npublic/ クリーンアップ"]
     S10 --> END([完了])
+
+    ROUTE -->|既存システムの相談\n課題整理・移行・リファクタ| CONSULT["flows/consult/SKILL.md\n相談 → 現状調査 → 選択肢提示\n→ 実行（任意）"]
+    CONSULT --> END_C([完了])
 ```
 
 ---
@@ -145,13 +148,15 @@ flowchart LR
 - アプリのライブラリは `pnpm add` でインストールする（mise は関与しない）
 - `mise install` は新規クローン時・`.mise.toml` 更新時に実行する
 
+---
+
 ## ディレクトリ構成
 
 ```
 craft/
-├── SKILL.md      # エントリポイント（静的 / 動的の種別選択ルーター）
+├── SKILL.md      # エントリポイント（静的サイト / 動的アプリ / 相談 の選択ルーター）
 ├── agents/       # サブエージェント定義（Claude が自律的に呼び出す）
-├── flows/        # 実行フロー定義（new-project・new-static 等のサブ手順）
+├── flows/        # 実行フロー定義（new-project・new-static・consult 等のサブ手順）
 ├── guidelines/   # 開発ガイドライン（アーキテクチャ・設計手法・DB設計）
 ├── hooks/        # ツール実行前後に自動で動くスクリプト
 ├── gitignore     # プロジェクトの .gitignore ひな形
@@ -159,11 +164,25 @@ craft/
 └── settings.json # Claude Code 設定（権限・フック登録など）
 ```
 
+### 新規プロジェクトにコピーされるファイル
+
+agents・guidelines は craft から直接参照するためコピーしない。
+プロジェクトに展開されるのは以下のみ。
+
+| ファイル | 展開先 |
+|---|---|
+| `gitignore` | `.gitignore` |
+| `mcp.json` | `.mcp.json` |
+| `settings.json` | `.claude/settings.json`（絶対パス埋め込み） |
+| `hooks/on-session-start.js` | `.claude/hooks/on-session-start.js` |
+| `hooks/pre-bash.js` | `.claude/hooks/pre-bash.js` |
+| `flows/git-workflow/SKILL.md` | `.claude/commands/git-workflow.md` |
+
 ---
 
 ## agents/
 
-Claude が状況に応じて自律呼び出しするサブエージェント。
+craft テンプレートに置かれ、Claude が状況に応じて自律呼び出しするサブエージェント。
 各ファイルの `description` フィールドが「いつ呼び出すか」の判断基準になる。
 
 ### 設計フェーズ（STEP 1〜4 / 自動・順次）
