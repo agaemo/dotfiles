@@ -18,8 +18,9 @@ SKILL_DIR = このSKILL.mdが存在するディレクトリの絶対パス
 
 ASK USER: どの作業を行いますか？
   1. 静的サイトを新規作成（LP・PoC・画面モック。API / DB / 認証不要）
-  2. 動的アプリを新規作成（API・DB・認証など動的機能あり）
-  3. 既存システムの相談（課題整理・移行検討・品質改善・リファクタ等）
+  2. Webアプリを新規作成（Node.js系。API・DB・認証など動的機能あり）
+  3. クロスプラットフォームアプリを新規作成（Flutter・React Native・Expo等）
+  4. 既存システムの相談（課題整理・移行検討・品質改善・リファクタ等）
 
 WAIT_FOR: ユーザーの選択
 
@@ -28,12 +29,17 @@ IF 1（静的サイト）:
   FOLLOW: そこに記述されたすべての手順を実行する
   STOP: 以降のステップは実行しない
 
-IF 2（動的アプリ）:
+IF 2（Webアプリ）:
   READ {SKILL_DIR}/flows/new-project/SKILL.md
   FOLLOW: そこに記述されたすべての手順を実行する
   STOP: 以降のステップは実行しない
 
-IF 3（相談）:
+IF 3（クロスプラットフォームアプリ）:
+  READ {SKILL_DIR}/flows/new-app/SKILL.md
+  FOLLOW: そこに記述されたすべての手順を実行する
+  STOP: 以降のステップは実行しない
+
+IF 4（相談）:
   READ {SKILL_DIR}/flows/consult/SKILL.md
   FOLLOW: そこに記述されたすべての手順を実行する
 ```
