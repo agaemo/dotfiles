@@ -16,11 +16,20 @@ SKILL_DIR = このSKILL.mdが存在するディレクトリの絶対パス
   # 例: /Users/alice/.claude/skills/craft
   # このファイルを読んだパスから導出すること
 
+IF .craft/plan.md が存在する:
+  SUGGEST: 「.craft/plan.mdが見つかりました。実装を再開しますか？」と提案する
+  IF ユーザーが再開を選択:
+    READ .craft/plan.md
+    READ {SKILL_DIR}/flows/new-app/SKILL.md の「実装再開」セクション
+    FOLLOW: 実装再開フロー
+    STOP: 以降のステップは実行しない
+
 ASK USER: どの作業を行いますか？
   1. 静的サイトを新規作成（LP・PoC・画面モック。API / DB / 認証不要）
   2. Webアプリを新規作成（Node.js系。API・DB・認証など動的機能あり）
   3. クロスプラットフォームアプリを新規作成（Flutter・React Native・Expo等）
   4. 既存システムの相談（課題整理・移行検討・品質改善・リファクタ等）
+  5. 実装を再開（.craft/plan.md が既にある）
 
 WAIT_FOR: ユーザーの選択
 
@@ -42,4 +51,11 @@ IF 3（クロスプラットフォームアプリ）:
 IF 4（相談）:
   READ {SKILL_DIR}/flows/consult/SKILL.md
   FOLLOW: そこに記述されたすべての手順を実行する
+  STOP: 以降のステップは実行しない
+
+IF 5（実装再開）:
+  READ .craft/plan.md
+  READ {SKILL_DIR}/flows/new-app/SKILL.md の「実装再開」セクション
+  FOLLOW: 実装再開フロー
+  STOP: 以降のステップは実行しない
 ```
