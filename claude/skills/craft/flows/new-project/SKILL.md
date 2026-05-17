@@ -246,13 +246,13 @@ REPORT TO USER:
 
 ```
 STEP 1: intake
-  OUTPUT: docs/working/requirements.md
+  OUTPUT: .craft/requirements.md
   GATE: 承認進捗を表示してからユーザーに内容を提示し、承認を得ること
   PROHIBITED: 承認前に次ステップへ進むこと
 
 STEP 2: refiner
-  INPUT:  docs/working/requirements.md
-  OUTPUT: docs/working/stories.md
+  INPUT:  .craft/requirements.md
+  OUTPUT: .craft/stories.md
   NOTE: 未解決の疑問はユーザーから回答を得た後も削除しない。
         以下の形式でチェック済みにして残すこと（意思決定の根拠として保持）:
         - [x] [疑問の内容]
@@ -262,17 +262,17 @@ STEP 2: refiner
 
 IF HAS_FRONTEND == true:
   STEP 3: designer ← 省略禁止・planner より先に実施すること
-    a. designer エージェントを呼び出す（内蔵の「テンプレート: デザインブリーフ」を使用） → docs/working/design-brief.md
-    b. designer エージェントを呼び出す（内蔵の「テンプレート: デザインシステム」を使用） → docs/working/design-system.md
-    c. 画面構成・コンポーネント構成を docs/design.md に記録
+    a. designer エージェントを呼び出す（内蔵の「テンプレート: デザインブリーフ」を使用） → .craft/design-brief.md
+    b. designer エージェントを呼び出す（内蔵の「テンプレート: デザインシステム」を使用） → .craft/design-system.md
+    c. 画面構成・コンポーネント構成を .craft/design.md に記録
     GATE: 承認進捗を表示してからユーザーに提示し、承認を得ること
     PROHIBITED: デザイン承認前にコンポーネントを1行も書くこと
     NOTE: デザインによってAPIの形・DBフィールドが変わる場合があるため、planner より前に確定させること
 ENDIF
 
 STEP 4: planner
-  INPUT:  docs/working/stories.md（+ docs/working/design-brief.md があれば）
-  OUTPUT: docs/working/plan.md
+  INPUT:  .craft/stories.md（+ .craft/design-brief.md があれば）
+  OUTPUT: .craft/plan.md
   NOTE: 呼び出し前に「planner へ渡すべき設計判断の確認事項」セクションを参照し、
         ユーザーに確認すること
   GATE: 承認進捗を表示してからユーザーに計画を提示し、承認を得ること
@@ -303,12 +303,12 @@ STEP 6: 統合設計書生成 ← 理解度確認後の総合確認ゲート
        「これで開発を始めてよい」と判断できる状態にする。
 
   生成する3文書:
-    a. このファイル末尾の「テンプレート: 要求定義書」を参照 → docs/01_requirements_doc.md
-       入力: docs/working/requirements.md
-    b. このファイル末尾の「テンプレート: 要件定義書」を参照 → docs/02_specifications_doc.md
-       入力: docs/working/stories.md
-    c. このファイル末尾の「テンプレート: 基本設計書」を参照 → docs/03_basic_design_doc.md
-       入力: docs/working/plan.md（+ docs/working/design-system.md があれば）
+    a. このファイル末尾の「テンプレート: 要求定義書」を参照 → .craft/01_requirements_doc.md
+       入力: .craft/requirements.md
+    b. このファイル末尾の「テンプレート: 要件定義書」を参照 → .craft/02_specifications_doc.md
+       入力: .craft/stories.md
+    c. このファイル末尾の「テンプレート: 基本設計書」を参照 → .craft/03_basic_design_doc.md
+       入力: .craft/plan.md（+ .craft/design-system.md があれば）
 
   GATE: 3文書を生成後、以下の形式でユーザーに一括提示し、承認を得ること:
 
@@ -322,9 +322,9 @@ STEP 6: 統合設計書生成 ← 理解度確認後の総合確認ゲート
 
     以下の3文書の内容を確認してください。これらの内容で開発を開始します。
 
-    📄 要求定義書 → docs/01_requirements_doc.md
-    📄 要件定義書 → docs/02_specifications_doc.md
-    📄 基本設計書 → docs/03_basic_design_doc.md
+    📄 要求定義書 → .craft/01_requirements_doc.md
+    📄 要件定義書 → .craft/02_specifications_doc.md
+    📄 基本設計書 → .craft/03_basic_design_doc.md
 
     （各文書の概要サマリーをここに記載する）
 
@@ -335,7 +335,7 @@ STEP 6: 統合設計書生成 ← 理解度確認後の総合確認ゲート
 
 STEP 7: 実装
 
-  docs/working/plan.md の「フィーチャートラック設計」セクションを読んでから実装を開始すること。
+  .craft/plan.md の「フィーチャートラック設計」セクションを読んでから実装を開始すること。
   トラック設計がある場合は以下の3フェーズで進める。
   トラック設計がない場合（小規模）は「フェーズ1のみ・逐次確認サイクル」で進める。
 
@@ -343,7 +343,7 @@ STEP 7: 実装
 
   ### フェーズ1: クリティカルパス（シリアル）
 
-  docs/working/plan.md の「フェーズ1」ステップを順番に実装する。
+  .craft/plan.md の「フェーズ1」ステップを順番に実装する。
   各ステップ完了ごとに `mise exec -- pnpm build` で型エラーがないことを確認する。
 
   フェーズ1完了後:
@@ -360,7 +360,7 @@ STEP 7: 実装
 
   ### フェーズ2: 並列フィーチャートラック（worktree 分離）
 
-  docs/working/plan.md の「フェーズ2」に定義された各トラックを、
+  .craft/plan.md の「フェーズ2」に定義された各トラックを、
   **isolation: "worktree" + run_in_background: true** でバックグラウンド並列実行する。
 
   各トラックに渡すプロンプト（下記テンプレートを使用・変数を展開して渡すこと）:
@@ -371,16 +371,16 @@ STEP 7: 実装
   プロジェクトルート: [ABSOLUTE_PATH]
 
   担当ユーザーストーリー:
-  [US番号とタイトルのリスト（docs/working/stories.md の該当USを転記）]
+  [US番号とタイトルのリスト（.craft/stories.md の該当USを転記）]
 
   所有ファイル（このトラックだけが作成・編集する）:
-  [docs/working/plan.md のトラック定義から転記]
+  [.craft/plan.md のトラック定義から転記]
 
   依存ファイル（読み取り専用・編集禁止）:
-  [docs/working/plan.md のトラック定義から転記]
+  [.craft/plan.md のトラック定義から転記]
 
   実装手順:
-  1. docs/working/stories.md の担当 US の受け入れ条件をすべて読む
+  1. .craft/stories.md の担当 US の受け入れ条件をすべて読む
   2. 依存ファイルを読んで型・インターフェースを把握する
   3. 所有ファイルを実装する（所有ファイル以外は絶対に編集しない）
   4. `mise exec -- pnpm build` を実行し、型エラー・コンパイルエラーがないことを確認する
@@ -446,7 +446,7 @@ STEP 11: CLAUDE.md・README.md 生成 + クリーンアップ
     - 開発コマンド（dev / test / build の実際のコマンド）
     - アーキテクチャ（採用パターン名・ディレクトリ構造のポイント・レイヤー間の依存の向き）
     - プロジェクト固有の制約（DBエンジン・実行環境の制限など）
-    - docs/working/plan.md を参照するよう一言書く
+    - .craft/plan.md を参照するよう一言書く
     上限: 60行以内
 
   README.md に含めること:
@@ -514,7 +514,7 @@ planner を呼び出す前に、以下の判断をユーザーに確認するこ
 - 公開エンドポイント（認証不要）と保護エンドポイント（認証必要）の境界線
   - 特に「ログイン前の顧客がアクセスできる情報」を明確にする
 
-> **設計判断の記録:** 確認した内容は `docs/working/plan.md` の「設計判断」セクションに記録すること。
+> **設計判断の記録:** 確認した内容は `.craft/plan.md` の「設計判断」セクションに記録すること。
 
 ---
 
@@ -531,14 +531,14 @@ planner を呼び出す前に、以下の判断をユーザーに確認するこ
 
 ## テンプレート: 要求定義書
 
-STEP 6 で `docs/01_requirements_doc.md` を生成する際の雛形。入力: `docs/working/requirements.md`
+STEP 6 で `.craft/01_requirements_doc.md` を生成する際の雛形。入力: `.craft/requirements.md`
 
 ```markdown
 # 要求定義書
 
 > バージョン: 1.0
 > 作成日: YYYY-MM-DD
-> 元要件: docs/working/requirements.md
+> 元要件: .craft/requirements.md
 
 ---
 
@@ -607,14 +607,14 @@ STEP 6 で `docs/01_requirements_doc.md` を生成する際の雛形。入力: `
 
 ## テンプレート: 要件定義書
 
-STEP 6 で `docs/02_specifications_doc.md` を生成する際の雛形。入力: `docs/working/stories.md`
+STEP 6 で `.craft/02_specifications_doc.md` を生成する際の雛形。入力: `.craft/stories.md`
 
 ```markdown
 # 要件定義書
 
 > バージョン: 1.0
 > 作成日: YYYY-MM-DD
-> 元要件: docs/working/stories.md
+> 元要件: .craft/stories.md
 
 ---
 
@@ -690,14 +690,14 @@ STEP 6 で `docs/02_specifications_doc.md` を生成する際の雛形。入力:
 
 ## テンプレート: 基本設計書
 
-STEP 6 で `docs/03_basic_design_doc.md` を生成する際の雛形。入力: `docs/working/plan.md`（+ `docs/working/design-system.md` があれば）
+STEP 6 で `.craft/03_basic_design_doc.md` を生成する際の雛形。入力: `.craft/plan.md`（+ `.craft/design-system.md` があれば）
 
 ```markdown
 # 基本設計書
 
 > バージョン: 1.0
 > 作成日: YYYY-MM-DD
-> 元要件: docs/working/plan.md
+> 元要件: .craft/plan.md
 
 ---
 
