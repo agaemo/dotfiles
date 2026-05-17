@@ -19,9 +19,7 @@ SKILL_DIR = このSKILL.mdが存在するディレクトリの絶対パス
 IF .craft/plan.md が存在する:
   SUGGEST: 「.craft/plan.mdが見つかりました。実装を再開しますか？」と提案する
   IF ユーザーが再開を選択:
-    READ .craft/plan.md
-    READ {SKILL_DIR}/flows/new-app/SKILL.md の「実装再開」セクション
-    FOLLOW: 実装再開フロー
+    FOLLOW: 実装再開フロー（このファイル末尾）
     STOP: 以降のステップは実行しない
 
 ASK USER: どの作業を行いますか？
@@ -54,8 +52,28 @@ IF 4（相談）:
   STOP: 以降のステップは実行しない
 
 IF 5（実装再開）:
-  READ .craft/plan.md
-  READ {SKILL_DIR}/flows/new-app/SKILL.md の「実装再開」セクション
-  FOLLOW: 実装再開フロー
+  FOLLOW: 実装再開フロー（このファイル末尾）
   STOP: 以降のステップは実行しない
+```
+
+---
+
+## 実装再開フロー
+
+`.craft/plan.md` が存在する状態から実装を続ける場合の汎用手順。
+フレームワーク固有の注意点は各フローファイルを参照すること。
+
+```
+1. READ .craft/plan.md
+2. READ .craft/design-system.md（存在すれば）
+3. 完了状況を確認してユーザーに提示する:
+   - 完了済みのステップ（対応するコード・ファイルが存在するか確認）
+   - 未着手のステップ
+   - 外部依存で未接続のもの（Firebase・外部API・認証基盤等）
+4. 未着手のステップを plan.md の順番で実装する
+5. 外部依存が未接続の場合はモックで実装し、CLAUDE.md に接続手順を記録する
+6. 各ステップ完了後にビルド確認を行う
+   - Flutter:        mise exec -- flutter analyze
+   - Node.js / Web: mise exec -- pnpm build
+   - 静的サイト:     mise exec -- pnpm build
 ```

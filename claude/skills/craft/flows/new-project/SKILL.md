@@ -529,6 +529,23 @@ planner を呼び出す前に、以下の判断をユーザーに確認するこ
 
 ---
 
+## Node.js / Webアプリ固有の再開時注意点
+
+汎用の実装再開フローは `/craft` の `SKILL.md` に定義されている。
+Node.js 系プロジェクトで再開する際は以下を追加で確認すること。
+
+```
+- .env ファイルが存在するか確認する:
+    存在しない → .env.example をもとに作成が必要かユーザーに確認する
+- DBマイグレーション状態を確認する:
+    `pnpm db:migrate` 等のマイグレーションコマンドが未実行でないか確認する
+    スキーマと実際のDBがずれている場合はマイグレーションを先に実行する
+- ビルド確認コマンドは `mise exec -- pnpm build` を使う
+- `node_modules/` が存在しない場合は `mise exec -- pnpm install` を先に実行する
+```
+
+---
+
 ## テンプレート: 要求定義書
 
 STEP 6 で `.craft/01_requirements_doc.md` を生成する際の雛形。入力: `.craft/requirements.md`

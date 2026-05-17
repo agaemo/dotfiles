@@ -11,7 +11,7 @@
 flowchart TD
     START([/craft 起動]) --> DETECT{.craft/plan.md\n存在する?}
     DETECT -->|Yes| SUGGEST["「実装を再開しますか？」と提案"]
-    SUGGEST -->|再開する| RESUME[new-app 実装再開フロー]
+    SUGGEST -->|再開する| RESUME[実装再開フロー\nSKILL.md に定義]
     SUGGEST -->|しない| ROUTE
     DETECT -->|No| ROUTE
 
