@@ -122,9 +122,13 @@ ELSE:
   ISSUE_NUMBER = なし
 
 RUN: git checkout -b qa/bootstrap
+```
+
+---
 
 ### ステップ 4.5: 環境構築
 
+```
 IF テストフレームワークが未導入:
   EXECUTE: フレームワークのインストール・設定ファイル作成
     例: pnpm add -D vitest @vitest/coverage-v8

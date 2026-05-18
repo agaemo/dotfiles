@@ -66,8 +66,10 @@ ENDIF
 IF framework == "flutter":
   ASK USER: アプリの組織IDを教えてください（例: jp.bookdrop）
   SET org_id = 回答
+  ASK USER: 対象プラットフォームを教えてください（例: android,ios,web）
+  SET platforms = 回答
 
-IF framework == "react-native-cli":
+IF framework == "react-native":
   ASK USER: アプリ名を教えてください（例: MyApp）
   SET app_name = 回答
 ```

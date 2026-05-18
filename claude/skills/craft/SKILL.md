@@ -21,6 +21,9 @@ IF .craft/plan.md が存在する:
   IF ユーザーが再開を選択:
     FOLLOW: 実装再開フロー（このファイル末尾）
     STOP: 以降のステップは実行しない
+  ELSE:
+    # 再開しない → 以降の ASK USER（種別選択）に進む
+  ENDIF
 
 ASK USER: どの作業を行いますか？
   1. 静的サイトを新規作成（LP・PoC・画面モック。API / DB / 認証不要）

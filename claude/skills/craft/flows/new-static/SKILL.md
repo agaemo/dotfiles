@@ -236,14 +236,14 @@ ENDIF
 
 --- STEP 8: セットアップ確認 ---
 
-FOREACH path IN [
-  .claude/settings.json,
-  .claude/hooks/on-session-start.js,
-  .claude/hooks/pre-bash.js,
-  .claude/commands/git-workflow.md
+FOREACH (path, src) IN [
+  (.claude/settings.json,              settings.json),
+  (.claude/hooks/on-session-start.js,  hooks/on-session-start.js),
+  (.claude/hooks/pre-bash.js,          hooks/pre-bash.js),
+  (.claude/commands/git-workflow.md,   flows/git-workflow/SKILL.md)
 ]:
   IF NOT EXISTS(CWD/path):
-    READ  TEMPLATE/<対応する src>
+    READ  TEMPLATE/src
     WRITE CWD/path  ← Write ツールを使うこと
   ENDIF
   ASSERT EXISTS(CWD/path)

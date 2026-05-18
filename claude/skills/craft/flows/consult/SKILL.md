@@ -160,6 +160,7 @@ BODY
 
   BRANCH = consult/<slug>
     例: consult/sqlite-to-mysql、consult/auth-refactor
+  RUN: git checkout -b {BRANCH}
 
   FOREACH phase IN 計画:
     REPORT: 「フェーズ N を開始します」と通知
