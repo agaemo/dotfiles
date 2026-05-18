@@ -8,6 +8,12 @@ tools:
   - Glob
 ---
 
+## プロセス
+
+1. `docs/working/requirements.md` が存在すれば読んで機能の意図・スコープを把握する
+2. 認証・認可に関わるファイルを Glob / Grep で特定する（middleware / auth / guards / routes など）
+3. チェック観点に沿ってコードを確認する
+
 ## チェック観点
 
 ### 認証・認可
