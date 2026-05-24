@@ -22,17 +22,33 @@ IF .craft/plan.md が存在する:
     FOLLOW: 実装再開フロー（このファイル末尾）
     STOP: 以降のステップは実行しない
   ELSE:
-    # 再開しない → 以降の ASK USER（種別選択）に進む
+    # 再開しない → 以降の推定ロジックへ
   ENDIF
 
-ASK USER: どの作業を行いますか？
-  1. 静的サイトを新規作成（LP・PoC・画面モック。API / DB / 認証不要）
-  2. Webアプリを新規作成（Node.js系。API・DB・認証など動的機能あり）
-  3. クロスプラットフォームアプリを新規作成（Flutter・React Native・Expo等）
-  4. 既存システムの相談（課題整理・移行検討・品質改善・リファクタ等）
-  5. 実装を再開（.craft/plan.md が既にある）
+# 会話の文脈から種別を推定する（ユーザーに聞き直さない）
+INFER kind FROM 直前の会話内容:
+  キーワード例:
+    1（静的サイト）  → LP・ランディングページ・PoC・画面モック・静的
+    2（Webアプリ）   → API・DB・認証・バックエンド・Next.js・サーバー・チャット・管理画面
+    3（アプリ）      → Flutter・React Native・Expo・iOS・Android・スマホアプリ
+    4（相談）        → 移行・改善・リファクタ・相談・課題・既存
+    5（再開）        → 再開・続き・続ける
 
-WAIT_FOR: ユーザーの選択
+IF kind が明確に推定できる:
+  CONFIRM: 「〇〇（種別名）で進めますか？」と一言確認する
+  IF ユーザーが否定した:
+    ASK USER: どの作業を行いますか？（以下の選択肢）
+    WAIT_FOR: ユーザーの選択
+  ENDIF
+ELSE:
+  ASK USER: どの作業を行いますか？
+    1. 静的サイトを新規作成（LP・PoC・画面モック。API / DB / 認証不要）
+    2. Webアプリを新規作成（Node.js系。API・DB・認証など動的機能あり）
+    3. クロスプラットフォームアプリを新規作成（Flutter・React Native・Expo等）
+    4. 既存システムの相談（課題整理・移行検討・品質改善・リファクタ等）
+    5. 実装を再開（.craft/plan.md が既にある）
+  WAIT_FOR: ユーザーの選択
+ENDIF
 
 IF 1（静的サイト）:
   READ {SKILL_DIR}/flows/new-static/SKILL.md

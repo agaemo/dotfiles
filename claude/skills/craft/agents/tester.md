@@ -29,6 +29,7 @@ tools:
 - Glob・Grep で既存テストを探し、テストフレームワーク・命名規則・ディレクトリ配置を把握する
 - `package.json` / `go.mod` / `pyproject.toml` 等でテストランナーを確認する
 - テスト環境が未整備の場合はセットアップ手順を示してから実装に進む
+  （Node.js: vitest 推奨。jest も可だが ESM 対応で設定が複雑）（Python: pytest 推奨）
 
 ### ステップ 2：テストケースを列挙する
 
@@ -54,11 +55,26 @@ tools:
 - バグチケット・再現手順・エラーログを読み、バグを最小限に再現するテストを1件書く
 - Bash でテストを実行し、**必ず失敗（Red）を確認する**（再現できない場合は再現手順の不足を報告して終了）
 - 失敗を確認したら「バグ修正に進んでください」と報告して終了する
-- 修正後は補完モードで再度呼び出し、全件 green を確認する
+- 修正後は「補完モードで tester を再度呼び出してください」と呼び出し元に伝えること
 
 ### ステップ 4：テストを実行して確認する（補完モードのみ）
 
 Bash でテストを実行し、全件 green を確認する。失敗した場合は根本原因を特定して修正する。
+
+## テスト困難な領域
+
+以下の領域はユニットテストが難しい。代替手段を提案すること。
+
+| 領域 | 困難な理由 | 代替手段 |
+|------|-----------|---------|
+| サーバーレスエッジ関数（Vercel Edge, Cloudflare Workers 等） | ランタイムが Node.js と異なり、標準 API の一部が未実装 | Miniflare / wrangler dev 等のローカルエミュレーターで統合テスト |
+| WebSocket・Socket.IO のリアルタイムイベント | イベントループの非同期性・接続状態の再現が困難 | `socket.io-client` + テスト用サーバーを起動する統合テスト |
+| Next.js の Server Components / Server Actions | RSC のレンダリングパイプラインを再現できない | `next build` + `playwright` / `cypress` でE2Eテスト |
+| ブラウザ固有 API（IndexedDB・Service Worker・Geolocation） | jsdom では未実装または挙動が異なる | Playwright + 実ブラウザで E2E テスト |
+| DB マイグレーション（スキーマ変更の適用） | 本番DBへの副作用を伴う | テスト用インメモリDB（better-sqlite3 の `:memory:`）で統合テスト |
+| 外部 API（Stripe・SendGrid 等） | 実APIへの呼び出しはテストで行わない | `msw`（Mock Service Worker）または vitest の `vi.mock` でモック |
+
+「テストできない」で終わらせず、上記の代替手段を必ず提示すること。
 
 ## ルール
 
