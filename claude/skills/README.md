@@ -12,6 +12,7 @@ Claude Code のカスタムスキル定義ディレクトリ。
 | [`/issue-triage`](issue-triage/SKILL.md) | issue番号なしで呼ぶと一覧表示・選択、番号指定で直接トリアージ。承認を得てから修正・PR作成まで行う |
 | [`/improve-skill`](improve-skill/SKILL.md) | スキルファイルを静的解析・実行シミュレーションで改善する |
 | [`/improve-agent`](improve-agent/SKILL.md) | エージェントファイルを静的解析・実行シミュレーションで改善する |
+| [`/trade-roshi`](trade-roshi/SKILL.md) | 投資道場の老師として株式銘柄を分析・裁定する（エンタメ用途・投資助言ではない） |
 
 ## 使い方
 
