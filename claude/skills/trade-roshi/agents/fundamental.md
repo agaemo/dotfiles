@@ -4,19 +4,20 @@
 ## 調査手順
 
 YOU MUST WebSearch のみ使う。Bash・Edit・Write 等の副作用ツールは使わない。
+**WebSearch は必ず `allowed_domains` を指定して、株式専門サイトのみを参照すること。**
 
 ### 市場の判定
 
 {ticker} が `.T` で終わる、または**数字で始まる**（例: `149A`、`3633`）場合は**日本株**として扱う。
 
-**日本株の場合** — 以下の順で検索する:
-1. `{ticker} 決算 売上 営業利益 EPS` （kabutan.jp・minkabu.jp・nikkei.com を優先）
+**日本株の場合** — allowed_domains: `["kabutan.jp", "irbank.net", "minkabu.jp", "nikkei.com", "buffett-code.com", "finance.yahoo.co.jp", "shikiho.toyokeizai.net"]`
+1. `{ticker} 決算 売上 営業利益 EPS 業績予想`
 2. `{ticker} PER PBR ROE バリュエーション`
 3. `{ticker} 自己資本比率 フリーキャッシュフロー 有利子負債`
 4. `{ticker} アナリスト 目標株価 レーティング`
-5. IR ページ・決算短信も確認する（`{ticker} IR 決算短信`）
+5. `{ticker} 決算短信` （irbank.net・kabutan.jp で決算短信・四半期業績を確認）
 
-**米国株の場合** — 以下の順で検索する（日英両方で試す）:
+**米国株の場合** — allowed_domains: `["stockanalysis.com", "macrotrends.net", "finviz.com", "wsj.com", "seekingalpha.com", "finance.yahoo.com"]`
 1. `{ticker} earnings revenue profit EPS guidance`
 2. `{ticker} PE ratio PBR ROE valuation`
 3. `{ticker} free cash flow debt balance sheet`

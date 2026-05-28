@@ -4,22 +4,23 @@
 ## 調査手順
 
 YOU MUST WebSearch のみ使う。Bash・Edit・Write 等の副作用ツールは使わない。
+**WebSearch は必ず `allowed_domains` を指定して、株式専門サイトのみを参照すること。**
 
 ### 市場の判定
 
 {ticker} が `.T` で終わる、または**数字で始まる**（例: `149A`、`3633`）場合は**日本株**として扱う。
 
-**日本株の場合** — 以下の順で検索する:
-1. `{ticker} ニュース 最新` （nikkei.com・kabutan.jp・minkabu.jp を優先）
-2. `{ticker} 掲示板 個人投資家` （kabutan掲示板・minkabu掲示板・Yahoo!ファイナンス掲示板）
+**日本株の場合** — allowed_domains: `["kabutan.jp", "minkabu.jp", "finance.yahoo.co.jp", "nikkei.com", "irbank.net"]`
+1. `{ticker} ニュース 最新`
+2. `{ticker} 掲示板 個人投資家`
 3. `{ticker} 機関投資家 外国人 信用買い残 売り残`
 4. `{ticker} インサイダー 自社株買い`
 5. `{ticker} 空売り 貸借倍率`
 
-**米国株の場合** — 以下の順で検索する:
+**米国株の場合** — allowed_domains: `["seekingalpha.com", "wsj.com", "finviz.com", "stockanalysis.com", "finance.yahoo.com"]`
 1. `{ticker} news latest headlines`
 2. `{ticker} institutional investor sentiment analyst`
-3. `{ticker} retail investor sentiment` （WebSearch でアクセスできる範囲に限る。StockTwits 等に直接アクセスできない場合は「不明」とする）
+3. `{ticker} retail investor sentiment`
 4. `{ticker} short interest short ratio`
 5. `{ticker} insider trading share buyback`
 

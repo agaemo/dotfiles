@@ -4,19 +4,20 @@
 ## 調査手順
 
 YOU MUST WebSearch のみ使う。Bash・Edit・Write 等の副作用ツールは使わない。
+**WebSearch は必ず `allowed_domains` を指定して、株式専門サイトのみを参照すること。**
 
 ### 市場の判定
 
 {ticker} が `.T` で終わる、または**数字で始まる**（例: `149A`、`3633`）場合は**日本株**として扱う。
 
-**日本株の場合** — 以下の順で検索する:
-1. `{ticker} 業界 セクター 動向` （nikkei.com・業界専門メディアを優先）
+**日本株の場合** — allowed_domains: `["nikkei.com", "kabutan.jp", "minkabu.jp", "buffett-code.com", "finance.yahoo.co.jp"]`
+1. `{ticker} 業界 セクター 動向`
 2. `{ticker} 日銀 金利 為替 円安 影響`
 3. `{ticker} 競合 同業他社 シェア`
 4. `{ticker} 規制 政策 補助金 リスク`
 5. `日本経済 景気 インフレ {ticker}が属するセクター`
 
-**米国株の場合** — 以下の順で検索する:
+**米国株の場合** — allowed_domains: `["wsj.com", "seekingalpha.com", "macrotrends.net", "finviz.com", "finance.yahoo.com"]`
 1. `{ticker} sector industry trend outlook`
 2. `{ticker} interest rate Fed dollar impact`
 3. `{ticker} competitors market share industry position`
