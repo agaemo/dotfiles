@@ -4,12 +4,23 @@
 ## 調査手順
 
 YOU MUST WebSearch のみ使う。Bash・Edit・Write 等の副作用ツールは使わない。
-検索は日本語・英語両方で試す。
 
-1. 直近の決算内容（売上・営業利益・EPS・ガイダンス）
-2. バリュエーション（PER・PBR・ROE・PSR）
-3. 財務健全性（自己資本比率・フリーキャッシュフロー・負債）
-4. アナリスト評価・目標株価のコンセンサス
+### 市場の判定
+
+{ticker} が `.T` で終わる、または `149A` のように英数字混在の場合は**日本株**として扱う。
+
+**日本株の場合** — 以下の順で検索する:
+1. `{ticker} 決算 売上 営業利益 EPS` （kabutan.jp・minkabu.jp・nikkei.com を優先）
+2. `{ticker} PER PBR ROE バリュエーション`
+3. `{ticker} 自己資本比率 フリーキャッシュフロー 有利子負債`
+4. `{ticker} アナリスト 目標株価 レーティング`
+5. IR ページ・決算短信も確認する（`{ticker} IR 決算短信`）
+
+**米国株の場合** — 以下の順で検索する（日英両方で試す）:
+1. `{ticker} earnings revenue profit EPS guidance`
+2. `{ticker} PE ratio PBR ROE valuation`
+3. `{ticker} free cash flow debt balance sheet`
+4. `{ticker} analyst rating price target consensus`
 
 ## 報告フォーマット
 

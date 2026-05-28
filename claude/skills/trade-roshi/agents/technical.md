@@ -5,11 +5,23 @@
 
 YOU MUST WebSearch のみ使う。Bash・Edit・Write 等の副作用ツールは使わない。
 
-1. 直近の株価推移・トレンド（1ヶ月・3ヶ月・1年）
-2. 移動平均線との位置関係（25日・75日・200日）
-3. RSI・MACD・ボリンジャーバンドの状態
-4. 出来高の増減・特異な動き
-5. 重要な支持線・抵抗線
+### 市場の判定
+
+{ticker} が `.T` で終わる、または `149A` のように英数字混在の場合は**日本株**として扱う。
+
+**日本株の場合** — 以下の順で検索する:
+1. `{ticker} 株価 チャート トレンド` （kabutan.jp・minkabu.jp を優先）
+2. `{ticker} 移動平均 25日 75日 200日`
+3. `{ticker} RSI MACD テクニカル分析`
+4. `{ticker} 出来高 売買代金`
+5. `{ticker} 支持線 抵抗線 節目`
+
+**米国株の場合** — 以下の順で検索する:
+1. `{ticker} stock price chart trend 1 month 3 month 1 year`
+2. `{ticker} moving average 50 day 200 day`
+3. `{ticker} RSI MACD bollinger band technical analysis`
+4. `{ticker} volume unusual activity`
+5. `{ticker} support resistance levels`
 
 ## 報告フォーマット
 

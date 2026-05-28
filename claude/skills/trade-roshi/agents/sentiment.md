@@ -5,11 +5,23 @@
 
 YOU MUST WebSearch のみ使う。Bash・Edit・Write 等の副作用ツールは使わない。
 
-1. 直近1〜2週間のニュースヘッドライン（ポジティブ・ネガティブ両方）
-2. 機関投資家・著名投資家の発言・動向
-3. SNS・掲示板での個人投資家の反応（WebSearch でアクセスできる範囲に限る。StockTwits 等に直接アクセスできない場合は「不明」とする）
-4. ショートポジション・空売り比率の動向
-5. インサイダー取引・自社株買いの動き
+### 市場の判定
+
+{ticker} が `.T` で終わる、または `149A` のように英数字混在の場合は**日本株**として扱う。
+
+**日本株の場合** — 以下の順で検索する:
+1. `{ticker} ニュース 最新` （nikkei.com・kabutan.jp・minkabu.jp を優先）
+2. `{ticker} 掲示板 個人投資家` （kabutan掲示板・minkabu掲示板・Yahoo!ファイナンス掲示板）
+3. `{ticker} 機関投資家 外国人 信用買い残 売り残`
+4. `{ticker} インサイダー 自社株買い`
+5. `{ticker} 空売り 貸借倍率`
+
+**米国株の場合** — 以下の順で検索する:
+1. `{ticker} news latest headlines`
+2. `{ticker} institutional investor sentiment analyst`
+3. `{ticker} retail investor sentiment` （WebSearch でアクセスできる範囲に限る。StockTwits 等に直接アクセスできない場合は「不明」とする）
+4. `{ticker} short interest short ratio`
+5. `{ticker} insider trading share buyback`
 
 ## 報告フォーマット
 

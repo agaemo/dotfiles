@@ -5,11 +5,23 @@
 
 YOU MUST WebSearch のみ使う。Bash・Edit・Write 等の副作用ツールは使わない。
 
-1. 属するセクター・業界の直近トレンド
-2. 金利・為替・コモディティ価格との関係
-3. 競合他社の動向・業界内ポジション
-4. 規制・政策リスク（関税・法規制・地政学）
-5. マクロ経済指標（景気・インフレ・雇用）との連動性
+### 市場の判定
+
+{ticker} が `.T` で終わる、または `149A` のように英数字混在の場合は**日本株**として扱う。
+
+**日本株の場合** — 以下の順で検索する:
+1. `{ticker} 業界 セクター 動向` （nikkei.com・業界専門メディアを優先）
+2. `{ticker} 日銀 金利 為替 円安 影響`
+3. `{ticker} 競合 同業他社 シェア`
+4. `{ticker} 規制 政策 補助金 リスク`
+5. `日本経済 景気 インフレ {ticker}が属するセクター`
+
+**米国株の場合** — 以下の順で検索する:
+1. `{ticker} sector industry trend outlook`
+2. `{ticker} interest rate Fed dollar impact`
+3. `{ticker} competitors market share industry position`
+4. `{ticker} regulation policy tariff risk`
+5. `US economy inflation employment {ticker} sector`
 
 ## 報告フォーマット
 
