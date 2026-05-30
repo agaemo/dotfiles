@@ -14,11 +14,12 @@ SCAMPER 法を4エージェントで実装したスキル。
 
 ## 使い方
 
-`/think` 経由で呼び出す。
+`/think` 経由で呼び出す。verbosity キーワードで出力粒度を調整できる（簡潔/標準/詳細）。
 
 ```
 /think scamper "自社のサブスクリプション型学習サービス"
 /think scamper "現在の採用面接プロセス"
+/think scamper "競合のフリーミアムモデルを詳しく変形したい"
 /think scamper    # 入力を対話形式で聞く
 ```
 

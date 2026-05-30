@@ -14,11 +14,12 @@
 
 ## 使い方
 
-`/think` 経由で呼び出す。
+`/think` 経由で呼び出す。verbosity キーワードで出力粒度を調整できる（簡潔/標準/詳細）。
 
 ```
 /think first-principles "なぜ採用コストはこんなに高いのか"
 /think first-principles "教育は学校でなければならないという前提を疑いたい"
+/think first-principles "オフィス出社が当然という前提を詳しく分解したい"
 /think first-principles    # 入力を対話形式で聞く
 ```
 
