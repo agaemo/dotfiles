@@ -7,12 +7,13 @@ Claude Code のカスタムスキル定義ディレクトリ。
 
 | スキル | 説明 |
 |--------|------|
-| [`/craft`](craft/SKILL.md) | システム開発に関する部品集。新規立ち上げ・維持保守・移行など開発全工程のフローを包含する |
+| [`/craft`](craft/README.md) | システム開発に関する部品集。新規立ち上げ・維持保守・移行など開発全工程のフローを包含する |
+| [`/think`](think/README.md) | 入力の内容に応じて six-hats / scamper / first-principles / triz へ委譲する思考・分析オーケストレーター |
 | [`/lp-publish`](lp-publish/SKILL.md) | LP を本番公開するための準備・手順をガイドする。ホスティング・ドメイン・SEO ファイルの知識がなくても進められる |
 | [`/issue-triage`](issue-triage/SKILL.md) | issue番号なしで呼ぶと一覧表示・選択、番号指定で直接トリアージ。承認を得てから修正・PR作成まで行う |
 | [`/improve-skill`](improve-skill/SKILL.md) | スキルファイルを静的解析・実行シミュレーションで改善する |
 | [`/improve-agent`](improve-agent/SKILL.md) | エージェントファイルを静的解析・実行シミュレーションで改善する |
-| [`/trade-roshi`](trade-roshi/SKILL.md) | 投資道場の老師として株式銘柄を分析・裁定する（エンタメ用途・投資助言ではない） |
+| [`/trade-roshi`](trade-roshi/README.md) | 投資道場の老師として株式銘柄を分析・裁定する（エンタメ用途・投資助言ではない） |
 
 ## 使い方
 

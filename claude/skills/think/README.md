@@ -2,32 +2,6 @@
 
 思考・分析・検討の相談を受け付けるオーケストレーター。入力の内容に応じて適切なスキルへ委譲する。
 
-## フロー
-
-```mermaid
-flowchart TD
-    Start(["/think [スキル名] 入力"]) --> Parse[引数を解析]
-
-    Parse --> ExplicitSkill{スキル名を\n明示指定?}
-
-    ExplicitSkill -- あり --> ValidSkill{スキルが\n存在する?}
-    ValidSkill -- No --> Error["「スキル名XXは存在しません」\nSTOP"]
-    ValidSkill -- Yes --> EmptyInput{入力が空?}
-    EmptyInput -- Yes --> AskInput["「何を分析しますか?」"]
-    AskInput --> Delegate
-    EmptyInput -- No --> Delegate
-
-    ExplicitSkill -- なし --> Auto[自動分類]
-    Auto --> IsSixHats{six-hats\n向けか?}
-    IsSixHats -- Yes --> Delegate
-    IsSixHats -- No --> AskSkill["どのスキルを使うか\nユーザーに確認"]
-    AskSkill --> UserChoice{選択}
-    UserChoice -- six-hats --> Delegate
-    UserChoice -- 直接回答 --> DirectAnswer[直接回答]
-
-    Delegate["six-hats/SKILL.md を READ\n{input} を置換して実行"]
-```
-
 ## 使い方
 
 ```
@@ -36,21 +10,54 @@ flowchart TD
 
 # スキルを明示指定
 /think six-hats "AWSかGCPか、バックエンドのクラウド選定"
+/think scamper "自社のサブスクリプション型学習サービス"
+/think first-principles "なぜ採用コストはこんなに高いのか"
+/think triz "機能を増やすと操作が複雑になる"
 
-# 対話形式
+# 対話形式（スキル選択を対話で行う）
 /think
 ```
 
-## 委譲ルール
+## 利用できるスキル
+
+| スキル | 向いている入力 | 論拠 |
+|-------|--------------|------|
+| [six-hats](six-hats/README.md) | 具体的な提案・計画・選択肢の多角的検証 | de Bono (1985) |
+| [scamper](scamper/README.md) | 既存のアイデア・製品・プロセスを変形・発展させたい | Eberle (1971) / Osborn (1953) |
+| [first-principles](first-principles/README.md) | 常識・慣習を疑い、ゼロから再構築したい | Aristotle / Musk |
+| [triz](triz/README.md) | 相反する要件を同時に満たす解法を探したい | Altshuller (1956) |
+
+## 自動ルーティングの基準
 
 | 入力の性質 | 委譲先 |
 |-----------|-------|
-| 具体的な提案・計画・選択肢の検証 | six-hats |
-| 上記以外 | ユーザーに確認 |
+| 具体的な提案・計画・選択肢があり、多角的な検証・論点整理が目的 | six-hats |
+| 変形・改良の対象となる既存のものがある | scamper |
+| 「なぜ？」「本当にそうか？」という根本的な疑問を含む | first-principles |
+| 「〇〇するとXXが悪化する」という矛盾・トレードオフを含む | triz |
+| 上記いずれにも当てはまらない | ユーザーに確認 |
+
+## フロー
+
+```mermaid
+flowchart TD
+    Start(["/think [スキル名] 入力"]) --> Parse{スキル名を\n明示指定?}
+
+    Parse -- あり --> Direct[指定スキルへ委譲]
+    Parse -- なし --> Auto[入力を自動分類]
+    Auto --> Route[該当スキルへ委譲]
+    Auto -- 判定不能 --> Ask[ユーザーに選択を求める]
+
+    Direct & Route --> Exec[スキルを実行]
+    Ask --> Exec
+
+    Exec --> Report[保存先を確認 → MD ファイルに保存\n会話上はサマリーのみ表示]
+    Report --> Dialog[対話・深掘り]
+```
 
 ## スキルの追加方法
 
 1. `SKILL.md` の「使えるスキル」テーブルにスキル名と得意な入力を追記する
-2. ステップ2に判定基準を追加する
+2. ステップ2に自動分類の判定基準を追加する
 3. ステップ3に委譲処理を追加する
-4. スキルのディレクトリを `think/` 配下に配置する
+4. スキルのディレクトリを `think/` 配下に配置し、このREADMEの「利用できるスキル」テーブルに追記する
