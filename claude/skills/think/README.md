@@ -45,8 +45,11 @@ flowchart TD
 
     Parse -- あり --> Direct[指定スキルへ委譲]
     Parse -- なし --> Auto[入力を自動分類]
-    Auto --> Route[該当スキルへ委譲]
-    Auto -- 判定不能 --> Ask[ユーザーに選択を求める]
+    Auto --> Confirm[スキル名と理由を提示\nyes / no / 別スキル名で確認]
+    Confirm -- yes --> Route[選択スキルへ委譲]
+    Confirm -- no --> Ask[ユーザーに選択を求める]
+    Confirm -- 別スキル名 --> Route
+    Auto -- 判定不能 --> Ask
 
     Direct & Route --> Exec[スキルを実行]
     Ask --> Exec

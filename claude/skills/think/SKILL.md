@@ -62,25 +62,30 @@ SKILL_DIR = スキル起動時に提供される "Base directory for this skill:
 
 ## ステップ3: 委譲または確認
 
-### six-hats の場合
+### スキル名を明示指定した場合（ステップ1で直接委譲）
 
-「six-hats で分析します。」と一言伝えてから、
-`{SKILL_DIR}/six-hats/SKILL.md` を READ し、ファイル内の `{input}` を分析対象テキストに置換した上でフロー全体を実行する。
+確認なしに即座に実行する。
 
-### scamper の場合
+- six-hats: `{SKILL_DIR}/six-hats/SKILL.md` を READ し実行
+- scamper: `{SKILL_DIR}/scamper/SKILL.md` を READ し実行
+- first-principles: `{SKILL_DIR}/first-principles/SKILL.md` を READ し実行
+- triz: `{SKILL_DIR}/triz/SKILL.md` を READ し実行
 
-「SCAMPER で変形・発展させます。」と一言伝えてから、
-`{SKILL_DIR}/scamper/SKILL.md` を READ し、`{input}` を置換した上でフロー全体を実行する。
+### 自動判定した場合（ステップ2を経由）
 
-### first-principles の場合
+以下の形式でスキル選択の理由を示し、yes/no を確認する。
 
-「第一原理思考で前提を問い直します。」と一言伝えてから、
-`{SKILL_DIR}/first-principles/SKILL.md` を READ し、`{input}` を置換した上でフロー全体を実行する。
+```
+スキル: <スキル名>
+理由: <判定基準のどの条件に該当したか、1〜2文で具体的に>
 
-### triz の場合
+このスキルで進めますか？ [yes / no / <別スキル名>]
+```
 
-「TRIZ で矛盾を解消します。」と一言伝えてから、
-`{SKILL_DIR}/triz/SKILL.md` を READ し、`{input}` を置換した上でフロー全体を実行する。
+WAIT_FOR: ユーザーの返答
+- `yes` または Enter → 選択スキルの SKILL.md を READ して実行する
+- `no` → 「使えるスキル」テーブルを表示してスキルを選ばせる
+- `<別スキル名>` → そのスキルの SKILL.md を READ して実行する
 
 ### 未分類の場合
 
