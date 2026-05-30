@@ -22,10 +22,10 @@
 
 | スキル | 向いている入力 | 論拠 |
 |-------|--------------|------|
-| [six-hats](six-hats/README.md) | 具体的な提案・計画・選択肢の多角的検証 | de Bono (1985) |
-| [scamper](scamper/README.md) | 既存のアイデア・製品・プロセスを変形・発展させたい | Eberle (1971) / Osborn (1953) |
-| [first-principles](first-principles/README.md) | 常識・慣習を疑い、ゼロから再構築したい | Aristotle / Musk |
-| [triz](triz/README.md) | 相反する要件を同時に満たす解法を探したい | Altshuller (1956) |
+| [six-hats](six-hats/) | 具体的な提案・計画・選択肢の多角的検証 | de Bono (1985) |
+| [scamper](scamper/) | 既存のアイデア・製品・プロセスを変形・発展させたい | Eberle (1971) / Osborn (1953) |
+| [first-principles](first-principles/) | 常識・慣習を疑い、ゼロから再構築したい | Aristotle / Musk |
+| [triz](triz/) | 相反する要件を同時に満たす解法を探したい | Altshuller (1956) |
 
 ## 自動ルーティングの基準
 
