@@ -7,14 +7,20 @@
 
 ## 調査手順
 
-YOU MUST WebSearch のみ使う。Bash・Edit・Write 等の副作用ツールは使わない。
+**YOU MUST: WebSearch のみ使い、必ず `allowed_domains` を指定すること。PROHIBITED: Bash・Edit・Write・その他副作用ツールの使用は一切禁止。**
 
 {tickers} の各銘柄（以下 ticker と呼ぶ）について以下の基準で検索する:
 
-- `.T` で終わる、または**数字で始まる**（例: `149A`、`3633`）→ **日本株**: `ticker 現在株価` で検索
-- それ以外 → **米国株**: `ticker stock price current` で検索
+- `.T` で終わる、または**数字で始まる**（例: `149A`、`3633`）→ **日本株**
+  - allowed_domains: `["finance.yahoo.co.jp", "kabutan.jp", "minkabu.jp"]`
+  - クエリ: `ticker 現在株価`
+  - 取得できない場合: `ticker 株価 終値` で再検索する
+- それ以外 → **米国株**
+  - allowed_domains: `["finance.yahoo.com", "stockanalysis.com", "finviz.com"]`
+  - クエリ: `ticker stock price current`
+  - 取得できない場合: `ticker share price today` で再検索する
 
-取得できない銘柄は「不明」とする。各クエリで有効な情報が得られない場合は次の検索方法を試み、それでも取得できなければ「不明」とする。
+再検索しても取得できない銘柄は「不明」とする。
 
 ## 報告フォーマット
 
