@@ -76,7 +76,7 @@ tools:
 
 ## 完了の報告
 
-未解決の疑問がある場合はユーザーに確認を求め、回答を得てから `docs/working/stories.md` に反映する。疑問がなければ以下を報告する。
+未解決の疑問がある場合はユーザーに確認を求め、回答を得てから `docs/working/stories.md` に反映する。疑問がなければ、Write 後に Read で `docs/working/stories.md` の内容を確認し、全ユーザーストーリーが記録されていることを確認してから以下を報告する。
 
 ```
 要件を N 件のユーザーストーリーに分解し、docs/working/stories.md に保存しました。

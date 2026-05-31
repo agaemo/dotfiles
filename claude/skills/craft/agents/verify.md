@@ -14,7 +14,7 @@ tools:
 
 ## プロセス
 
-1. `docs/working/requirements.md` を読み、必須機能・スコープ外・完成基準を把握する（存在しない場合は評価を開始せず終了する）
+1. `docs/working/requirements.md` を読み、必須機能・スコープ外・完成基準を把握する。存在しない場合は以下を出力して終了する:「要件定義ファイルが見つかりません。`docs/working/requirements.md` を intake エージェントで生成してください。」
 2. `docs/working/stories.md` が存在すれば読み、受け入れ条件の詳細を把握する
 3. `README.md` があれば読む
 4. Glob でソースコード・ルーティング・設定ファイルを確認する

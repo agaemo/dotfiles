@@ -7,6 +7,7 @@ tools:
   - Grep
   - Glob
   - Write
+  - WebSearch
 ---
 
 ## 役割
@@ -75,24 +76,13 @@ UIコンポーネント・外部サービスの薄いラッパーは実装後で
 > 「Tailwind CSS のクラスのみ」で実現できる場合は導入しないことを推奨する。
 > 採用する場合は必ずユーザーに確認し、承認を得てから計画に含めること。
 
-## 既知のライブラリ破壊的変更（採用時に必ず確認）
+## ライブラリの破壊的変更
 
-| ライブラリ | 変更内容 | コード上の影響 |
-|-----------|---------|--------------|
-| **shadcn/ui v4+** | Radix UI → Base UI へ移行。`asChild` プロップが廃止 | `<Button asChild><Link>` → `<Link className={buttonVariants({...})}>` に書き換え。`Select.onValueChange` の型が `(value: string \| null) => void` に変更 |
-| **zod v4** | `ZodError.errors` → `ZodError.issues` に変更 | `.errors[0].message` → `.issues[0].message` |
-| **next-auth v5 (Auth.js)** | `session.strategy = "jwt"` 推奨、`auth()` ヘルパー関数に変更 | Credentials provider の設定・セッション取得方法が変わる |
+採用ライブラリの破壊的変更は `guidelines/breaking-changes.md` を参照すること（存在しない場合は WebSearch で確認）。
 
 ## pnpm ネイティブモジュール設定
 
-`better-sqlite3`・`bcrypt` 等のネイティブアドオンを使う場合、pnpm はビルドスクリプトをデフォルトでブロックする。
-`package.json` に以下を追加してから `pnpm install` を実行すること:
-
-```json
-"pnpm": {
-  "onlyBuiltDependencies": ["better-sqlite3", "esbuild"]
-}
-```
+`better-sqlite3`・`bcrypt` 等のネイティブアドオンを使う場合、pnpm はビルドスクリプトをデフォルトでブロックする。`package.json` に `pnpm.onlyBuiltDependencies` を設定してから install すること（詳細は pnpm ドキュメント参照）。
 
 ## ADR（アーキテクチャ決定記録）
 
@@ -238,5 +228,6 @@ ADR を作成すべき判断の例:
 
 - 各ステップは独立して実行できる粒度に保つこと。
 - フロントエンドUIを含む計画には、デザイン（`designer` エージェント）が承認済みであることを前提とすること。
-- ライブラリを追加する前に必ずユーザーに確認すること（特に UI コンポーネントライブラリ）。
+- **MUST: ライブラリを追加する前に必ずユーザーに確認すること。** 特に UI コンポーネントライブラリ・ORM・認証ライブラリは後からの変更コストが高い。
 - 独立した画面が3つ以上ある新規プロジェクトでは、必ずフィーチャートラック設計セクションを出力すること。
+- 計画出力後に確認: (1) `docs/working/plan.md` が Write で保存されていること (2) 「レビュートラック」セクションが冒頭に宣言されていること (3) UI を含む計画では designer 承認済みと明記されていること（未承認なら「designer 承認待ち」と記載）。

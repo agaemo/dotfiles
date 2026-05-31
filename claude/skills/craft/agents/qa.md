@@ -15,7 +15,7 @@ tools:
 ## プロセス
 
 1. `docs/working/requirements.md` を読んで要件・完成基準を把握する
-2. `docs/working/stories.md` が存在すれば読んで受け入れ条件の詳細を把握する
+2. `docs/working/stories.md` が存在すれば読んで受け入れ条件の詳細を把握する（requirements.md と stories.md の両方が存在する場合は stories.md の受け入れ条件を正とし、requirements.md は補完情報として扱う）
 3. 既存テストファイルを Glob で確認する
 4. 受け入れ条件に対応するテストが存在するかを評価する
 5. 不足テストケースを提案する
