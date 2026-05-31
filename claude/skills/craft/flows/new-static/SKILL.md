@@ -1,6 +1,6 @@
 ---
 name: new-static
-description: 静的サイト（LP・PoC・画面モック）のセットアップ手順。/craft から静的サイトを選択したときに実行される。
+description: Astro + Node.js で静的サイト（LP・PoC・画面モック）をセットアップする手順。/craft から静的サイトを選択したときに実行される。
 ---
 
 # new-static（静的サイトセットアップ）
@@ -199,20 +199,18 @@ IF FAILED:
 --- STEP 2.5: Astro が生成した不要ディレクトリの削除 ---
 
 IF EXISTS(CWD/.vscode):
-  NOTE: ユーザーが .vscode を別の用途で使用している場合は削除前に確認すること
+  NOTE: Astro create が生成するファイル。通常は安全に削除できる（新規プロジェクトのため）。
+        ユーザーが IDE で .vscode を管理している場合のみ削除前に確認すること。
   RUN: rm -rf CWD/.vscode
-  NOTE: Astro create が生成するが Claude Code では不要
 ENDIF
 
 --- STEP 3: settings.json の書き出し（最初に実施してパーミッション設定を有効化） ---
 
 READ TEMPLATE/settings.json
-REPLACE ALL: ".claude/hooks/" → "CWD/.claude/hooks/"  # CWD はプロンプト先頭で定義済みの絶対パス
+CWD の絶対パスを使って以下の置換を行う（"CWD" をそのまま書かず、CWD の値で展開した絶対パスを使うこと）:
+  REPLACE ALL: ".claude/hooks/" → "{CWD の値}/.claude/hooks/"
+  例 (CWD = /Users/alice/myproject): ".claude/hooks/" → "/Users/alice/myproject/.claude/hooks/"
 WRITE CWD/.claude/settings.json  ← Write ツールを使うこと（Bash 禁止）
-
-例 (CWD = /Users/alice/myproject の場合):
-  変換前: "command": "node .claude/hooks/on-session-start.js"
-  変換後: "command": "node /Users/alice/myproject/.claude/hooks/on-session-start.js"
 
 ASSERT EXISTS(CWD/.claude/settings.json)
 
