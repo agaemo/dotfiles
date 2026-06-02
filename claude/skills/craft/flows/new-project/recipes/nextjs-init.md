@@ -12,9 +12,13 @@ ASSERT:  `mise exec -- pnpm --version` が成功すること
 ```bash
 # NG: _tmp は npm naming restrictions（アンダースコア始まり禁止）でエラーになる
 # OK: tmp を作成してマージ
-mise exec -- pnpm create next-app tmp --typescript --tailwind --app --src-dir=false --import-alias "@/*" --no-git --yes
+mise exec -- pnpm create next-app tmp --typescript --tailwind --app --src-dir=false --import-alias "@/*" --no-git --no-eslint --yes
 cp -r tmp/. . && rm -rf tmp
 mise exec -- pnpm install
+
+# Oxlint をリンターとして追加（ESLint の代替）
+mise exec -- pnpm add -D oxlint
+mise exec -- pnpm pkg set scripts.lint="oxlint ."
 ```
 
 ## バージョン管理の注意

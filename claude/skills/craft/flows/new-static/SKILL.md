@@ -246,7 +246,13 @@ ELSE:
 ENDIF
 ASSERT EXISTS(.git/)
 
---- STEP 6: ネイティブ依存関係のビルド承認 ---
+--- STEP 6: Oxlint のインストール ---
+
+RUN:
+  mise exec -- pnpm add -D oxlint
+  mise exec -- pnpm pkg set scripts.lint="oxlint ."
+
+--- STEP 7: ネイティブ依存関係のビルド承認 ---
 
 RUN:
   mise exec -- pnpm approve-builds --all
@@ -256,7 +262,7 @@ IF FAILED:
   REPORT: エラー内容を報告してユーザーに確認を求める
   STOP
 
---- STEP 7: ビルド確認 ---
+--- STEP 8: ビルド確認 ---
 
 RUN:
   mise exec -- pnpm run build
@@ -266,7 +272,7 @@ IF build FAILED:
   STOP
 ENDIF
 
---- STEP 8: 最終確認 ---
+--- STEP 9: 最終確認 ---
 
 ASSERT EXISTS: CWD/.claude/settings.json
 ASSERT EXISTS: CWD/.claude/hooks/on-session-start.js
@@ -274,7 +280,7 @@ ASSERT EXISTS: CWD/.claude/hooks/pre-bash.js
 ASSERT EXISTS: CWD/.claude/commands/git-workflow.md
 NOTE: 存在しないファイルがあれば対応する STEP に戻って再実行すること
 
---- STEP 9: 完了報告 ---
+--- STEP 10: 完了報告 ---
 
 REPORT: "完了しました"
 ```
