@@ -6,9 +6,10 @@
 ## 使い方
 
 ```
-/improve-agent <ファイルパス>        # 単体
-/improve-agent path/a.md path/b.md  # 複数
-/improve-agent all                  # .claude/agents/ 全件
+/improve-agent <ファイルパス>               # 単体
+/improve-agent path/a.md path/b.md         # 複数
+/improve-agent all                         # .claude/agents/ 全件
+/improve-agent <ファイルパス> --cross       # 親子エージェント一貫性チェックも実行
 ```
 
 ## 6次元の静的評価
@@ -34,4 +35,5 @@
 1. スコアと改善提案を表示
 2. 全書き直し判定（2/5 以下が 3 次元以上ならユーザーに確認）
 3. ユーザーが適用する提案番号を選択（`all` / `1 3 5` / `skip`）
-4. 適用 → READ で確認 → 報告
+4. 適用 → READ で確認 → スコア再評価 → 報告
+5. `--cross` 時は親子エージェント一貫性チェック（[X1〜X4]）も実施
