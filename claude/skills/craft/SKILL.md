@@ -1,6 +1,6 @@
 ---
 name: craft
-description: システム開発に関する部品集。新規立ち上げ・移行など開発全工程のフローを包含する。新規作成か既存プロジェクトの移行かを選択して対応する手順に委譲する。
+description: 新規プロジェクト（静的サイト・Webアプリ・モバイルアプリ）の立ち上げ、または既存システムの移行・リファクタ相談を開始するときに呼び出す。
 ---
 
 # /craft
@@ -50,29 +50,29 @@ ELSE:
   WAIT_FOR: ユーザーの選択
 ENDIF
 
-IF 1（静的サイト）:
-  READ {SKILL_DIR}/flows/new-static/SKILL.md
-  FOLLOW: そこに記述されたすべての手順を実行する
-  STOP: 以降のステップは実行しない
+NOTE: いずれの子スキルでも FOLLOW 実行中にエラーや予期しない STOP が発生した場合は、
+  中断した箇所と理由をユーザーに伝え、再試行するか（同じ種別を選択 / 別の種別を選ぶ）確認すること。
 
-IF 2（Webアプリ）:
-  READ {SKILL_DIR}/flows/new-project/SKILL.md
-  FOLLOW: そこに記述されたすべての手順を実行する
-  STOP: 以降のステップは実行しない
+# 種別 → フローファイルの対応
+# | 種別                     | フローファイル                                       |
+# |--------------------------|------------------------------------------------------|
+# | 1（静的サイト）           | {SKILL_DIR}/flows/new-static/SKILL.md                |
+# | 2（Webアプリ）            | {SKILL_DIR}/flows/new-project/SKILL.md               |
+# | 3（クロスプラットフォーム）| {SKILL_DIR}/flows/new-app/SKILL.md                   |
+# | 4（相談）                 | {SKILL_DIR}/flows/consult/SKILL.md                   |
+# | 5（実装再開）             | このファイル末尾の「実装再開フロー」                   |
 
-IF 3（クロスプラットフォームアプリ）:
-  READ {SKILL_DIR}/flows/new-app/SKILL.md
+IF kind != 5:
+  READ 上記テーブルの対応フローファイル（{SKILL_DIR}は導出済みの絶対パスに展開すること）
+  IF READ FAILED:
+    REPORT: "フローファイルが見つかりません: {path}。SKILL_DIR の導出を確認してください。"
+    STOP
   FOLLOW: そこに記述されたすべての手順を実行する
-  STOP: 以降のステップは実行しない
-
-IF 4（相談）:
-  READ {SKILL_DIR}/flows/consult/SKILL.md
-  FOLLOW: そこに記述されたすべての手順を実行する
-  STOP: 以降のステップは実行しない
-
-IF 5（実装再開）:
+ELSE:
   FOLLOW: 実装再開フロー（このファイル末尾）
-  STOP: 以降のステップは実行しない
+ENDIF
+STOP: 以降のステップは実行しない
+
 ```
 
 ---
