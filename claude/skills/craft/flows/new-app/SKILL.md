@@ -80,7 +80,10 @@ ENDIF
 
 Agent ツールでサブエージェントを起動し、以下のプロンプトを渡す。
 **`CWD` と `TEMPLATE` は実際の絶対パスに展開してから渡すこと。**
-サブエージェントが完了したら結果のみ受け取り、続きに進む。
+WAIT_FOR: サブエージェントの完了報告（"完了しました"）を受け取ってから続きに進む。
+IF サブエージェントが "完了しました" を報告しない（エラー・中断）:
+  REPORT: 失敗したステップと理由をユーザーに伝え、再試行するか確認すること
+  STOP
 
 ---
 
@@ -271,7 +274,7 @@ STEP 11: CLAUDE.md・README.md 生成 + クリーンアップ
 ```
 
 各 GATE・テンプレート・フェーズ2の並列実装手順が必要な場合:
-`READ {SKILL_DIR}/flows/new-project/SKILL.md` の「標準エージェントチェーン」セクション
+`READ {SKILL_DIR}/flows/new-project/agent-chain.md`（エージェントチェーン全詳細）
 
 Flutter コマンド読み替え・STEP 7 確認コマンド・STEP 11 CLAUDE.md 記載事項・再開時注意点:
 `READ {SKILL_DIR}/flows/new-app/flutter-notes.md`（必要になった時点で読む）

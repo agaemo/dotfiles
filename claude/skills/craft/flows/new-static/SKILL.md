@@ -80,7 +80,7 @@ SELF: ヒアリング回答をもとに docs/design-brief.md の全TODOを埋め
     組織名: 「サンプル株式会社」「架空チーム」など
     IDや数値: 実運用を想定した形式だが実在しない値（例: INC-001、#00000）
 
-THEN: 埋めたデザインブリーフの内容をユーザーに簡潔に見せる
+SELF: 埋めたデザインブリーフの内容をユーザーに簡潔に見せる
 ```
 
 ---
@@ -314,6 +314,7 @@ IF NOT EXISTS(CLAUDE.md):
     - TODO・プレースホルダー
 
   LIMIT: 40行以内
+  ASSERT EXISTS(CLAUDE.md)
 
 --- README.md ---
 
@@ -327,6 +328,7 @@ IF NOT EXISTS(README.md):
     - コマンド一覧（dev / build）
 
   OMIT: 本番の認証情報・APIキー・パスワード
+  ASSERT EXISTS(README.md)
 
 --- .craft/plan.md ---
 
@@ -340,6 +342,7 @@ IF NOT EXISTS(.craft/plan.md):
     - ファイル構成の概要
   NOTE: craft の再開フロー（/craft で「続きをお願いします」）は
         .craft/plan.md の存在に依存する
+  ASSERT EXISTS(.craft/plan.md)
 ENDIF
 ```
 
