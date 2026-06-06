@@ -1,6 +1,6 @@
 # think — 思考・分析オーケストレーター
 
-問いや課題を受け取り、**intent**（発散/収束）と **verbosity**（簡潔/標準/詳細）を判定して
+問いや課題を受け取り、**intent**（発散/収束）と **verbosity**（ひと言/箇条書き/フル論拠付き）を判定して
 サブスキルに委譲する。
 
 ```
@@ -27,7 +27,18 @@ SKILL_DIR = スキル起動時に提供される "Base directory for this skill:
   - `<入力>` が空 → 「何を分析しますか?」と聞き、返答を `{input}` とする
   - スキル名が存在しない → 「スキル名 `<X>` は存在しません。使えるスキル: ideate / scamper / six-hats / triz / first-principles」と返してSTOP
 - **`/think <入力>`**: スキル名なし。`<入力>` 全体を `{input}` としてステップ2に進む
-- **`/think`（引数なし）**: 「何を考えたいですか?」と一言聞く。返答を `{input}` としてステップ2に進む
+- **`/think`（引数なし）**: 以下を表示して WAIT_FOR: ユーザーの返答
+
+  ```
+  何を壁打ちしたいですか？
+
+  今どの段階ですか:
+  - まだモヤモヤ（何から考えればいい？）
+  - 方向性はある（深めたい）
+  - 案はある（検証・評価したい）
+  ```
+
+  返答を `{input}` とし、選択した段階を intent 判定のヒントとしてステップ2に進む（モヤモヤ→発散寄り / 方向性はある→ステップ2の通常判定に委ねる / 案はある→収束寄り）
 
 ---
 
@@ -36,9 +47,11 @@ SKILL_DIR = スキル起動時に提供される "Base directory for this skill:
 ### verbosity の判定
 
 `{input}` に以下が含まれる場合:
-- 「簡潔に」「さっと」「手短に」「手軽に」→ `{verbosity}` = 簡潔
-- 「詳しく」「丁寧に」「しっかり」「詳細に」→ `{verbosity}` = 詳細
-- それ以外 → `{verbosity}` = 標準
+- 「ひと言」「さっと」「手短に」「手軽に」→ `{verbosity_label}` = ひと言、`{verbosity}` = 簡潔
+- 「詳しく」「丁寧に」「しっかり」「論拠付き」「根拠つき」→ `{verbosity_label}` = フル論拠付き、`{verbosity}` = 詳細
+- それ以外 → `{verbosity_label}` = 箇条書き、`{verbosity}` = 標準
+
+**注**: サブスキルには `{verbosity}`（簡潔/標準/詳細）を渡す。`{verbosity_label}` はユーザー表示専用。
 
 ### intent の判定
 
@@ -71,28 +84,27 @@ SKILL_DIR = スキル起動時に提供される "Base directory for this skill:
 
 確認なしに即座に実行する。verbosity はステップ2の verbosity 判定ロジックに準じて `{input}` から判定する。
 
-- ideate: `{SKILL_DIR}/ideate/SKILL.md` を READ し、`{input}` と `{verbosity}` を渡して実行
-- scamper: `{SKILL_DIR}/scamper/SKILL.md` を READ し、`{input}` と `{verbosity}` を渡して実行
-- six-hats: `{SKILL_DIR}/six-hats/SKILL.md` を READ し、`{input}` と `{verbosity}` を渡して実行
-- first-principles: `{SKILL_DIR}/first-principles/SKILL.md` を READ し、`{input}` と `{verbosity}` を渡して実行
-- triz: `{SKILL_DIR}/triz/SKILL.md` を READ し、`{input}` と `{verbosity}` を渡して実行
+選択スキルの `{SKILL_DIR}/<スキル名>/SKILL.md` を READ し、`{input}` と `{verbosity}` を渡して実行する。
+SKILL.md が存在しない・READ 失敗の場合は「スキル `<X>` を起動できません」と伝えてSTOP。
 
 ### 自動判定した場合（ステップ2を経由）
 
-以下の形式でスキル選択の理由と verbosity を示し、yes/no を確認する。
+`[発散]` または `[収束]` ＋ 説明1文の形式で提示し、確認する:
 
 ```
-intent: <発散 / 収束>
-スキル: <スキル名>
-理由: <判定基準のどの条件に該当したか、1〜2文>
-出力粒度: <簡潔 / 標準 / 詳細>
+[発散] アイデアを広げ具体的な提案を生成します
+手法: ideate（Brown 2008 / Christensen 2016）
+粒度: 箇条書き
 
-このスキルで進めますか？ [yes / no / <別スキル名>]
+このまま進めますか？ [yes / 別の方向で / 直接回答して / <別スキル名>]
 ```
+
+論拠の例: ideate → Brown (2008) / Christensen (2016)、scamper → Eberle (1971) / Osborn (1953)、six-hats → de Bono (1985)、triz → Altshuller (1956)、first-principles → Aristotle
 
 WAIT_FOR: ユーザーの返答
 - `yes` または Enter → 選択スキルの SKILL.md を READ し、`{input}` と `{verbosity}` を渡して実行する
-- `no` → サブスキル一覧を表示してスキルを選ばせる
+- `別の方向で` / `no` → サブスキル一覧を表示してスキルを選ばせる
+- `直接回答して` → フレームを使わず `{input}` に対して直接回答する
 - `<別スキル名>` → サブスキル一覧に存在するか確認する。存在しない場合は「スキル名 `<X>` は存在しません」と伝えて再度選択を促す。存在する場合はその SKILL.md を READ し、`{input}` と `{verbosity}` を渡して実行する
 
 ### 未分類の場合
@@ -117,3 +129,22 @@ WAIT_FOR: ユーザーの返答
 WAIT_FOR: ユーザーの選択
 - スキルを選んだ場合 → そのスキルの SKILL.md を READ し、`{input}` と `{verbosity}` を渡して実行する
 - 直接回答を選んだ場合 → `{input}` に対して直接回答する
+
+---
+
+## 連鎖モード
+
+サブスキルの実行が完了した後、対話中にいつでも以下のコマンドで別スキルへ連鎖できる:
+
+```
+→ <スキル名>
+```
+
+例:
+- `→ six-hats` — 出たアイデアをリスク・実現性の観点で検証する
+- `→ triz` — 見えてきた矛盾・トレードオフを解消する
+- `→ first-principles` — 前提を疑いゼロから再検討する
+- `→ ideate` — 評価フェーズから発想フェーズに戻る
+
+連鎖時は直前の `{input}` と会話文脈を引き継ぎ、`{verbosity}` と `{verbosity_label}` はそのまま維持する。
+スキル名が存在しない場合は「スキル名 `<X>` は存在しません。使えるスキル: ideate / scamper / six-hats / triz / first-principles」と返して連鎖を中断する。
