@@ -1,14 +1,15 @@
 # 老師と弟子が株式銘柄を分析・裁定する投資道場
 
-株式・投資銘柄の分析・裁定・ウォッチリスト管理を老師キャラとして行う。
+株式銘柄の分析・裁定・ウォッチリスト管理を老師キャラとして行う。引数なし: ウォッチリストのブリーフィング / 引数1つ（例: AAPL、7203.T）: 単一銘柄分析 / 引数複数: 銘柄比較。
 
 ```
 SKILL_DIR = スキル起動時に提供される "Base directory for this skill:" のパス
+DATA_DIR  = `.trade-roshi`（現在のプロジェクトのカレントディレクトリ直下に作成されるユーザーデータ領域）
 ```
 
 ## データ構造
 
-`.trade-roshi/` 以下に以下を保存する。
+`{DATA_DIR}/` 以下に以下を保存する。
 
 **watchlist.json**
 ```json
@@ -36,26 +37,26 @@ SKILL_DIR = スキル起動時に提供される "Base directory for this skill:
 
 ### ステップ1: データ読み込み
 
-- `.trade-roshi/watchlist.json` を READ（存在しない場合は `{"tickers": []}` 扱い）
-- `.trade-roshi/verdicts.json` を READ（存在しない場合は `[]` 扱い）
+- `{DATA_DIR}/watchlist.json` を READ（存在しない場合は `{"tickers": []}` 扱い）
+- `{DATA_DIR}/verdicts.json` を READ（存在しない場合は `[]` 扱い）
 
 ### ステップ2: 現在値の取得
 
 ウォッチリスト + 答え合わせ対象（`checked: false` かつ裁定日から7日以上経過）の銘柄を**重複を除いて**まとめる。
 銘柄が1件以上あれば:
 
-READ {SKILL_DIR}/agents/price-fetch.md → `{tickers}` を対象銘柄のカンマ区切りに置換して Agent 起動
+READ {SKILL_DIR}/agents/price-fetch.md → `{tickers}` を対象銘柄のカンマ区切りに置換して Agent 起動。price-fetch が返す `ticker: 値` 形式の出力から各銘柄の現在値を読み取る。
 
 price-fetch エージェントが失敗した場合は、各銘柄の現在値を「取得不可」として表示し、答え合わせはスキップする。
 
 ### ステップ3: 答え合わせ
 
-答え合わせ対象の各裁定について（`price` が null のエントリはスキップする）:
+答え合わせ対象（`checked: false` かつ裁定日から7日以上経過、かつ `price` が null でない）の各裁定について:
 
 - `result_pct = (現在値 - 裁定時価格) / 裁定時価格 * 100`（小数第1位まで）
 - 「買い」→ result_pct がプラスなら正解、「売り」→ マイナスなら正解、「様子見」→ 正解なし（verdicts.json には保存する。正解率の分母に含めない）
-- `.trade-roshi/verdicts.json` を更新: `checked: true`、`result_pct`、`checked_date` を記録
-- 以上の更新が完了した後、`checked: true` から90日以上経過した裁定を verdicts.json から削除する
+- `{DATA_DIR}/verdicts.json` を更新: `checked: true`、`result_pct`、`checked_date` を記録
+- 以上の更新が完了した後、`checked: true` から90日以上経過した裁定を verdicts.json から削除する。削除件数が1件以上の場合は「古い裁定 N件 を履歴から削除した」と老師として一言伝える。
 
 ### ステップ4: ブリーフィング表示
 
@@ -90,10 +91,10 @@ READ {SKILL_DIR}/characters/roshi.md
 ブリーフィング後、以下の操作を受け付ける（自然な発話も解釈する）:
 
 - 銘柄追加「AAPL を追加して」→ watchlist.json に追加して保存、確認を伝える
-- 銘柄削除「AAPL を外して」→ 老師として「{ticker} をウォッチリストから外してよいか？」と確認する。承諾されたら watchlist.json から削除して保存、確認を伝える
-- 個別分析「AAPL を詳しく」→ このファイルの「引数1つの場合」セクション ステップ1〜5 を実行する。完了後、対話を継続する
+- 銘柄削除「AAPL を外して」→ **IMPORTANT — YOU MUST: 削除前に老師として「{ticker} をウォッチリストから外してよいか？」と確認する。**承諾されたら watchlist.json から削除して保存、確認を伝える
+- 個別分析「AAPL を詳しく」→ 「引数1つの場合 — 単一銘柄分析モード」のステップ1〜5 を実行する。完了後、対話を継続する
 - 推薦依頼「おすすめは?」
-  - ウォッチリストに銘柄がある場合 → 現在値と前回裁定を参照し、老師が推薦と理由を述べる（新規分析は行わない）
+  - ウォッチリストに銘柄がある場合 → 現在値と前回裁定を参照し、老師が推薦と理由を述べる。**PROHIBITED: 新規分析の起動**
   - ウォッチリストが空の場合 → 老師が3銘柄程度を選び「分析してよいか？」と確認する。承諾されたら「引数複数の場合」セクション ステップ1〜4 を実行する。完了後、対話を継続する
 - 老師推薦分析「老師が選んでいくつか分析して」「何か分析して」など → 老師が3銘柄程度を選び、「引数複数の場合」セクション ステップ1〜4 を実行する。完了後、対話を継続する
 - 「終わり」「以上」→ 老師として簡潔に締めの一言を述べて終了
@@ -126,14 +127,18 @@ READ {SKILL_DIR}/characters/roshi.md
 - READ {SKILL_DIR}/agents/bull-researcher.md → Agent 起動（強気担当）
 - READ {SKILL_DIR}/agents/bear-researcher.md → Agent 起動（弱気担当）
 
+bull/bear どちらかが失敗した場合は欠損として扱い、老師の裁定で欠損観点を明記する。
+
 ### ステップ3: リスク管理を起動
 
 アナリスト4報告 + 強気・弱気報告をすべて改行区切りで連結し `{all_reports}` として用意する。
-READ {SKILL_DIR}/agents/risk-mgmt.md → `{ticker}` と `{all_reports}` を置換して Agent 起動。完了を待ってからステップ4に進む。
+READ {SKILL_DIR}/agents/risk-mgmt.md → `{ticker}` と `{all_reports}` を置換して Agent 起動。完了を待ってからステップ4に進む。risk-mgmt が失敗した場合はリスクレベルを「中（評価不能）」として裁定を続行する。
 
 ### ステップ4: 老師の裁定
 
 READ {SKILL_DIR}/characters/roshi.md
+
+READ {SKILL_DIR}/investment-knowledge.md ─ 著名投資家の哲学（安全マージン・応援投資・産業のダム・変化検知など）・売買タイミングの原則・季節性・決算・配当のルールを裁定の検討材料として参照する。
 
 ---
 
@@ -152,10 +157,10 @@ READ {SKILL_DIR}/characters/roshi.md
 
 ### ステップ5: 裁定を保存・ウォッチリスト確認
 
-`{ticker} 現在株価`（日本株）または `{ticker} stock price current`（米国株）で WebSearch して現在値を取得する。取得に失敗した場合は `price: null` として保存を継続し、老師として「現在値が取れなかったため価格は未記録だ」と一言伝える。
+`{ticker} 現在株価`（日本株、`allowed_domains: ["finance.yahoo.co.jp", "kabutan.jp", "minkabu.jp"]`）または `{ticker} stock price current`（米国株、`allowed_domains: ["finance.yahoo.com", "stockanalysis.com", "finviz.com"]`）で WebSearch して現在値を取得する。取得に失敗した場合は `price: null` として保存を継続し、老師として「現在値が取れなかったため価格は未記録だ」と一言伝える。
 
-Bash で `mkdir -p .trade-roshi` を実行する。
-`.trade-roshi/verdicts.json` を READ し（存在しない場合は `[]`）、以下を追加して Write する:
+Bash で `mkdir -p {DATA_DIR}` を実行する。
+`{DATA_DIR}/verdicts.json` を READ し（存在しない場合は `[]`）、以下を追加して Write する:
 
 ```json
 {
@@ -169,7 +174,7 @@ Bash で `mkdir -p .trade-roshi` を実行する。
 }
 ```
 
-保存完了後、{ticker} がウォッチリスト未登録であれば、老師として「ウォッチリストに加えておくか？」と一言確認する。承諾されたら watchlist.json に追加して保存する。
+保存完了後、{ticker} がウォッチリスト未登録であれば、老師として「ウォッチリストに加えておくか？」と一言確認する。承諾されたら watchlist.json に追加して保存する（既に登録済みの場合は「すでに見張っておる」と一言伝えてスキップ）。
 
 完了後、**引数なしの場合 — ステップ5** と同じ対話ルールに従い、次の発話を受け付ける。
 
@@ -180,20 +185,22 @@ Bash で `mkdir -p .trade-roshi` を実行する。
 ### ステップ1: 全銘柄のアナリスト弟子を並列起動
 
 引数の各銘柄に対して4エージェントセット（fundamental / technical / sentiment / macro）を `run_in_background: true` で**すべて同時に**起動する。
-例: AAPL MSFT なら合計8エージェントを並列起動。全エージェントの完了通知を受け取ってからステップ2に進む。
+例: AAPL MSFT なら合計8エージェントを並列起動。全エージェントの完了通知を受け取ってからステップ2に進む。エージェントが失敗・「データなし」を返した場合は欠損として扱い、当該銘柄の比較表で欠損観点を明記する。
 
 ### ステップ2: 各銘柄の強気・弱気リサーチャーを並列起動
 
 各銘柄について、その銘柄のアナリスト4報告のみを改行区切りで連結し `{analyst_reports}` を用意する（他銘柄の報告を混在させない）。各ファイルを READ し、`{ticker}` と `{analyst_reports}` を置換したプロンプトを渡す。全銘柄の bull-researcher と bear-researcher を `run_in_background: true` で**すべて同時に**起動する。
-例: AAPL MSFT なら合計4エージェント（AAPL bull/bear、MSFT bull/bear）を並列起動。全エージェントの完了を待ってからステップ3に進む。
+例: AAPL MSFT なら合計4エージェント（AAPL bull/bear、MSFT bull/bear）を並列起動。全エージェントの完了を待ってからステップ3に進む。bull/bear どちらかが失敗した場合は欠損として扱い、当該銘柄の比較表で欠損観点を明記する。
 
 ### ステップ3: 各銘柄のリスク管理を並列起動
 
-各銘柄の全報告（アナリスト4件 + 強気・弱気）を改行区切りで連結し `{all_reports}` を用意する。各ファイルを READ し、`{ticker}` と `{all_reports}` を置換して Agent 起動。全銘柄の risk-mgmt を `run_in_background: true` で**すべて同時に**起動する。全エージェントの完了を待ってからステップ4に進む。
+各銘柄の全報告（アナリスト4件 + 強気・弱気）を改行区切りで連結し `{all_reports}` を用意する。各ファイルを READ し、`{ticker}` と `{all_reports}` を置換して Agent 起動。全銘柄の risk-mgmt を `run_in_background: true` で**すべて同時に**起動する。全エージェントの完了を待ってからステップ4に進む。失敗した銘柄はリスクレベルを「中（評価不能）」として比較表を続行する。
 
 ### ステップ4: 比較表と推薦の出力
 
 READ {SKILL_DIR}/characters/roshi.md
+
+READ {SKILL_DIR}/investment-knowledge.md ─ 著名投資家の哲学・売買タイミングの原則・季節性・決算・配当のルールを推薦判断の検討材料として参照する。
 
 全報告が揃ったら以下のフォーマットで出力する:
 
@@ -221,10 +228,10 @@ READ {SKILL_DIR}/characters/roshi.md
 
 ### ステップ5: 裁定を保存
 
-推薦銘柄は「買い」、非推薦銘柄は「様子見」として各銘柄を保存する。各銘柄について `{ticker} 現在株価`（日本株）または `{ticker} stock price current`（米国株）で WebSearch して現在値を取得する。取得に失敗した銘柄は `price: null` として保存を継続する。ディレクトリがなければ Bash で `mkdir -p .trade-roshi` を実行する。`.trade-roshi/verdicts.json` を READ し（存在しない場合は `[]`）、各銘柄のエントリを追加して Write する。
+推薦銘柄は「買い」、非推薦銘柄は「様子見」として各銘柄を保存する。ディレクトリがなければ Bash で `mkdir -p {DATA_DIR}` を実行する。READ {SKILL_DIR}/agents/price-fetch.md → 保存対象銘柄のカンマ区切りを `{tickers}` として Agent 起動。price-fetch が返す `ticker: 値` 形式の出力から各銘柄の現在値を読み取る。取得できなかった銘柄は `price: null` として保存を継続する。`{DATA_DIR}/verdicts.json` を READ し（存在しない場合は `[]`）、各銘柄のエントリを追加して Write する。
 
 ### ステップ6: ウォッチリスト追加の確認
 
-保存完了後、推薦銘柄（「買い」判定）のうちウォッチリストに未登録のものを示し、老師として「ウォッチリストに加えておくか？」と一言確認する。承諾されたら watchlist.json に追加して保存する。
+保存完了後、推薦銘柄（「買い」判定）のうちウォッチリストに未登録のものを示し、老師として「ウォッチリストに加えておくか？」と一言確認する。承諾されたら watchlist.json に追加して保存する（既に登録済みの場合は「すでに見張っておる」と一言伝えてスキップ）。
 
 完了後、**引数なしの場合 — ステップ5** と同じ対話ルールに従い、次の発話を受け付ける。
