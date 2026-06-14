@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel — Green</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f0f8f2;color:#183828;padding:2.5rem 1.5rem;line-height:1.5}
+.wrap{max-width:800px;margin:0 auto}
+h1{font-size:1.4rem;font-weight:700;color:#287848;letter-spacing:-.02em;margin-bottom:.25rem}
+.sub{font-size:.85rem;color:#489868;margin-bottom:1.75rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem}
+.card{background:#f6fdf8;border:1px solid #bce8ca;border-radius:10px;padding:1rem 1.1rem}
+.card-top{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem}
+.icon{font-size:1.3rem;flex-shrink:0}
+.name{font-family:"SF Mono","Fira Code",monospace;font-size:.88rem;font-weight:600;color:#287848}
+.cmd{font-size:.72rem;color:#489868;font-family:"SF Mono","Fira Code",monospace;margin-top:.05rem}
+.desc{font-size:.8rem;color:#489868;line-height:1.55}
+.tag{display:inline-block;font-size:.65rem;background:#ccf0da;color:#287848;padding:.1rem .4rem;border-radius:4px;margin-top:.5rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>スキル一覧</h1>
+  <p class="sub">Claude Code で利用可能なスキル（サンプル表示）</p>
+  <div class="grid">
+    <div class="card"><div class="card-top"><span class="icon">🎨</span><div><div class="name">algorithmic-art</div><div class="cmd">/algorithmic-art</div></div></div><div class="desc">p5.js を使ったアルゴリズムアートの生成</div><span class="tag">art</span></div>
+    <div class="card"><div class="card-top"><span class="icon">🤖</span><div><div class="name">claude-api</div><div class="cmd">/claude-api</div></div></div><div class="desc">Claude API / SDK アプリのビルド・最適化</div><span class="tag">API</span></div>
+    <div class="card"><div class="card-top"><span class="icon">📝</span><div><div class="name">doc-coauthoring</div><div class="cmd">/doc-coauthoring</div></div></div><div class="desc">ドキュメント・仕様書の共同作成ワークフロー</div><span class="tag">docs</span></div>
+    <div class="card"><div class="card-top"><span class="icon">🔌</span><div><div class="name">mcp-builder</div><div class="cmd">/mcp-builder</div></div></div><div class="desc">MCP サーバーの設計・実装ガイド</div><span class="tag">MCP</span></div>
+    <div class="card"><div class="card-top"><span class="icon">🖌️</span><div><div class="name">theme-factory</div><div class="cmd">/theme-factory</div></div></div><div class="desc">スライド・HTML ページへのテーマ適用</div><span class="tag">design</span></div>
+    <div class="card"><div class="card-top"><span class="icon">🧪</span><div><div class="name">webapp-testing</div><div class="cmd">/webapp-testing</div></div></div><div class="desc">Playwright を使った Web アプリのテスト</div><span class="tag">test</span></div>
+    <div class="card"><div class="card-top"><span class="icon">📋</span><div><div class="name">output-brief</div><div class="cmd">/output-brief</div></div></div><div class="desc">ブリーフィング → 承認 → アウトプット</div><span class="tag">workflow</span></div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simple List — Light</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f8f8f8;color:#111111;padding:2.5rem 1.5rem;line-height:1.5}
+.wrap{max-width:700px;margin:0 auto}
+h1{font-size:1.4rem;font-weight:700;color:#2a2a2a;letter-spacing:-.02em;margin-bottom:.25rem}
+.sub{font-size:.85rem;color:#666666;margin-bottom:1.75rem}
+.list{background:#ffffff;border:1px solid #e0e0e0;border-radius:10px;overflow:hidden}
+.row{display:grid;grid-template-columns:160px 1fr auto;align-items:center;gap:1rem;padding:.75rem 1rem;border-bottom:1px solid #e0e0e0}
+.row:last-child{border-bottom:none}
+.name{font-family:"SF Mono","Fira Code",monospace;font-size:.88rem;font-weight:600;color:#2a2a2a}
+.desc{font-size:.82rem;color:#666666}
+.tag{font-size:.68rem;background:#eeeeee;color:#333333;padding:.1rem .45rem;border-radius:4px;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>スキル一覧</h1>
+  <p class="sub">Claude Code で利用可能なスキル（サンプル表示）</p>
+  <div class="list">
+    <div class="row"><span class="name">/algorithmic-art</span><span class="desc">p5.js を使ったアルゴリズムアートの生成</span><span class="tag">art</span></div>
+    <div class="row"><span class="name">/claude-api</span><span class="desc">Claude API / Anthropic SDK アプリのビルド・最適化</span><span class="tag">API</span></div>
+    <div class="row"><span class="name">/doc-coauthoring</span><span class="desc">ドキュメント・技術仕様書の共同作成ワークフロー</span><span class="tag">docs</span></div>
+    <div class="row"><span class="name">/mcp-builder</span><span class="desc">MCP サーバーの設計・実装ガイド</span><span class="tag">MCP</span></div>
+    <div class="row"><span class="name">/theme-factory</span><span class="desc">スライド・HTML ページへのテーマ適用</span><span class="tag">design</span></div>
+    <div class="row"><span class="name">/webapp-testing</span><span class="desc">Playwright を使った Web アプリのテスト</span><span class="tag">test</span></div>
+    <div class="row"><span class="name">/output-brief</span><span class="desc">ブリーフィング → 承認 → アウトプット</span><span class="tag">workflow</span></div>
+  </div>
+</div>
+</body>
+</html>
