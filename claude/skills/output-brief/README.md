@@ -47,10 +47,12 @@
 
 #### レイアウト
 
-| レイアウト | 説明 | 向いているコンテンツ |
-|-----------|------|-------------------|
-| `simple-list` | 行ごとに縦一覧 | テキスト中心・情報量が多い |
-| `panel` | カードグリッド | 同程度の重要度の項目 |
+| カテゴリ | レイアウト | 説明 | 向いているコンテンツ |
+|---------|-----------|------|-------------------|
+| 一覧 | `simple-list` | 行ごとに縦一覧 | テキスト中心・情報量が多い |
+| 一覧 | `panel` | カードグリッド | 同程度の重要度の項目 |
+| 文書 | `article` | 本文・見出し・コード・引用 | Markdown 的な構造のドキュメント |
+| 表 | `table` | データ比較表 | 複数項目を列ごとに比較するコンテンツ |
 
 #### カラーテーマ
 
@@ -84,6 +86,26 @@
 | green | dark | light |
 |-------|------|-------|
 | [![](assets/previews/panel-green.png)](assets/previews/panel-green.png) | [![](assets/previews/panel-dark.png)](assets/previews/panel-dark.png) | [![](assets/previews/panel-light.png)](assets/previews/panel-light.png) |
+
+##### article
+
+| warm | cool | blue |
+|------|------|------|
+| [![](assets/previews/article-warm.png)](assets/previews/article-warm.png) | [![](assets/previews/article-cool.png)](assets/previews/article-cool.png) | [![](assets/previews/article-blue.png)](assets/previews/article-blue.png) |
+
+| green | dark | light |
+|-------|------|-------|
+| [![](assets/previews/article-green.png)](assets/previews/article-green.png) | [![](assets/previews/article-dark.png)](assets/previews/article-dark.png) | [![](assets/previews/article-light.png)](assets/previews/article-light.png) |
+
+##### table
+
+| warm | cool | blue |
+|------|------|------|
+| [![](assets/previews/table-warm.png)](assets/previews/table-warm.png) | [![](assets/previews/table-cool.png)](assets/previews/table-cool.png) | [![](assets/previews/table-blue.png)](assets/previews/table-blue.png) |
+
+| green | dark | light |
+|-------|------|-------|
+| [![](assets/previews/table-green.png)](assets/previews/table-green.png) | [![](assets/previews/table-dark.png)](assets/previews/table-dark.png) | [![](assets/previews/table-light.png)](assets/previews/table-light.png) |
 
 ---
 

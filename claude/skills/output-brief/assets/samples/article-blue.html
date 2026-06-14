@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Article — Blue</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#eff5ff;color:#18284a;line-height:1.75}
+.page{display:grid;grid-template-columns:200px 1fr;gap:2.5rem;max-width:980px;margin:0 auto;padding:2.5rem 1.5rem;align-items:start}
+.sidebar{position:sticky;top:2rem}
+.nav-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#4868a0;margin-bottom:.5rem}
+.nav-list{list-style:none;display:flex;flex-direction:column;gap:.1rem}
+.nav-list a{display:block;font-size:.8rem;color:#4868a0;text-decoration:none;padding:.3rem .55rem;border-radius:5px}
+.nav-list a:hover{background:#d8e8ff;color:#2358c0}
+.nav-sub a{padding-left:1.1rem;font-size:.76rem}
+h1{font-size:1.6rem;font-weight:700;color:#2358c0;letter-spacing:-.03em;margin-bottom:.3rem;line-height:1.3}
+h2{font-size:1.1rem;font-weight:700;color:#2358c0;margin:2rem 0 .75rem;padding-bottom:.4rem;border-bottom:2px solid #c5d8f5}
+h3{font-size:.95rem;font-weight:700;color:#4868a0;margin:1.5rem 0 .5rem}
+.meta{font-size:.8rem;color:#4868a0;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid #c5d8f5}
+p{margin-bottom:1rem;font-size:.93rem}
+ul,ol{margin:.5rem 0 1rem 1.5rem;font-size:.93rem}
+li{margin-bottom:.3rem}
+pre{background:#f6faff;border:1px solid #c5d8f5;border-radius:8px;padding:1rem;overflow-x:auto;margin:1rem 0}
+code{font-family:"SF Mono","Fira Code",monospace;font-size:.82rem;color:#2358c0}
+pre code{color:#18284a}
+blockquote{border-left:3px solid #c5d8f5;padding:.5rem 1rem;margin:1rem 0;color:#4868a0;font-style:italic;font-size:.9rem}
+</style>
+</head>
+<body>
+<div class="page">
+  <nav class="sidebar">
+    <p class="nav-label">目次</p>
+    <ul class="nav-list" id="toc"></ul>
+  </nav>
+  <main>
+    <h1>Claude Code スキル設計ガイド</h1>
+    <p class="meta">サンプルドキュメント — output-brief / article レイアウト</p>
+    <h2 id="overview">概要</h2>
+    <p>Claude Code スキルは、繰り返し使うワークフローを <code>SKILL.md</code> ファイルとして定義し、<code>/skill-name</code> で呼び出せる仕組みです。スキルを設計するときは「コールドスタートのエージェントが迷わず実行できるか」を基準にします。</p>
+    <blockquote>スキルは Claude への指示書であり、人間向けのドキュメントではない。</blockquote>
+    <h2 id="types">スキルの種類</h2>
+    <h3 id="prog">プログラム型</h3>
+    <p>Agent ツールでサブエージェントを呼び出す構造。複雑なタスクを並列・分散して処理できます。</p>
+    <ul>
+      <li>親エージェントがオーケストレーション</li>
+      <li>サブエージェントが実作業を担当</li>
+      <li>完了待ちを明示する</li>
+    </ul>
+    <h3 id="inst">指示文型</h3>
+    <p>Claude への自然言語指示のみで構成。ユーザーとのインタラクションが中心のスキルに向いています。</p>
+    <h2 id="principles">設計原則</h2>
+    <p>以下の3点を常に確認してください。</p>
+    <ol>
+      <li><strong>Progressive Disclosure</strong> — description だけでトリガー判断できること</li>
+      <li><strong>ゲート設計</strong> — 不可逆操作の前に必ず WAIT_FOR を置く</li>
+      <li><strong>1回でまとめて</strong> — ユーザーへの質問は1メッセージに集約する</li>
+    </ol>
+    <h2 id="example">実装例</h2>
+    <pre><code>WAIT_FOR: ユーザーの承認を受けてから次へ進む
+PROHIBITED: 承認なしにファイルを書き換えること</code></pre>
+    <p>上記のように <code>WAIT_FOR</code> と <code>PROHIBITED</code> を対で使うと、ゲートのスキップを防げます。</p>
+  </main>
+</div>
+<script>
+const toc=document.getElementById('toc');
+document.querySelectorAll('main h2,main h3').forEach(h=>{
+  const li=document.createElement('li');
+  li.className=h.tagName==='H3'?'nav-sub':'';
+  li.innerHTML=`<a href="#${h.id}">${h.textContent}</a>`;
+  toc.appendChild(li);
+});
+</script>
+</body>
+</html>
