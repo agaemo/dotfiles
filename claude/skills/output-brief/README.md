@@ -25,9 +25,22 @@
 
 ## サンプル
 
-ブラウザで開いて確認できます。
+### simple-list
 
-|  | warm | cool | blue | green | dark | light |
-|--|------|------|------|-------|------|-------|
-| **simple-list** | [▶](assets/samples/simple-list-warm.html) | [▶](assets/samples/simple-list-cool.html) | [▶](assets/samples/simple-list-blue.html) | [▶](assets/samples/simple-list-green.html) | [▶](assets/samples/simple-list-dark.html) | [▶](assets/samples/simple-list-light.html) |
-| **panel**       | [▶](assets/samples/panel-warm.html)        | [▶](assets/samples/panel-cool.html)        | [▶](assets/samples/panel-blue.html)        | [▶](assets/samples/panel-green.html)        | [▶](assets/samples/panel-dark.html)        | [▶](assets/samples/panel-light.html)        |
+| warm | cool | blue |
+|------|------|------|
+| [![](assets/previews/simple-list-warm.png)](assets/samples/simple-list-warm.html) | [![](assets/previews/simple-list-cool.png)](assets/samples/simple-list-cool.html) | [![](assets/previews/simple-list-blue.png)](assets/samples/simple-list-blue.html) |
+
+| green | dark | light |
+|-------|------|-------|
+| [![](assets/previews/simple-list-green.png)](assets/samples/simple-list-green.html) | [![](assets/previews/simple-list-dark.png)](assets/samples/simple-list-dark.html) | [![](assets/previews/simple-list-light.png)](assets/samples/simple-list-light.html) |
+
+### panel
+
+| warm | cool | blue |
+|------|------|------|
+| [![](assets/previews/panel-warm.png)](assets/samples/panel-warm.html) | [![](assets/previews/panel-cool.png)](assets/samples/panel-cool.html) | [![](assets/previews/panel-blue.png)](assets/samples/panel-blue.html) |
+
+| green | dark | light |
+|-------|------|-------|
+| [![](assets/previews/panel-green.png)](assets/samples/panel-green.html) | [![](assets/previews/panel-dark.png)](assets/samples/panel-dark.html) | [![](assets/previews/panel-light.png)](assets/samples/panel-light.html) |
