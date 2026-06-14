@@ -69,21 +69,21 @@
 
 | warm | cool | blue |
 |------|------|------|
-| [![](assets/previews/simple-list-warm.png)](assets/samples/simple-list-warm.html) | [![](assets/previews/simple-list-cool.png)](assets/samples/simple-list-cool.html) | [![](assets/previews/simple-list-blue.png)](assets/samples/simple-list-blue.html) |
+| [![](assets/previews/simple-list-warm.png)](assets/previews/simple-list-warm.png) | [![](assets/previews/simple-list-cool.png)](assets/previews/simple-list-cool.png) | [![](assets/previews/simple-list-blue.png)](assets/previews/simple-list-blue.png) |
 
 | green | dark | light |
 |-------|------|-------|
-| [![](assets/previews/simple-list-green.png)](assets/samples/simple-list-green.html) | [![](assets/previews/simple-list-dark.png)](assets/samples/simple-list-dark.html) | [![](assets/previews/simple-list-light.png)](assets/samples/simple-list-light.html) |
+| [![](assets/previews/simple-list-green.png)](assets/previews/simple-list-green.png) | [![](assets/previews/simple-list-dark.png)](assets/previews/simple-list-dark.png) | [![](assets/previews/simple-list-light.png)](assets/previews/simple-list-light.png) |
 
 ##### panel
 
 | warm | cool | blue |
 |------|------|------|
-| [![](assets/previews/panel-warm.png)](assets/samples/panel-warm.html) | [![](assets/previews/panel-cool.png)](assets/samples/panel-cool.html) | [![](assets/previews/panel-blue.png)](assets/samples/panel-blue.html) |
+| [![](assets/previews/panel-warm.png)](assets/previews/panel-warm.png) | [![](assets/previews/panel-cool.png)](assets/previews/panel-cool.png) | [![](assets/previews/panel-blue.png)](assets/previews/panel-blue.png) |
 
 | green | dark | light |
 |-------|------|-------|
-| [![](assets/previews/panel-green.png)](assets/samples/panel-green.html) | [![](assets/previews/panel-dark.png)](assets/samples/panel-dark.html) | [![](assets/previews/panel-light.png)](assets/samples/panel-light.html) |
+| [![](assets/previews/panel-green.png)](assets/previews/panel-green.png) | [![](assets/previews/panel-dark.png)](assets/previews/panel-dark.png) | [![](assets/previews/panel-light.png)](assets/previews/panel-light.png) |
 
 ---
 
