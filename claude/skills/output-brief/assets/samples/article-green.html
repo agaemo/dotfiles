@@ -7,12 +7,17 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f0f8f2;color:#183828;line-height:1.75}
+header{position:sticky;top:0;z-index:100;background:#287848;color:#fff;padding:.7rem 1.5rem;display:flex;align-items:center;gap:1rem;box-shadow:0 2px 8px rgba(40,120,72,.25)}
+header .site-title{font-size:.95rem;font-weight:700;white-space:nowrap}
+header nav{display:flex;gap:.25rem;margin-left:auto;flex-wrap:wrap}
+header nav a{font-size:.78rem;color:rgba(255,255,255,.85);text-decoration:none;padding:.25rem .6rem;border-radius:4px}
+header nav a:hover{background:rgba(255,255,255,.18);color:#fff}
 .page{display:grid;grid-template-columns:200px 1fr;gap:2.5rem;max-width:980px;margin:0 auto;padding:2.5rem 1.5rem;align-items:start}
-.sidebar{position:sticky;top:2rem}
-.nav-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#489868;margin-bottom:.5rem}
+.sidebar{position:sticky;top:3.5rem;background:#ccf0da;border-radius:10px;padding:1rem .75rem}
+.nav-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#489868;margin-bottom:.5rem;padding:0 .3rem}
 .nav-list{list-style:none;display:flex;flex-direction:column;gap:.1rem}
 .nav-list a{display:block;font-size:.8rem;color:#489868;text-decoration:none;padding:.3rem .55rem;border-radius:5px}
-.nav-list a:hover{background:#ccf0da;color:#287848}
+.nav-list a:hover{background:#a8e0be;color:#287848}
 .nav-sub a{padding-left:1.1rem;font-size:.76rem}
 h1{font-size:1.6rem;font-weight:700;color:#287848;letter-spacing:-.03em;margin-bottom:.3rem;line-height:1.3}
 h2{font-size:1.1rem;font-weight:700;color:#287848;margin:2rem 0 .75rem;padding-bottom:.4rem;border-bottom:2px solid #bce8ca}
@@ -28,6 +33,10 @@ blockquote{border-left:3px solid #bce8ca;padding:.5rem 1rem;margin:1rem 0;color:
 </style>
 </head>
 <body>
+<header>
+  <span class="site-title" id="header-title"></span>
+  <nav id="header-nav"></nav>
+</header>
 <div class="page">
   <nav class="sidebar">
     <p class="nav-label">目次</p>
@@ -69,6 +78,15 @@ document.querySelectorAll('main h2,main h3').forEach(h=>{
   li.className=h.tagName==='H3'?'nav-sub':'';
   li.innerHTML=`<a href="#${h.id}">${h.textContent}</a>`;
   toc.appendChild(li);
+});
+const h1=document.querySelector('main h1');
+if(h1)document.getElementById('header-title').textContent=h1.textContent;
+const hn=document.getElementById('header-nav');
+document.querySelectorAll('main h2').forEach(h=>{
+  const a=document.createElement('a');
+  a.href='#'+h.id;
+  a.textContent=h.textContent;
+  hn.appendChild(a);
 });
 </script>
 </body>
