@@ -88,7 +88,7 @@ SKILL_DIR = スキル起動時に提供される "Base directory for this skill:
 
 ### スキル名を明示指定した場合（ステップ1で直接委譲）
 
-確認なしに即座に実行する。verbosity はステップ2の verbosity 判定ロジックに準じて `{input}` から判定する。
+確認なしに即座に実行する。`{input}` が空でない場合はステップ2の verbosity 判定ロジックに準じて `{input}` から判定する。`{input}` が空の場合は一旦 `{verbosity}` = 標準 とし、委譲先スキルが「引数なし」分岐で実際の入力を取得した時点で、その入力に対してステップ2の verbosity 判定ロジックを再適用する。
 
 選択スキルの `{SKILL_DIR}/<スキル名>/SKILL.md` を READ し、`{input}` と `{verbosity}` を渡して実行する。
 SKILL.md が存在しない・READ 失敗の場合は「スキル `<X>` を起動できません」と伝えてSTOP。
