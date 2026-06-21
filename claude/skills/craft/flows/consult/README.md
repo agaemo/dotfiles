@@ -24,7 +24,11 @@ flowchart TD
     QAC_ESC -->|Yes| QA
     QAC_ESC -->|No| END_QC([完了])
 
-    QA_CHECK -->|No| TARGET1[相談対象 = 既存システム\nor 新規構築と判定]
+    QA_CHECK -->|No| DOMAIN_CHECK{DBマイグレーション/リリース計画/\nIaC/健全性評価/LP公開の相談?}
+    DOMAIN_CHECK -->|Yes| DOMAIN["該当フローへ直接委譲\ndb-migration / release-planner /\niac / scorer / lp-publish"]
+    DOMAIN --> END_D([完了])
+
+    DOMAIN_CHECK -->|No| TARGET1[相談対象 = 既存システム\nor 新規構築と判定]
     TARGET1 --> TARGET
     TARGET2 --> TARGET
     TARGET{相談対象}
@@ -47,3 +51,5 @@ flowchart TD
 ```
 
 テスト・品質・QAに関する相談の委譲先は [flows/qa-consult/README.md](../qa-consult/README.md) を参照。
+db-migration・release-planner・iac・scorer・lp-publish は選択肢整理を経ずに直接委譲する
+（各フローが独自のヒアリング・実行手順を持つため）。

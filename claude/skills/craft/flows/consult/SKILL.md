@@ -62,6 +62,33 @@ IF 相談内容がテスト・品質・QAに関するもの:
     READ {SKILL_DIR}/flows/qa-consult/SKILL.md
     FOLLOW: そこに記述されたすべての手順を実行する。SUMMARY を相談の前提として渡す。
     STOP
+
+# 特定領域の相談は、選択肢整理を経ずに専用フローへ直接委譲する
+# （各フローが独自のヒアリング・実行手順を持つため、ステップ2以降は実行しない）
+IF 相談内容が DB マイグレーション（テーブル追加・カラム変更・インデックス追加等）に関するもの:
+  READ {SKILL_DIR}/flows/db-migration/SKILL.md
+  FOLLOW: そこに記述されたすべての手順を実行する。
+  STOP
+
+IF 相談内容が本番リリース戦略・デプロイ計画・ロールバック手順の策定に関するもの:
+  READ {SKILL_DIR}/flows/release-planner/SKILL.md
+  FOLLOW: そこに記述されたすべての手順を実行する。
+  STOP
+
+IF 相談内容が IaC（Terraform/OpenTofu 等によるインフラのコード管理）に関するもの:
+  READ {SKILL_DIR}/flows/iac/SKILL.md
+  FOLLOW: そこに記述されたすべての手順を実行する。
+  STOP
+
+IF 相談内容がコードベース健全性の定期評価（スコアリング・改善タスク抽出）に関するもの:
+  READ {SKILL_DIR}/flows/scorer/SKILL.md
+  FOLLOW: そこに記述されたすべての手順を実行する。
+  STOP
+
+IF 相談内容が LP・静的サイトの本番公開（ホスティング・ドメイン・SEO）に関するもの:
+  READ {SKILL_DIR}/flows/lp-publish/SKILL.md
+  FOLLOW: そこに記述されたすべての手順を実行する。
+  STOP
 ```
 
 ### ステップ 2: 現状調査

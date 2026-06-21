@@ -10,7 +10,6 @@ Claude Code のカスタムスキル定義ディレクトリ。
 | [`/craft`](craft/) | システム開発に関する部品集。新規立ち上げ・維持保守・移行など開発全工程のフローを包含する |
 | [`/think`](think/) | 入力の intent に応じて ideate / scamper / six-hats / triz / first-principles へ委譲する思考・分析オーケストレーター |
 | [`/runbook`](runbook/) | 開発タスク（本番デプロイ・DB移行・インシデント対応など）を渡すと航空SOP方式の読み上げ式チェックリストを生成する |
-| [`/lp-publish`](lp-publish/) | LP を本番公開するための準備・手順をガイドする。ホスティング・ドメイン・SEO ファイルの知識がなくても進められる |
 | [`/issue-triage`](issue-triage/) | issue番号なしで呼ぶと一覧表示・選択、番号指定で直接トリアージ。承認を得てから修正・PR作成まで行う |
 | [`/improve-skill`](improve-skill/) | スキルファイルを静的解析・実行シミュレーションで改善する |
 | [`/improve-agent`](improve-agent/) | エージェントファイルを静的解析・実行シミュレーションで改善する |
