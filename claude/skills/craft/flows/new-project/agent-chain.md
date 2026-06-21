@@ -1,6 +1,6 @@
 ---
 name: new-project-agent-chain
-description: new-project セットアップ完了後のエージェントチェーン（STEP 1-11）・オプションエージェント・Node.js 再開時注意点
+description: new-project セットアップ完了後の設計フェーズ・エージェントチェーン（STEP 1-7、STEP7はbuildフローへ委譲）・オプションエージェント・Node.js 再開時注意点
 ---
 
 # 標準エージェントチェーン（新規プロジェクト・新機能）
@@ -114,136 +114,17 @@ STEP 6: 統合設計書生成 ← 理解度確認後の総合確認ゲート
   PROHIBITED: 3文書の承認前に実装を開始すること
   NOTE: 文書の内容に矛盾が見つかった場合は、該当する元ドキュメント（requirements.md 等）を修正してから再生成すること
 
-STEP 7: 実装
+STEP 7: build フローへ委譲
 
-  > **テスト戦略（フェーズ1開始前に決定すること）:**
-  >
-  > フェーズ1の実装を始める前に `tester` エージェントを呼び出してテスト環境をセットアップすること
-  > （tester が vitest / pytest のセットアップ手順を案内する。Node.js のデフォルトは vitest 推奨）。
-  > 後付けでテスト環境を追加するとモック設計が困難になり、テストの書けないコードが残る。
-  >
-  > | 対象 | 方針 | 理由 |
-  > |------|------|------|
-  > | API ルート・ミドルウェア・認証ロジック | **TDD 必須** | DBバグ・認証バイパスの温床。後から追加しにくい |
-  > | DBクエリ・マイグレーション | **TDD 必須** | スキーマ変更後に追加すると既存動作の担保が取れない |
-  > | バリデーション・状態遷移関数 | **TDD 必須** | 境界値バグが本番で発覚しやすく、修正コストが高い |
-  > | その他のビジネスロジック関数 | TDD 推奨 | ロジックの複雑度に応じて判断 |
-  > | UI コンポーネント | 任意 | 実画面確認で代替可能 |
-  > | サーバーレスエッジ関数 | ローカルエミュレーターで統合テスト | ユニットテストでは実行環境を再現できない |
-  > | WebSocket・リアルタイムイベント | 統合テスト推奨 | イベントループの非同期性がユニットテストでは再現困難 |
-  > | 外部API連携 | モックで単体テスト | 実APIへの依存を排除してFastを保つ |
-  >
-  > TDD 必須の層を実装するときは `tester` エージェントを「TDDモード」で先に呼び出すこと。
-  > `tester` が Red（失敗）を確認したら実装に進み、Green になったら次の層へ。
-  >
-  > バグが見つかった場合は**フェーズを問わず**後述の Bug-fix TDD 手順で修正すること。
-  > （フェーズ1・2・3いずれでも同じ手順を使う。詳細はフェーズ3を参照）
+  READ {SKILL_DIR}/flows/build/SKILL.md
+  FOLLOW: そこに記述されたすべての手順を実行する
+    STACK = "node"
+    HAS_REVIEW_CHAIN = true
+    HAS_FRONTEND = <このチェーン冒頭で設定済みの変数>
 
-  .craft/plan.md の「フィーチャートラック設計」セクションを読んでから実装を開始すること。
-  トラック設計がある場合は以下の3フェーズで進める。
-  トラック設計がない場合（小規模）は「フェーズ1のみ・逐次確認サイクル」で進める。
-
-  ---
-
-  ### フェーズ1: クリティカルパス（シリアル）
-
-  .craft/plan.md の「フェーズ1」ステップを順番に実装する。
-  各ステップ完了ごとに `mise exec -- pnpm build` で型エラーがないことを確認する。
-
-  フェーズ1完了後:
-    1. `mise exec -- pnpm dev` を起動し、ログイン〜基本ナビゲーションが動作することを確認する
-    2. バグが見つかった場合は Bug-fix TDD 手順（フェーズ3参照）で修正してから commit すること
-    3. 問題なければフェーズ1の成果を git commit する（フェーズ2の起点になる）
-
-  ```bash
-  git add -p  # 変更を確認しながらステージング
-  git commit -m "フェーズ1: クリティカルパス実装完了"
-  # 実際に実装した内容に合わせてメッセージを調整すること
-  ```
-
-  ---
-
-  ### フェーズ2: 並列フィーチャートラック（worktree 分離）
-
-  .craft/plan.md の「フェーズ2」に定義された各トラックを、
-  **isolation: "worktree" + run_in_background: true** でバックグラウンド並列実行する。
-
-  各トラックに渡すプロンプト:
-  READ {SKILL_DIR}/flows/new-project/phase2-prompt.md  ← フェーズ2開始直前に読む
-  （テンプレート内の [TRACK_NAME]・[ABSOLUTE_PATH] 等を実際の値に展開してから渡すこと）
-
-  全トラック完了後:
-    FOR EACH completed_track:
-      1. worktree で作成されたブランチの差分を確認する
-      2. main ブランチにマージする
-      3. コンフリクトがあれば解消する
-      4. `mise exec -- pnpm build` で統合ビルドを確認する
-
-  ---
-
-  ### フェーズ3: 統合確認
-
-  全トラックのマージ完了後:
-    1. `mise exec -- pnpm dev` を起動する
-    2. 主要フローを実機で確認する（一覧→登録→詳細→操作→ダッシュボード）
-    3. バグが見つかった場合は以下の **Bug-fix TDD** 手順で修正すること:
-       a. `tester` エージェントを「バグ修正TDDモード」で呼び出し、バグを再現するテストを書く
-       b. テストが Red（失敗）になることを確認する（再現できない場合は再現手順を精査する）
-       c. バグを修正する
-       d. テストが Green になることを確認する
-       e. 補完モードで `tester` を再度呼び出してリグレッションテストを追加する
-       ⚠️ PROHIBITED: テストを書かずに直接修正すること（同じバグが再発しても検出できなくなる）
-    4. `git commit` で統合完了を記録する
-
-  フェーズ3完了後に STEP 10 のレビューチェーン（verify → security-reviewer → qa → code-reviewer）へ進む。
-
-IF HAS_FRONTEND == true:
-  STEP 8: designer による実画面レビュー
-    RUN: Puppeteer MCP でスクリーンショットを撮影
-    CHECK: デザインブリーフ・デザインシステムとの差異を確認・修正
-
-  STEP 9: /ultrareview（公式スキル・オプション）
-    IF /ultrareview が利用可能:
-      RUN: /ultrareview
-    ELSE:
-      SKIP → STEP 10 へ
-    CHECK: コンポーネント設計・アクセシビリティ・型安全性
-ENDIF
-
-STEP 10: verify → security-reviewer → qa → code-reviewer
-
-STEP 11: CLAUDE.md・README.md 生成 + クリーンアップ
-  実装完了後、確定したスタック・コマンド・構造をもとに生成する。
-  （実装前に生成するとプレースホルダーになるため、このタイミングで行う）
-
-  CLAUDE.md に含めること:
-    - プロジェクト名・目的（1〜2文）
-    - スタック（実際に使う言語・フレームワーク・主要ライブラリ）
-    - 開発コマンド（dev / test / build の実際のコマンド）
-    - アーキテクチャ（採用パターン名・ディレクトリ構造のポイント・レイヤー間の依存の向き）
-    - プロジェクト固有の制約（DBエンジン・実行環境の制限など）
-    - .craft/plan.md を参照するよう一言書く
-    上限: 60行以内
-
-  README.md に含めること:
-    - 概要（1〜2文）
-    - 前提条件（mise・Node・pnpm の実際のバージョン）
-    - セットアップ手順（git clone 〜 依存インストール 〜 .env 設定）
-    - コマンド一覧（dev / test / build / migrate など）
-    - 環境変数（キー名と説明のみ。実際の値は書かない）
-
-  --- public/ クリーンアップ（HAS_FRONTEND == true の場合） ---
-
-  IF HAS_FRONTEND == true:
-    FOREACH file IN [vercel.svg, next.svg, window.svg, file.svg, globe.svg]:
-      IF EXISTS(public/<file>):
-        IF NOT REFERENCED IN src/:
-          DELETE public/file
-        ENDIF
-      ENDIF
-    ENDFOREACH
-    NOTE: 要件検討中にロゴ等を public/ に置いている場合があるため、参照チェックを必ず行ってから削除すること
-  ENDIF
+  NOTE: 実装（フェーズ1〜3 or シンプルループ）・designerによる実画面レビュー・
+        /ultrareview・レビューチェーン（verify→security-reviewer→qa→code-reviewer）・
+        CLAUDE.md/README.md生成は build フロー側で実行される。
 ```
 
 ---
@@ -261,7 +142,7 @@ STEP 11: CLAUDE.md・README.md 生成 + クリーンアップ
 
 ## Node.js / Webアプリ固有の再開時注意点
 
-汎用の実装再開フローは `/craft` の `SKILL.md` に定義されている。
+汎用の実装フロー（初回実装・再開共通）は `{SKILL_DIR}/flows/build/SKILL.md` に定義されている。
 Node.js 系プロジェクトで再開する際は以下を追加で確認すること。
 
 ```

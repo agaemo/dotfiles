@@ -234,5 +234,6 @@ REPORT TO USER:
 ## 標準エージェントチェーン・オプションエージェント・再開時注意点
 
 READ {SKILL_DIR}/flows/new-project/agent-chain.md ← ステップ4完了後、エージェントチェーンを開始する前に読む
-（STEP 1〜11 の詳細手順・GATE・テスト戦略・フェーズ2/3・CLAUDE.md生成手順がここに定義されている）
+（STEP 1〜6 の設計フェーズ詳細手順・GATEがここに定義されている。STEP 7 で build フローに委譲し、
+ 実装・テスト戦略・フェーズ2/3・CLAUDE.md生成は {SKILL_DIR}/flows/build/SKILL.md が担当する）
 

@@ -80,20 +80,12 @@ STOP: 以降のステップは実行しない
 
 ## 実装再開フロー
 
-`.craft/plan.md` が存在する状態から実装を続ける場合の汎用手順。
-フレームワーク固有の注意点は各フローファイルを参照すること。
+`.craft/plan.md` が存在する状態から実装を続ける場合は、build フローに委譲する。
+初回実装（各 new-xxx フローの設計完了後）と同じエンジンを使うため、手順の二重管理がない。
 
 ```
-1. READ .craft/plan.md
-2. READ .craft/design-system.md（存在すれば）
-3. 完了状況を確認してユーザーに提示する:
-   - 完了済みのステップ（対応するコード・ファイルが存在するか確認）
-   - 未着手のステップ
-   - 外部依存で未接続のもの（Firebase・外部API・認証基盤等）
-4. 未着手のステップを plan.md の順番で実装する
-5. 外部依存が未接続の場合はモックで実装し、CLAUDE.md に接続手順を記録する
-6. 各ステップ完了後にビルド確認を行う
-   - Flutter:        mise exec -- flutter analyze
-   - Node.js / Web: mise exec -- pnpm build
-   - 静的サイト:     mise exec -- pnpm build
+READ {SKILL_DIR}/flows/build/SKILL.md
+FOLLOW: そこに記述されたすべての手順を実行する
+  NOTE: STACK・HAS_REVIEW_CHAIN・HAS_FRONTEND は呼び出し元変数が無いため
+        build フロー内で自動判定される（pubspec.yaml・design-brief.md 等の有無から推定）
 ```

@@ -293,84 +293,38 @@ REPORT: "完了しました"
 
 ---
 
-### ステップ 4: CLAUDE.md・README.md 生成（メインClaude自身が実行）
+### ステップ 3.5: 初期 .craft/plan.md 生成
 
-セットアップ完了後、セッション情報をもとに以下を生成する。
+セットアップ完了後、デザインブリーフのページ・セクション構成から実装計画を作る。
 
 ```
---- CLAUDE.md ---
-
-IF NOT EXISTS(CLAUDE.md):
-  WRITE CLAUDE.md based on actual session context.
-
-  INCLUDE（実際の値のみ。プレースホルダー禁止）:
-    - プロジェクト名・目的（1〜2文）
-    - スタック（Astro + 実際に追加したライブラリ）
-    - 開発コマンド: pnpm dev / pnpm build（実際に動くコマンド）
-
-  OMIT（書かない）:
-    - 本番の認証情報・APIキー・パスワード・実在するユーザー情報
-    - DB・API・TDD・リリースプランナーなど LP に不要なルール
-    - TODO・プレースホルダー
-
-  LIMIT: 40行以内
-  ASSERT EXISTS(CLAUDE.md)
-
---- README.md ---
-
-IF NOT EXISTS(README.md):
-  WRITE README.md based on actual session context.
-
-  INCLUDE:
-    - 概要（1〜2文）
-    - 前提条件（mise・Node・pnpm の実際のバージョン）
-    - セットアップ手順（git clone 〜 pnpm install）
-    - コマンド一覧（dev / build）
-
-  OMIT: 本番の認証情報・APIキー・パスワード
-  ASSERT EXISTS(README.md)
-
---- .craft/plan.md ---
-
 IF NOT EXISTS(.craft/plan.md):
+  ANALYZE: docs/design-brief.md のページ構成・セクション構成を読み取る
   WRITE .craft/plan.md
-  INCLUDE:
-    - プロジェクト名・目的（1〜2文）
-    - セクション構成（ID・内容・実装状態の表）
-    - 完了済みタスク一覧（チェックボックス形式）
-    - 未完了・今後のタスク一覧（外部依存の未設定項目を含む）
-    - ファイル構成の概要
-  NOTE: craft の再開フロー（/craft で「続きをお願いします」）は
-        .craft/plan.md の存在に依存する
+    INCLUDE:
+      - プロジェクト名・目的（1〜2文）
+      - セクション構成（ID・内容・実装状態の表）。各セクションは「未着手」で初期化する
+      - ファイル構成の概要（.astro コンポーネントの配置方針）
+    NOTE: フィーチャートラック設計セクションは不要
+          （static は build フロー内で常にシンプルループとして実装される）
   ASSERT EXISTS(.craft/plan.md)
-ENDIF
 ```
 
 ---
 
-### ステップ 5: 完了報告
+### ステップ 4: build フローへ委譲
 
 ```
-REPORT TO USER:
-  静的サイトプロジェクトのセットアップが完了しました。
-  （詳細はサブエージェントの報告を参照）
+READ {SKILL_DIR}/../build/SKILL.md
+  # SKILL_DIR はこのファイル（craft/flows/new-static）を指すため、
+  # craft/flows/build/SKILL.md へは1階層上がってアクセスする
+FOLLOW: そこに記述されたすべての手順を実行する
+  STACK = "static"
+  HAS_REVIEW_CHAIN = false
+  HAS_FRONTEND = true
 
-  次のステップ:
-  1. デザインブリーフをもとにページ構成・コンポーネント分割を計画する
-  2. セクション単位で .astro コンポーネントを実装し、各セクション完了後に `pnpm dev` で表示確認する
-     （一気に全セクションを実装しない。問題の原因特定が困難になるため）
-  3. レスポンシブ対応は必ずモバイルファーストで実装する
-     - iPhone の論理ピクセル幅は 375〜430px。`@media (max-width: 480px)` は機能しないことがある
-     - ブレークポイントは `768px`（タブレット境界）を基準にする
-     - `width` / `max-width` に CSS カスタムプロパティを `calc()` で使う場合は展開後の値で検証する
-     - CTA ボタンが画面幅を超えない保証: `max-width: 90%` + `box-sizing: border-box` を基本形にする
-  4. 全セクション完了後、Puppeteer MCP が使える場合はスクリーンショットで最終確認する
-
-IF 未完了タスクがある状態でセッションを終了する場合:
-  SAVE TO MEMORY（auto-memory に記録）:
-    - 未完了セクション一覧（ID・内容・状態）
-    - 次セッションで /craft の実装再開フローが参照するため必ず保存すること
-  NOTE: 保存しないと次のセッションで「続きをお願いします」が機能しない
+NOTE: セクション単位の実装・モバイルファースト対応・Puppeteer での最終確認・
+      CLAUDE.md / README.md 生成・.craft/plan.md の更新は build フロー側で行われる。
 ```
 
 ---

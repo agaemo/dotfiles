@@ -266,15 +266,16 @@ STEP 3: designer       → .craft/design-brief.md / design-system.md / design.md
 STEP 4: planner        → .craft/plan.md
 STEP 5: 理解度チェック
 STEP 6: 統合設計書生成  → .craft/01_requirements_doc.md / 02_specifications_doc.md / 03_basic_design_doc.md
-STEP 7: 実装
-STEP 8: designer による実画面レビュー
-STEP 9: /ultrareview（オプション）
-STEP 10: verify → security-reviewer → qa → code-reviewer
-STEP 11: CLAUDE.md・README.md 生成 + クリーンアップ
+STEP 7: build フローへ委譲（実装・実画面レビュー・レビューチェーン・CLAUDE.md生成）
+  READ {SKILL_DIR}/flows/build/SKILL.md
+  FOLLOW: そこに記述されたすべての手順を実行する
+    STACK = framework == "flutter" の場合 "flutter"、それ以外（react-native）は "node"
+    HAS_REVIEW_CHAIN = true
+    HAS_FRONTEND = true
 ```
 
 各 GATE・テンプレート・フェーズ2の並列実装手順が必要な場合:
-`READ {SKILL_DIR}/flows/new-project/agent-chain.md`（エージェントチェーン全詳細）
+`READ {SKILL_DIR}/flows/new-project/agent-chain.md`（エージェントチェーン全詳細、STEP1-6）
 
-Flutter コマンド読み替え・STEP 7 確認コマンド・STEP 11 CLAUDE.md 記載事項・再開時注意点:
+Flutter コマンド読み替え・ビルド確認コマンド・CLAUDE.md記載事項・再開時注意点:
 `READ {SKILL_DIR}/flows/new-app/flutter-notes.md`（必要になった時点で読む）
