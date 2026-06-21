@@ -37,17 +37,14 @@ INFER kind FROM 直前の会話内容:
 IF kind が明確に推定できる:
   CONFIRM: 「〇〇（種別名）で進めますか？」と一言確認する
   IF ユーザーが否定した:
-    ASK USER: どの作業を行いますか？（以下の選択肢）
-    WAIT_FOR: ユーザーの選択
+    READ {SKILL_DIR}/flows/scope/SKILL.md
+    FOLLOW: そこに記述されたすべての手順を実行する
+    STOP: 以降のステップは実行しない
   ENDIF
 ELSE:
-  ASK USER: どの作業を行いますか？
-    1. 静的サイトを新規作成（LP・PoC・画面モック。API / DB / 認証不要）
-    2. Webアプリを新規作成（Node.js系。API・DB・認証など動的機能あり）
-    3. クロスプラットフォームアプリを新規作成（Flutter・React Native・Expo等）
-    4. 既存システムの相談（課題整理・移行検討・品質改善・リファクタ等）
-    5. 実装を再開（.craft/plan.md が既にある）
-  WAIT_FOR: ユーザーの選択
+  READ {SKILL_DIR}/flows/scope/SKILL.md
+  FOLLOW: そこに記述されたすべての手順を実行する
+  STOP: 以降のステップは実行しない
 ENDIF
 
 NOTE: いずれの子スキルでも FOLLOW 実行中にエラーや予期しない STOP が発生した場合は、
@@ -61,6 +58,10 @@ NOTE: いずれの子スキルでも FOLLOW 実行中にエラーや予期しな
 # | 3（クロスプラットフォーム）| {SKILL_DIR}/flows/new-app/SKILL.md                   |
 # | 4（相談）                 | {SKILL_DIR}/flows/consult/SKILL.md                   |
 # | 5（実装再開）             | このファイル末尾の「実装再開フロー」                   |
+#
+# NOTE: 種別が推定できない場合・確認が否定された場合は scope フロー
+#       （{SKILL_DIR}/flows/scope/SKILL.md）が上記IF/ELSEで既に処理しており、
+#       このテーブル・以降のIF文には到達しない。
 
 IF kind != 5:
   READ 上記テーブルの対応フローファイル（{SKILL_DIR}は導出済みの絶対パスに展開すること）
