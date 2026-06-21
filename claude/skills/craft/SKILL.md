@@ -21,11 +21,14 @@ IF .craft/plan.md が存在する:
   IF ユーザーが再開を選択:
     FOLLOW: 実装再開フロー（このファイル末尾）
     STOP: 以降のステップは実行しない
-  ELSE:
-    # 再開しない → scope へ
   ENDIF
+  # 再開しない、または .craft/plan.md がそもそも存在しない → scope へ
+ENDIF
 
 READ {SKILL_DIR}/flows/scope/SKILL.md
+IF READ FAILED:
+  REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/scope/SKILL.md。SKILL_DIR の導出を確認してください。"
+  STOP
 FOLLOW: そこに記述されたすべての手順を実行する
   NOTE: 種別の推定・確認・new-static/new-project/new-app/consult への振り分けは
         すべて scope フロー側で行われる。
@@ -33,8 +36,9 @@ STOP: 以降のステップは実行しない
 
 ```
 
-NOTE: scope フロー（または scope が委譲した先のフロー）の FOLLOW 実行中にエラーや予期しない STOP が
-  発生した場合は、中断した箇所と理由をユーザーに伝え、再試行するか（同じ種別を選択 / 別の種別を選ぶ）確認すること。
+NOTE: scope フロー（または scope が委譲した先のフロー）・build フローのいずれかで
+  FOLLOW 実行中にエラーや予期しない STOP が発生した場合は、中断した箇所と理由をユーザーに伝え、
+  再試行するか（同じ種別を選択 / 別の種別を選ぶ / 再開を中止する）確認すること。
 
 ---
 
@@ -45,6 +49,9 @@ NOTE: scope フロー（または scope が委譲した先のフロー）の FOL
 
 ```
 READ {SKILL_DIR}/flows/build/SKILL.md
+IF READ FAILED:
+  REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/build/SKILL.md。SKILL_DIR の導出を確認してください。"
+  STOP
 FOLLOW: そこに記述されたすべての手順を実行する
   NOTE: STACK・HAS_REVIEW_CHAIN・HAS_FRONTEND は呼び出し元変数が無いため
         build フロー内で自動判定される（pubspec.yaml・design-brief.md 等の有無から推定）

@@ -42,6 +42,7 @@ IF kind が明確に推定できる:
     STOP
   ELSE:
     # 推定が外れた → ステップ1（自由ヒアリング）へ
+  ENDIF
 ENDIF
 # kind が推定できない場合も、そのままステップ1へ
 ```
@@ -56,6 +57,9 @@ WAIT_FOR: ユーザーの話
 
 IF 話の内容が既存システムへの課題・移行・リファクタ等（既存システムの相談）:
   READ {SKILL_DIR}/flows/consult/SKILL.md
+  IF READ FAILED:
+    REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/consult/SKILL.md。SKILL_DIR の導出を確認してください。"
+    STOP
   FOLLOW: そこに記述されたすべての手順を実行する
   STOP
 
@@ -99,6 +103,7 @@ GATE: ユーザー承認
   IF 否定された:
     ASK USER: 対応表から直接選んでもらう
     WAIT_FOR: ユーザーの選択
+    SET 選定カテゴリ = ユーザーが選択したカテゴリ
 
 IF 選定カテゴリ.状態 == TODO:
   REPORT:
@@ -112,6 +117,9 @@ IF 選定カテゴリ.状態 == TODO:
   IF 1（consultに相談）:
     SUMMARY = ここまでのヒアリング内容（要望・制約・選定カテゴリ名・TODOである理由）
     READ {SKILL_DIR}/flows/consult/SKILL.md
+    IF READ FAILED:
+      REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/consult/SKILL.md。SKILL_DIR の導出を確認してください。"
+      STOP
     FOLLOW: そこに記述されたすべての手順を実行する。SUMMARY を前提として渡し、再ヒアリングしない。
     STOP
   ELIF 2（妥協する）:
@@ -123,7 +131,8 @@ IF 選定カテゴリ.状態 == TODO:
 ### ステップ 4: 委譲
 
 ```
-READ {SKILL_DIR}/flows/<選定カテゴリの委譲先フロー>/SKILL.md
+# 選定カテゴリ.委譲先フロー は、ステップ3の対応表「委譲先フロー」列の値（例: new-static）を指す
+READ {SKILL_DIR}/flows/<選定カテゴリ.委譲先フロー>/SKILL.md
 IF READ FAILED:
   REPORT: "フローファイルが見つかりません。SKILL_DIR の導出を確認してください。"
   STOP
