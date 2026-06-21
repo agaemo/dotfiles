@@ -11,7 +11,7 @@
 flowchart TD
     START([/craft 起動]) --> DETECT{.craft/plan.md\n存在する?}
     DETECT -->|Yes| SUGGEST["「実装を再開しますか？」と提案"]
-    SUGGEST -->|再開する| RESUME[実装再開フロー\nSKILL.md に定義]
+    SUGGEST -->|再開する| RESUME["実装再開フロー\n（詳細は下記参照）"]
     SUGGEST -->|しない| INFER
     DETECT -->|No| INFER
 
@@ -19,31 +19,46 @@ flowchart TD
     INFER -->|Yes| CONFIRM["「〇〇で進めますか？」と確認"]
     CONFIRM -->|承認| DIRECT{種別}
     CONFIRM -->|否定| SCOPE
-    INFER -->|No| SCOPE[scope フロー\n要件・制約をヒアリングして振り分け]
+    INFER -->|No| SCOPE["scope フロー\n（詳細は下記参照）"]
 
     DIRECT -->|1. 静的サイト| STATIC[new-static フロー]
     DIRECT -->|2. Webアプリ| DYNAMIC[new-project フロー]
     DIRECT -->|3. クロスプラットフォームアプリ| APP[new-app フロー]
     DIRECT -->|4. 既存システムの相談| CONSULT[consult フロー]
 
-    SCOPE -->|既存システムの相談と判明| CONSULT
-    SCOPE -->|静的サイトと判定| STATIC
-    SCOPE -->|Webアプリと判定| DYNAMIC
-    SCOPE -->|クロスプラットフォームと判定| APP
-    SCOPE -->|対応レシピなし\nGAS等・TODO| TODO[未実装を報告]
-    TODO --> TODO_CHOICE{どうする?}
-    TODO_CHOICE -->|consultに相談| CONSULT
-    TODO_CHOICE -->|近いカテゴリで妥協| STATIC
-    TODO_CHOICE -->|近いカテゴリで妥協| DYNAMIC
-    TODO_CHOICE -->|近いカテゴリで妥協| APP
-    TODO_CHOICE -->|終了| END_T([終了])
+    SCOPE --> ROUTED[static / project / app / consult\nのいずれかへ委譲]
 
     STATIC --> END_S([完了])
     DYNAMIC --> END_D([完了])
     APP --> END_A([完了])
     CONSULT --> END_C([完了])
-    RESUME --> END_R([完了])
+    ROUTED --> END_SC([完了])
+    RESUME --> END_R([未着手ステップを\nすべて実装して完了])
 ```
+
+---
+
+<details>
+<summary>実装再開フロー</summary>
+
+`.craft/plan.md` が存在する状態から実装を続ける場合の汎用手順。SKILL.md末尾に定義。
+
+```mermaid
+flowchart TD
+    START([実装再開フロー起動]) --> R1["1. .craft/plan.md を読む"]
+    R1 --> R2["2. .craft/design-system.md を読む\n（存在すれば）"]
+    R2 --> R3["3. 完了状況を確認して提示\n完了済み / 未着手 / 外部依存未接続"]
+    R3 --> R4["4. 未着手のステップを\nplan.md の順番で1件実装"]
+    R4 --> R5{外部依存\n未接続?}
+    R5 -->|Yes| R5A["モックで実装\nCLAUDE.md に接続手順を記録"]
+    R5A --> R6
+    R5 -->|No| R6["6. ビルド確認\nFlutter: flutter analyze\nNode.js / 静的: pnpm build"]
+    R6 --> R7{未着手の\nステップが残っている?}
+    R7 -->|Yes| R4
+    R7 -->|No| END([完了])
+```
+
+</details>
 
 ---
 
