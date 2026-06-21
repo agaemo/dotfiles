@@ -113,11 +113,9 @@ ASSERT EXISTS(.git/)
 
 READ  TEMPLATE/gitignore              → WRITE CWD/.gitignore
 READ  TEMPLATE/mcp.json               → WRITE CWD/.mcp.json
-READ  TEMPLATE/flows/git-workflow/SKILL.md → WRITE CWD/.claude/commands/git-workflow.md
 
 ASSERT EXISTS(CWD/.gitignore)
 ASSERT EXISTS(CWD/.mcp.json)
-ASSERT EXISTS(CWD/.claude/commands/git-workflow.md)
 
 --- STEP 3: hooks ファイルの書き出し ---
 

@@ -58,8 +58,7 @@ IMPORTANT: 以下の操作はすべてユーザーへの確認なしに即座に
   - ビルド・インストールコマンドの実行
   確認が必要なのは rm / git の破壊的操作のみ。
 
-NOTE: .mcp.json と .claude/commands/git-workflow.md への Write は
-  settings.json の permissions.allow に登録されているため自動承認される。
+NOTE: .mcp.json への Write は settings.json の permissions.allow に登録されているため自動承認される。
   初回セットアップ中（settings.json 書き出し前）に確認が表示された場合は
   「はい」を選択して続行すること。
 
@@ -89,7 +88,6 @@ FOREACH row IN 以下の対応表:
   |------------------------------------------|---------------------------------------|---------------|
   | gitignore                                | .gitignore                            | false         |
   | mcp.json                                 | .mcp.json                             | false         |
-  | flows/git-workflow/SKILL.md             | .claude/commands/git-workflow.md      | false         |
 
 --- STEP 3: hooks ファイルの書き出し ---
 
@@ -121,8 +119,7 @@ NOTE: 通常は発火しない。STEP 2〜4で書き出し済みのため
 FOREACH (path, src) IN [
   (.claude/settings.json,              settings.json),
   (.claude/hooks/on-session-start.js,  hooks/on-session-start.js),
-  (.claude/hooks/pre-bash.js,          hooks/pre-bash.js),
-  (.claude/commands/git-workflow.md,   flows/git-workflow/SKILL.md)
+  (.claude/hooks/pre-bash.js,          hooks/pre-bash.js)
 ]:
   IF NOT EXISTS(CWD/path):
     READ  TEMPLATE/src

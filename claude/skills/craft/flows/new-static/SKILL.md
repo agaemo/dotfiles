@@ -141,8 +141,7 @@ IMPORTANT: 以下の操作はすべてユーザーへの確認なしに即座に
   - ビルド・インストールコマンドの実行
   確認が必要なのは rm / git の破壊的操作のみ。
 
-NOTE: .mcp.json と .claude/commands/git-workflow.md への Write は
-  settings.json の permissions.allow に登録されているため自動承認される。
+NOTE: .mcp.json への Write は settings.json の permissions.allow に登録されているため自動承認される。
   初回セットアップ中（settings.json 書き出し前）に確認が表示された場合は
   「はい」を選択して続行すること。
 
@@ -241,7 +240,6 @@ FOREACH row IN 以下の対応表:
   | mcp.json                      | .mcp.json                            |
   | hooks/on-session-start.js     | .claude/hooks/on-session-start.js    |
   | hooks/pre-bash.js             | .claude/hooks/pre-bash.js            |
-  | flows/git-workflow/SKILL.md  | .claude/commands/git-workflow.md     |
 
 --- STEP 5: git 初期化 ---
 
@@ -283,7 +281,6 @@ ENDIF
 ASSERT EXISTS: CWD/.claude/settings.json
 ASSERT EXISTS: CWD/.claude/hooks/on-session-start.js
 ASSERT EXISTS: CWD/.claude/hooks/pre-bash.js
-ASSERT EXISTS: CWD/.claude/commands/git-workflow.md
 NOTE: 存在しないファイルがあれば対応する STEP に戻って再実行すること
 
 --- STEP 10: 完了報告 ---
