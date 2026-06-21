@@ -156,6 +156,10 @@ ENDIF
 推奨されたホスティングに応じて、手順を **平易な言葉で** 案内する。
 
 ```
+GATE: 実際に公開コマンドを実行する前に「今、本番公開してよいか」を確認する（GUI手順はユーザー自身の操作のため対象外）
+WAIT_FOR: ユーザーの承認
+PROHIBITED: 承認前に `netlify deploy --prod` ・ `vercel --prod` 等の公開コマンドを実行すること
+
 BRANCH ON hosting:
 
   [Netlify - GUI の場合]

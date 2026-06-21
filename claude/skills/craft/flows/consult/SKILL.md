@@ -1,6 +1,6 @@
 ---
 name: consult
-description: 既存システムの課題・移行・リファクタ、または新規構築だが既存レシピ（static/project/app）に当てはまらない技術の相談を受け、選択肢の整理から実行・PRまでを行う。テスト・品質・QAの相談は内容に応じて qa / qa-consult に委譲する。/craft で「既存システムの相談」を選択したとき、または scope フローで対応レシピが見つからなかったときに実行される。
+description: 既存システムの課題・移行・リファクタ、または新規構築だが既存レシピ（static/project/app）に当てはまらない技術の相談を受け、選択肢の整理から実行・PRまでを行う。テスト・品質・QA、DBマイグレーション、リリース計画、IaC、健全性評価、LP公開の相談は内容に応じて qa / qa-consult / db-migration / release-planner / iac / scorer / lp-publish に委譲する。/craft で「既存システムの相談」を選択したとき、または scope フローで対応レシピが見つからなかったときに実行される。
 ---
 
 # consult（相談フロー）
@@ -65,30 +65,21 @@ IF 相談内容がテスト・品質・QAに関するもの:
 
 # 特定領域の相談は、選択肢整理を経ずに専用フローへ直接委譲する
 # （各フローが独自のヒアリング・実行手順を持つため、ステップ2以降は実行しない）
-IF 相談内容が DB マイグレーション（テーブル追加・カラム変更・インデックス追加等）に関するもの:
-  READ {SKILL_DIR}/flows/db-migration/SKILL.md
-  FOLLOW: そこに記述されたすべての手順を実行する。
+# 複数領域にまたがる場合は、直近に話した要望を優先し、残りは完了後に改めて相談として扱う
+SUMMARY = ここまでの相談内容を要約したもの（対象・要望・制約）
+
+IF 相談内容が下表のいずれかに該当する:
+  READ {SKILL_DIR}/flows/<flow>/SKILL.md
+  FOLLOW: そこに記述されたすべての手順を実行する。SUMMARY を前提として渡す。
   STOP
 
-IF 相談内容が本番リリース戦略・デプロイ計画・ロールバック手順の策定に関するもの:
-  READ {SKILL_DIR}/flows/release-planner/SKILL.md
-  FOLLOW: そこに記述されたすべての手順を実行する。
-  STOP
-
-IF 相談内容が IaC（Terraform/OpenTofu 等によるインフラのコード管理）に関するもの:
-  READ {SKILL_DIR}/flows/iac/SKILL.md
-  FOLLOW: そこに記述されたすべての手順を実行する。
-  STOP
-
-IF 相談内容がコードベース健全性の定期評価（スコアリング・改善タスク抽出）に関するもの:
-  READ {SKILL_DIR}/flows/scorer/SKILL.md
-  FOLLOW: そこに記述されたすべての手順を実行する。
-  STOP
-
-IF 相談内容が LP・静的サイトの本番公開（ホスティング・ドメイン・SEO）に関するもの:
-  READ {SKILL_DIR}/flows/lp-publish/SKILL.md
-  FOLLOW: そこに記述されたすべての手順を実行する。
-  STOP
+| 相談内容の例 | flow |
+|---|---|
+| DBマイグレーション（テーブル追加・カラム変更・インデックス追加等） | db-migration |
+| 本番リリース戦略・デプロイ計画・ロールバック手順の策定 | release-planner |
+| IaC（Terraform/OpenTofu 等によるインフラのコード管理） | iac |
+| コードベース健全性の定期評価（スコアリング・改善タスク抽出） | scorer |
+| LP・静的サイトの本番公開（ホスティング・ドメイン・SEO） | lp-publish |
 ```
 
 ### ステップ 2: 現状調査
@@ -286,6 +277,9 @@ CREATE PR:
   # PR 作成後にレビュースキルで自動レビューを実行する
   PR_NUMBER = 作成した PR の番号
   INVOKE SKILL: /review {PR_NUMBER}  ← Skill ツールで review スキルを呼び出す（bash RUN ではない）
+  IF レビューで重大な指摘がある:
+    REPORT: 指摘内容をユーザーに共有し、対応するか確認する
+    WAIT_FOR: ユーザーの判断
 
   # デフォルトブランチに戻す
   RUN: git checkout {DEFAULT_BRANCH}

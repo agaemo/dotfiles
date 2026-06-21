@@ -12,7 +12,7 @@ description: コードベース全体の健全性を6つの観点で定期評価
 ### ステップ 1：コードベースを把握する
 
 ```bash
-find . -type f \( -name "*.ts" -o -name "*.py" -o -name "*.go" \) | head -50
+find . -type f \( -name "*.ts" -o -name "*.py" -o -name "*.go" -o -name "*.rb" -o -name "*.java" -o -name "*.php" \) | head -50
 find . -name "*.test.*" -o -name "*.spec.*" | head -20
 cat package.json 2>/dev/null || cat pyproject.toml 2>/dev/null || cat go.mod 2>/dev/null || true
 ```
