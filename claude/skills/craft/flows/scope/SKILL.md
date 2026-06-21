@@ -1,9 +1,9 @@
 ---
 name: scope
-description: 新規構築したいが技術カテゴリ・レシピが決まっていないときに、要件と制約をヒアリングして new-static / new-project / new-app / consult に振り分ける。/craft のステップ0で種別が推定できない場合（または推定結果が否定された場合）に呼び出される。
+description: 種別（kind）の推定・確認・振り分けを一括で担当する。会話から明確に推定できる場合は一言確認して new-static / new-project / new-app / consult へ直接委譲し、不明確な場合（または確認が否定された場合）は要件・制約をヒアリングして振り分ける。/craft のステップ0から常に呼び出される。
 ---
 
-# scope（技術カテゴリ選定フロー）
+# scope（種別確認・技術カテゴリ選定フロー）
 
 ```
 SKILL_DIR = このSKILL.md（craft/flows/scope/SKILL.md）のパスから2階層上の絶対パス
@@ -14,6 +14,37 @@ SKILL_DIR = このSKILL.md（craft/flows/scope/SKILL.md）のパスから2階層
 ---
 
 ## 手順
+
+### ステップ 0: 種別の推定・確認（ショートカット）
+
+```
+# 会話の文脈から種別を推定する（ユーザーに聞き直さない）
+INFER kind FROM 直前の会話内容:
+  キーワード例:
+    1（静的サイト）  → LP・ランディングページ・PoC・画面モック・静的
+    2（Webアプリ）   → API・DB・認証・バックエンド・Next.js・サーバー・チャット・管理画面
+    3（アプリ）      → Flutter・React Native・Expo・iOS・Android・スマホアプリ
+    4（既存相談）    → 移行・改善・リファクタ・相談・課題・既存
+
+IF kind が明確に推定できる:
+  CONFIRM: 「〇〇（種別名）で進めますか？」と一言確認する
+  IF ユーザーが承認した:
+    委譲先 = (kind に応じて以下のいずれか)
+      1 → {SKILL_DIR}/flows/new-static/SKILL.md
+      2 → {SKILL_DIR}/flows/new-project/SKILL.md
+      3 → {SKILL_DIR}/flows/new-app/SKILL.md
+      4 → {SKILL_DIR}/flows/consult/SKILL.md
+    READ 委譲先
+    IF READ FAILED:
+      REPORT: "フローファイルが見つかりません: {委譲先}。SKILL_DIR の導出を確認してください。"
+      STOP
+    FOLLOW: そこに記述されたすべての手順を実行する
+    STOP
+  ELSE:
+    # 推定が外れた → ステップ1（自由ヒアリング）へ
+ENDIF
+# kind が推定できない場合も、そのままステップ1へ
+```
 
 ### ステップ 1: 相談の入口
 
@@ -93,6 +124,9 @@ IF 選定カテゴリ.状態 == TODO:
 
 ```
 READ {SKILL_DIR}/flows/<選定カテゴリの委譲先フロー>/SKILL.md
+IF READ FAILED:
+  REPORT: "フローファイルが見つかりません。SKILL_DIR の導出を確認してください。"
+  STOP
 FOLLOW: そこに記述されたすべての手順を実行する
 
 NOTE: ステップ2のヒアリングで判明済みの情報（フロントエンド要否・フレームワーク等）は、
