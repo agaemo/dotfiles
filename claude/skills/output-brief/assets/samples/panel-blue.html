@@ -4,77 +4,111 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Panel — Blue</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#eff5ff;color:#18284a;line-height:1.6}
-.page{display:grid;grid-template-columns:200px 1fr;gap:2.5rem;max-width:1040px;margin:0 auto;padding:2.5rem 1.5rem;align-items:start}
-.sidebar{position:sticky;top:2rem}
-.nav-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#4868a0;margin-bottom:.5rem}
-.nav-list{list-style:none;display:flex;flex-direction:column;gap:.1rem}
-.nav-list a{display:block;font-size:.8rem;color:#4868a0;text-decoration:none;padding:.3rem .55rem;border-radius:5px}
-.nav-list a:hover{background:#d8e8ff;color:#2358c0}
-.nav-list a.active{background:#d8e8ff;color:#2358c0;font-weight:700}
-.nav-sub a{padding-left:1.1rem;font-size:.76rem}
-h1{font-size:1.4rem;font-weight:700;color:#2358c0;letter-spacing:-.02em;margin-bottom:.2rem}
-h2{font-size:.95rem;font-weight:700;color:#2358c0;margin:1.75rem 0 .75rem;padding-bottom:.35rem;border-bottom:1px solid #c5d8f5}
-.sub{font-size:.85rem;color:#4868a0;margin-bottom:1.5rem}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem}
-.card{background:#f6faff;border:1px solid #c5d8f5;border-radius:10px;padding:1rem 1.1rem}
-.card-top{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem}
-.icon{font-size:1.3rem;flex-shrink:0}
-.name{font-family:"SF Mono","Fira Code",monospace;font-size:.88rem;font-weight:600;color:#2358c0}
-.cmd{font-size:.72rem;color:#4868a0;font-family:"SF Mono","Fira Code",monospace;margin-top:.05rem}
-.desc{font-size:.8rem;color:#4868a0;line-height:1.55}
-.tag{display:inline-block;font-size:.65rem;background:#d8e8ff;color:#2358c0;padding:.1rem .4rem;border-radius:4px;margin-top:.5rem}
+:root{
+  --accent:#2563eb;
+  --accent-bg:#eff6ff;
+  --accent-border:#bfdbfe;
+  --text:#111827;
+  --text-muted:#6b7280;
+  --bg:#f8fafc;
+  --surface:#ffffff;
+  --border:#e5e7eb;
+  --shadow:0 1px 4px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.04);
+  --shadow-hover:0 4px 16px rgba(0,0,0,.10),0 16px 40px rgba(0,0,0,.07);
+  --code-bg:#18181b;
+  --sidebar-bg:#0f172a;
+  --sidebar-text:#e2e8f0;
+  --sidebar-muted:#475569;
+  --sidebar-active-bg:rgba(96,165,250,.15);
+  --sidebar-active-text:#93c5fd;
+  --sidebar-dot:#93c5fd;
+}
+body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased;margin:0;display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sidebar{background:var(--sidebar-bg);position:sticky;top:0;height:100vh;overflow-y:auto;padding:2.25rem 1.25rem}
+.site-name{font-size:13px;font-weight:600;color:var(--sidebar-text);margin-bottom:2rem;padding:0 .5rem;display:flex;align-items:center;gap:.6rem}
+.site-dot{width:8px;height:8px;border-radius:50%;background:var(--sidebar-dot);flex-shrink:0;display:block}
+.nav-label{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--sidebar-muted);margin-bottom:.5rem;padding:0 .5rem}
+.nav-list{list-style:none;display:flex;flex-direction:column;gap:1px}
+.nav-list a{display:block;font-size:13px;color:var(--sidebar-text);text-decoration:none;padding:.35rem .5rem;border-radius:6px;transition:background .12s,color .12s,opacity .12s;opacity:.7}
+.nav-list a:hover{background:rgba(255,255,255,.07);opacity:1}
+.nav-list a.active{background:var(--sidebar-active-bg);color:var(--sidebar-active-text);font-weight:500;opacity:1}
+.nav-sub a{padding-left:1.25rem;font-size:12px;opacity:.55}
+main{padding:3.5rem 4rem;max-width:900px}
+.hero{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border)}
+.sub{font-size:14.5px;color:var(--text-muted);margin-top:.5rem}
+details{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0}
+details>summary{cursor:pointer;font-weight:600;color:var(--text);font-size:14px;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:.5rem;user-select:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:'';display:block;width:.45rem;height:.45rem;border-right:2px solid var(--text-muted);border-bottom:2px solid var(--text-muted);transform:rotate(45deg);transition:transform .2s;flex-shrink:0;margin-right:.25rem}
+details[open]>summary::after{transform:rotate(-135deg)}
+details[open]>summary{margin-bottom:.875rem;padding-bottom:.875rem;border-bottom:1px solid var(--border)}
+.mermaid-caption{font-size:12px;color:var(--text-muted);text-align:center;margin-top:-.75rem;margin-bottom:1.5rem;display:block}
+@media(max-width:768px){body{grid-template-columns:1fr}.sidebar{display:none}main{padding:2rem 1.5rem;max-width:100%}}
+h1{font-size:2.75rem;font-weight:800;color:var(--text);letter-spacing:-.05em;line-height:1.1;margin-bottom:.5rem}
+.section{margin-top:2.5rem}
+.section-label{display:flex;align-items:center;gap:.6rem;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.875rem}
+.section-label::before{content:'';display:block;width:3px;height:14px;background:var(--accent);border-radius:2px;flex-shrink:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:.875rem}
+.card{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:1.25rem;transition:transform .15s,box-shadow .15s;cursor:default}
+.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-hover)}
+.card-icon{font-size:1.5rem;margin-bottom:.75rem;display:block;line-height:1}
+.card-name{font-family:'SF Mono','Fira Code',monospace;font-size:13px;font-weight:600;color:var(--accent);margin-bottom:.3rem}
+.card-cmd{font-size:11.5px;color:var(--text-muted);margin-bottom:.6rem}
+.card-desc{font-size:13px;color:var(--text-muted);line-height:1.55;margin-bottom:.75rem}
+.tag{font-size:11px;font-weight:500;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-border);padding:.2rem .55rem;border-radius:999px;white-space:nowrap}
 </style>
 </head>
 <body>
-<div class="page">
-  <nav class="sidebar">
-    <p class="nav-label">目次</p>
-    <ul class="nav-list" id="toc"></ul>
-  </nav>
-  <main>
+<nav class="sidebar">
+  <div class="site-name"><span class="site-dot"></span>Claude Code</div>
+  <p class="nav-label">目次</p>
+  <ul class="nav-list" id="toc"></ul>
+</nav>
+<main>
+  <div class="hero">
     <h1>スキル一覧</h1>
     <p class="sub">Claude Code で利用可能なスキル（サンプル表示）</p>
-    <h2 id="workflow">ワークフロー</h2>
+  </div>
+  <div class="section">
+    <p class="section-label" id="workflow">ワークフロー</p>
     <div class="grid">
-      <div class="card"><div class="card-top"><span class="icon">📋</span><div><div class="name">output-brief</div><div class="cmd">/output-brief</div></div></div><div class="desc">ブリーフィング → 承認 → アウトプット</div><span class="tag">workflow</span></div>
-      <div class="card"><div class="card-top"><span class="icon">📖</span><div><div class="name">runbook</div><div class="cmd">/runbook</div></div></div><div class="desc">航空SOP方式のチェックリスト生成</div><span class="tag">workflow</span></div>
+      <div class="card"><span class="card-icon">📋</span><div class="card-name">output-brief</div><div class="card-cmd">/output-brief</div><div class="card-desc">ブリーフィング → 承認 → アウトプット</div><span class="tag">workflow</span></div>
+      <div class="card"><span class="card-icon">📖</span><div class="card-name">runbook</div><div class="card-cmd">/runbook</div><div class="card-desc">航空SOP方式のチェックリスト生成</div><span class="tag">workflow</span></div>
     </div>
-    <h2 id="dev">開発</h2>
+  </div>
+  <div class="section">
+    <p class="section-label" id="dev">開発</p>
     <div class="grid">
-      <div class="card"><div class="card-top"><span class="icon">🤖</span><div><div class="name">claude-api</div><div class="cmd">/claude-api</div></div></div><div class="desc">Claude API / SDK アプリのビルド・最適化</div><span class="tag">API</span></div>
-      <div class="card"><div class="card-top"><span class="icon">🔌</span><div><div class="name">mcp-builder</div><div class="cmd">/mcp-builder</div></div></div><div class="desc">MCP サーバーの設計・実装ガイド</div><span class="tag">MCP</span></div>
-      <div class="card"><div class="card-top"><span class="icon">🧪</span><div><div class="name">webapp-testing</div><div class="cmd">/webapp-testing</div></div></div><div class="desc">Playwright を使った Web アプリのテスト</div><span class="tag">test</span></div>
+      <div class="card"><span class="card-icon">🤖</span><div class="card-name">claude-api</div><div class="card-cmd">/claude-api</div><div class="card-desc">Claude API / SDK アプリのビルド・最適化</div><span class="tag">API</span></div>
+      <div class="card"><span class="card-icon">🔌</span><div class="card-name">mcp-builder</div><div class="card-cmd">/mcp-builder</div><div class="card-desc">MCP サーバーの設計・実装ガイド</div><span class="tag">MCP</span></div>
+      <div class="card"><span class="card-icon">🧪</span><div class="card-name">webapp-testing</div><div class="card-cmd">/webapp-testing</div><div class="card-desc">Playwright を使った Web アプリのテスト</div><span class="tag">test</span></div>
     </div>
-    <h2 id="design">デザイン・クリエイティブ</h2>
+  </div>
+  <div class="section">
+    <p class="section-label" id="design">デザイン・クリエイティブ</p>
     <div class="grid">
-      <div class="card"><div class="card-top"><span class="icon">🎨</span><div><div class="name">algorithmic-art</div><div class="cmd">/algorithmic-art</div></div></div><div class="desc">p5.js を使ったアルゴリズムアートの生成</div><span class="tag">art</span></div>
-      <div class="card"><div class="card-top"><span class="icon">🖌️</span><div><div class="name">theme-factory</div><div class="cmd">/theme-factory</div></div></div><div class="desc">スライド・HTML ページへのテーマ適用</div><span class="tag">design</span></div>
+      <div class="card"><span class="card-icon">🎨</span><div class="card-name">algorithmic-art</div><div class="card-cmd">/algorithmic-art</div><div class="card-desc">p5.js を使ったアルゴリズムアートの生成</div><span class="tag">art</span></div>
+      <div class="card"><span class="card-icon">🖌️</span><div class="card-name">theme-factory</div><div class="card-cmd">/theme-factory</div><div class="card-desc">スライド・HTML ページへのテーマ適用</div><span class="tag">design</span></div>
     </div>
-  </main>
-</div>
+  </div>
+</main>
 <script>
 const toc=document.getElementById('toc');
-document.querySelectorAll('main h2,main h3').forEach(h=>{
+document.querySelectorAll('.section-label').forEach(el=>{
   const li=document.createElement('li');
-  li.className=h.tagName==='H3'?'nav-sub':'';
-  li.innerHTML=`<a href="#${h.id}">${h.textContent}</a>`;
+  li.innerHTML=`<a href="#${el.id}">${el.textContent.trim()}</a>`;
   toc.appendChild(li);
 });
 const navLinks=[...document.querySelectorAll('#toc a')];
-const linkByHeadingId=new Map(navLinks.map(a=>[a.getAttribute('href').slice(1),a]));
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    if(!entry.isIntersecting)return;
-    const link=linkByHeadingId.get(entry.target.id);
-    if(!link)return;
-    navLinks.forEach(a=>a.classList.remove('active'));
-    link.classList.add('active');
-  });
+const byId=new Map(navLinks.map(a=>[a.getAttribute('href').slice(1),a]));
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(!e.isIntersecting)return;const l=byId.get(e.target.id);if(!l)return;navLinks.forEach(a=>a.classList.remove('active'));l.classList.add('active');});
 },{rootMargin:'-10% 0px -80% 0px'});
-document.querySelectorAll('main h2,main h3').forEach(h=>observer.observe(h));
+document.querySelectorAll('.section-label').forEach(el=>obs.observe(el));
 </script>
 </body>
 </html>

@@ -4,112 +4,132 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Table — Dark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#14161e;color:#d8dcf0;line-height:1.6}
-header{position:sticky;top:0;z-index:100;background:#282d60;color:#d8dcf0;padding:.7rem 1.5rem;display:flex;align-items:center;gap:1rem;box-shadow:0 2px 8px rgba(0,0,0,.4)}
-header .site-title{font-size:.95rem;font-weight:700;white-space:nowrap}
-.page{display:grid;grid-template-columns:200px 1fr;gap:2.5rem;max-width:1100px;margin:0 auto;padding:2.5rem 1.5rem;align-items:start}
-.sidebar{position:sticky;top:3.5rem;background:#1c1f2e;border-radius:10px;padding:1rem .75rem}
-.nav-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8090b8;margin-bottom:.5rem;padding:0 .3rem}
-.nav-list{list-style:none;display:flex;flex-direction:column;gap:.1rem}
-.nav-list a{display:block;font-size:.8rem;color:#8090b8;text-decoration:none;padding:.3rem .55rem;border-radius:5px}
-.nav-list a:hover{background:#282d50;color:#a0b0ff}
-.nav-list a.active{background:#282d50;color:#a0b0ff;font-weight:700}
-.nav-sub a{padding-left:1.1rem;font-size:.76rem}
-h1{font-size:1.4rem;font-weight:700;color:#8090f8;letter-spacing:-.03em;margin-bottom:.3rem;line-height:1.3}
-h2{font-size:1rem;font-weight:700;color:#8090f8;margin:2rem 0 .75rem;padding-bottom:.4rem;border-bottom:2px solid #282d42}
-.meta{font-size:.8rem;color:#8090b8;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid #282d42}
-p{margin-bottom:1rem;font-size:.93rem}
-.table-wrap{overflow-x:auto;margin:1rem 0}
-table{width:100%;border-collapse:collapse;font-size:.88rem}
-thead tr{background:#282d60;color:#d8dcf0}
-thead th{padding:.6rem .9rem;text-align:left;font-weight:600;white-space:nowrap}
-tbody tr:nth-child(odd){background:#1c1f2e}
-tbody tr:nth-child(even){background:#14161e}
-tbody tr:hover{background:#282d42}
-td{padding:.55rem .9rem;border-bottom:1px solid #282d42;vertical-align:top}
-td:first-child{font-weight:600;white-space:nowrap;color:#a0b0ff}
-.badge{display:inline-block;font-size:.73rem;font-weight:600;padding:.15rem .45rem;border-radius:4px;background:#282d60;color:#a0b0ff}
+:root{
+  --accent:#818cf8;
+  --accent-bg:rgba(129,140,248,0.12);
+  --accent-border:rgba(129,140,248,0.35);
+  --text:#f1f5f9;
+  --text-muted:#94a3b8;
+  --bg:#0f172a;
+  --surface:#1e293b;
+  --border:#334155;
+  --shadow:0 1px 4px rgba(0,0,0,.35),0 6px 20px rgba(0,0,0,.25);
+  --shadow-hover:0 4px 16px rgba(0,0,0,.50),0 16px 40px rgba(0,0,0,.35);
+  --code-bg:#0d1117;
+  --sidebar-bg:#09090b;
+  --sidebar-text:#e2e8f0;
+  --sidebar-muted:#64748b;
+  --sidebar-active-bg:rgba(129,140,248,.15);
+  --sidebar-active-text:#a5b4fc;
+  --sidebar-dot:#a5b4fc;
+}
+body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased;margin:0;display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sidebar{background:var(--sidebar-bg);position:sticky;top:0;height:100vh;overflow-y:auto;padding:2.25rem 1.25rem}
+.site-name{font-size:13px;font-weight:600;color:var(--sidebar-text);margin-bottom:2rem;padding:0 .5rem;display:flex;align-items:center;gap:.6rem}
+.site-dot{width:8px;height:8px;border-radius:50%;background:var(--sidebar-dot);flex-shrink:0;display:block}
+.nav-label{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--sidebar-muted);margin-bottom:.5rem;padding:0 .5rem}
+.nav-list{list-style:none;display:flex;flex-direction:column;gap:1px}
+.nav-list a{display:block;font-size:13px;color:var(--sidebar-text);text-decoration:none;padding:.35rem .5rem;border-radius:6px;transition:background .12s,color .12s,opacity .12s;opacity:.7}
+.nav-list a:hover{background:rgba(255,255,255,.07);opacity:1}
+.nav-list a.active{background:var(--sidebar-active-bg);color:var(--sidebar-active-text);font-weight:500;opacity:1}
+.nav-sub a{padding-left:1.25rem;font-size:12px;opacity:.55}
+main{padding:3.5rem 4rem;max-width:900px}
+.hero{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border)}
+.sub{font-size:14.5px;color:var(--text-muted);margin-top:.5rem}
+details{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0}
+details>summary{cursor:pointer;font-weight:600;color:var(--text);font-size:14px;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:.5rem;user-select:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:'';display:block;width:.45rem;height:.45rem;border-right:2px solid var(--text-muted);border-bottom:2px solid var(--text-muted);transform:rotate(45deg);transition:transform .2s;flex-shrink:0;margin-right:.25rem}
+details[open]>summary::after{transform:rotate(-135deg)}
+details[open]>summary{margin-bottom:.875rem;padding-bottom:.875rem;border-bottom:1px solid var(--border)}
+.mermaid-caption{font-size:12px;color:var(--text-muted);text-align:center;margin-top:-.75rem;margin-bottom:1.5rem;display:block}
+@media(max-width:768px){body{grid-template-columns:1fr}.sidebar{display:none}main{padding:2rem 1.5rem;max-width:100%}}
+h1{font-size:2.75rem;font-weight:800;color:var(--text);letter-spacing:-.05em;line-height:1.1;margin-bottom:.5rem}
+.section{margin-top:2.5rem}
+.section-label{display:flex;align-items:center;gap:.6rem;font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.875rem}
+.section-label::before{content:'';display:block;width:3px;height:14px;background:var(--accent);border-radius:2px;flex-shrink:0}
+p.lead{margin-bottom:.75rem;font-size:14px;color:var(--text-muted)}
+.table-wrap{overflow-x:auto;border-radius:12px;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;background:var(--surface)}
+thead tr{border-bottom:2px solid var(--accent)}
+thead th{padding:.75rem 1rem;text-align:left;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--accent-bg)}
+td{padding:.7rem 1rem;vertical-align:top;color:var(--text-muted)}
+td:first-child{font-family:'SF Mono','Fira Code',monospace;font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:.15rem .45rem;border-radius:999px;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+details.cell-detail{margin:0;background:none;border:none;padding:0}
+details.cell-detail>summary{font-size:12px;color:var(--accent);padding:0;font-weight:500;border:none;justify-content:flex-start;gap:.4rem}
+details.cell-detail>summary::after{width:.35rem;height:.35rem}
+details.cell-detail[open]>summary{margin-bottom:.375rem;padding-bottom:0;border:none}
+details.cell-detail p{font-size:12.5px;color:var(--text-muted);margin:.375rem 0 0;line-height:1.6}
 </style>
 </head>
 <body>
-<header>
-  <span class="site-title" id="header-title"></span>
-</header>
-<div class="page">
-  <nav class="sidebar">
-    <p class="nav-label">目次</p>
-    <ul class="nav-list" id="toc"></ul>
-  </nav>
-  <main>
+<nav class="sidebar">
+  <div class="site-name"><span class="site-dot"></span>Claude Code</div>
+  <p class="nav-label">目次</p>
+  <ul class="nav-list" id="toc"></ul>
+</nav>
+<main>
+  <div class="hero">
     <h1>Claude Code ツール比較</h1>
-    <p class="meta">サンプルドキュメント — output-brief / table レイアウト</p>
-    <h2 id="file-tools">ファイル操作ツール</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>ツール</th><th>主な用途</th><th>Read 前提</th><th>出力形式</th><th>備考</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Read</td><td>ファイル読み込み</td><td>—</td><td>行番号付きテキスト</td><td>PDF・画像・Notebook 対応</td></tr>
-          <tr><td>Write</td><td>ファイル書き込み（新規・上書き）</td><td>既存ファイルは必須</td><td>—</td><td>新規作成時は Read 不要</td></tr>
-          <tr><td>Edit</td><td>差分編集</td><td>必須</td><td>—</td><td>replace_all でリネーム可</td></tr>
-          <tr><td>Bash</td><td>シェルコマンド実行</td><td>—</td><td>stdout/stderr</td><td>副作用に注意</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <h2 id="search-tools">検索・調査ツール</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>ツール</th><th>主な用途</th><th>速度</th><th>特徴</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Bash (grep)</td><td>テキスト検索</td><td><span class="badge">高速</span></td><td>正規表現対応、ファイル名絞り込み可</td></tr>
-          <tr><td>Bash (find)</td><td>ファイル探索</td><td><span class="badge">高速</span></td><td>パターン・日時・サイズで絞り込み</td></tr>
-          <tr><td>WebSearch</td><td>外部情報検索</td><td>中速</td><td>最新情報・公式ドキュメント取得に有効</td></tr>
-          <tr><td>WebFetch</td><td>URL コンテンツ取得</td><td>中速</td><td>HTML → テキスト変換済みで返却</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <h2 id="agent-tools">エージェント・タスクツール</h2>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>ツール</th><th>用途</th><th>並列実行</th><th>コスト</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>Agent</td><td>サブエージェント起動</td><td>可（複数同時）</td><td><span class="badge">高</span></td></tr>
-          <tr><td>TaskCreate</td><td>タスク作成・追跡</td><td>—</td><td>低</td></tr>
-          <tr><td>Monitor</td><td>ファイル・プロセス監視</td><td>可（persistent）</td><td>低〜中</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </main>
-</div>
+    <p class="sub">サンプルドキュメント — output-brief / table レイアウト</p>
+  </div>
+  <div class="section">
+    <p class="section-label" id="file-tools">ファイル操作ツール</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>ツール</th><th>主な用途</th><th>Read 前提</th><th>備考</th></tr></thead>
+      <tbody>
+        <tr><td>Read</td><td>ファイル読み込み</td><td>—</td><td><details class="cell-detail"><summary>PDF・画像・Notebook 対応</summary><p>offset / limit で部分読み込み可。PDFは最大20ページ。画像はビジュアル表示。</p></details></td></tr>
+        <tr><td>Write</td><td>新規・上書き保存</td><td>既存ファイルは必須</td><td>新規作成時は不要</td></tr>
+        <tr><td>Edit</td><td>差分編集</td><td>必須</td><td>replace_all でリネーム可</td></tr>
+        <tr><td>Bash</td><td>シェルコマンド実行</td><td>—</td><td>副作用に注意</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="section">
+    <p class="section-label" id="search-tools">検索・調査ツール</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>ツール</th><th>主な用途</th><th>速度</th><th>特徴</th></tr></thead>
+      <tbody>
+        <tr><td>Bash (grep)</td><td>テキスト検索</td><td><span class="badge">高速</span></td><td>正規表現対応、絞り込み可</td></tr>
+        <tr><td>Bash (find)</td><td>ファイル探索</td><td><span class="badge">高速</span></td><td>パターン・日時・サイズで絞り込み</td></tr>
+        <tr><td>WebSearch</td><td>外部情報検索</td><td>中速</td><td><details class="cell-detail"><summary>最新情報・公式ドキュメント取得に有効</summary><p>キーワード検索。ヒット件数・タイトル・URLが返る。詳細はWebFetchで取得する。</p></details></td></tr>
+        <tr><td>WebFetch</td><td>URL コンテンツ取得</td><td>中速</td><td>HTML → テキスト変換済みで返却</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="section">
+    <p class="section-label" id="agent-tools">エージェント・タスクツール</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>ツール</th><th>用途</th><th>並列実行</th><th>コスト</th></tr></thead>
+      <tbody>
+        <tr><td>Agent</td><td>サブエージェント起動</td><td>可（複数同時）</td><td><span class="badge">高</span></td></tr>
+        <tr><td>TaskCreate</td><td>タスク作成・追跡</td><td>—</td><td>低</td></tr>
+        <tr><td>Monitor</td><td>ファイル・プロセス監視</td><td>可</td><td>低〜中</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</main>
 <script>
 const toc=document.getElementById('toc');
-document.querySelectorAll('main h2,main h3').forEach(h=>{
+document.querySelectorAll('.section-label').forEach(el=>{
   const li=document.createElement('li');
-  li.className=h.tagName==='H3'?'nav-sub':'';
-  li.innerHTML=`<a href="#${h.id}">${h.textContent}</a>`;
+  li.innerHTML=`<a href="#${el.id}">${el.textContent.trim()}</a>`;
   toc.appendChild(li);
 });
 const navLinks=[...document.querySelectorAll('#toc a')];
-const linkByHeadingId=new Map(navLinks.map(a=>[a.getAttribute('href').slice(1),a]));
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    if(!entry.isIntersecting)return;
-    const link=linkByHeadingId.get(entry.target.id);
-    if(!link)return;
-    navLinks.forEach(a=>a.classList.remove('active'));
-    link.classList.add('active');
-  });
+const byId=new Map(navLinks.map(a=>[a.getAttribute('href').slice(1),a]));
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(!e.isIntersecting)return;const l=byId.get(e.target.id);if(!l)return;navLinks.forEach(a=>a.classList.remove('active'));l.classList.add('active');});
 },{rootMargin:'-10% 0px -80% 0px'});
-document.querySelectorAll('main h2,main h3').forEach(h=>observer.observe(h));
-const h1=document.querySelector('main h1');
-if(h1)document.getElementById('header-title').textContent=h1.textContent;
+document.querySelectorAll('.section-label').forEach(el=>obs.observe(el));
 </script>
 </body>
 </html>

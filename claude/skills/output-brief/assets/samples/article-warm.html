@@ -4,70 +4,132 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Article — Warm</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#fdf6f0;color:#3a2818;line-height:1.75}
-header{position:sticky;top:0;z-index:100;background:#c55a28;color:#fff;padding:.7rem 1.5rem;display:flex;align-items:center;gap:1rem;box-shadow:0 2px 8px rgba(197,90,40,.25)}
-header .site-title{font-size:.95rem;font-weight:700;white-space:nowrap}
-.page{display:grid;grid-template-columns:200px 1fr;gap:2.5rem;max-width:980px;margin:0 auto;padding:2.5rem 1.5rem;align-items:start}
-.sidebar{position:sticky;top:3.5rem;background:#fde5cc;border-radius:10px;padding:1rem .75rem}
-.nav-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a6048;margin-bottom:.5rem;padding:0 .3rem}
-.nav-list{list-style:none;display:flex;flex-direction:column;gap:.1rem}
-.nav-list a{display:block;font-size:.8rem;color:#8a6048;text-decoration:none;padding:.3rem .55rem;border-radius:5px}
-.nav-list a:hover{background:#f5c090;color:#c55a28}
-.nav-list a.active{background:#f5c090;color:#c55a28;font-weight:700}
-.nav-sub a{padding-left:1.1rem;font-size:.76rem}
-h1{font-size:1.6rem;font-weight:700;color:#c55a28;letter-spacing:-.03em;margin-bottom:.3rem;line-height:1.3}
-h2{font-size:1.1rem;font-weight:700;color:#c55a28;margin:2rem 0 .75rem;padding-bottom:.4rem;border-bottom:2px solid #f0d5c0}
-h3{font-size:.95rem;font-weight:700;color:#8a6048;margin:1.5rem 0 .5rem}
-.meta{font-size:.8rem;color:#8a6048;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid #f0d5c0}
-p{margin-bottom:1rem;font-size:.93rem}
-ul,ol{margin:.5rem 0 1rem 1.5rem;font-size:.93rem}
+:root{
+  --accent:#c55a28;
+  --accent-bg:#fef0e8;
+  --accent-border:#e8c5aa;
+  --text:#111827;
+  --text-muted:#6b7280;
+  --bg:#faf9f7;
+  --surface:#ffffff;
+  --border:#e5e7eb;
+  --shadow:0 1px 4px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.04);
+  --shadow-hover:0 4px 16px rgba(0,0,0,.10),0 16px 40px rgba(0,0,0,.07);
+  --code-bg:#18181b;
+  --sidebar-bg:#1c1917;
+  --sidebar-text:#e7e5e4;
+  --sidebar-muted:#78716c;
+  --sidebar-active-bg:rgba(251,146,60,.15);
+  --sidebar-active-text:#fb923c;
+  --sidebar-dot:#fb923c;
+}
+body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased;margin:0;display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.sidebar{background:var(--sidebar-bg);position:sticky;top:0;height:100vh;overflow-y:auto;padding:2.25rem 1.25rem}
+.site-name{font-size:13px;font-weight:600;color:var(--sidebar-text);margin-bottom:2rem;padding:0 .5rem;display:flex;align-items:center;gap:.6rem}
+.site-dot{width:8px;height:8px;border-radius:50%;background:var(--sidebar-dot);flex-shrink:0;display:block}
+.nav-label{font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--sidebar-muted);margin-bottom:.5rem;padding:0 .5rem}
+.nav-list{list-style:none;display:flex;flex-direction:column;gap:1px}
+.nav-list a{display:block;font-size:13px;color:var(--sidebar-text);text-decoration:none;padding:.35rem .5rem;border-radius:6px;transition:background .12s,color .12s,opacity .12s;opacity:.7}
+.nav-list a:hover{background:rgba(255,255,255,.07);opacity:1}
+.nav-list a.active{background:var(--sidebar-active-bg);color:var(--sidebar-active-text);font-weight:500;opacity:1}
+.nav-sub a{padding-left:1.25rem;font-size:12px;opacity:.55}
+main{padding:3.5rem 4rem;max-width:900px}
+.hero{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border)}
+.sub{font-size:14.5px;color:var(--text-muted);margin-top:.5rem}
+details{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0}
+details>summary{cursor:pointer;font-weight:600;color:var(--text);font-size:14px;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:.5rem;user-select:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:'';display:block;width:.45rem;height:.45rem;border-right:2px solid var(--text-muted);border-bottom:2px solid var(--text-muted);transform:rotate(45deg);transition:transform .2s;flex-shrink:0;margin-right:.25rem}
+details[open]>summary::after{transform:rotate(-135deg)}
+details[open]>summary{margin-bottom:.875rem;padding-bottom:.875rem;border-bottom:1px solid var(--border)}
+.mermaid-caption{font-size:12px;color:var(--text-muted);text-align:center;margin-top:-.75rem;margin-bottom:1.5rem;display:block}
+@media(max-width:768px){body{grid-template-columns:1fr}.sidebar{display:none}main{padding:2rem 1.5rem;max-width:100%}}
+h1{font-size:2.5rem;font-weight:800;color:var(--text);letter-spacing:-.05em;line-height:1.15;margin-bottom:.75rem}
+.meta{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-size:13px;color:var(--text-muted);margin-bottom:2rem;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
+.meta-tag{font-size:11px;font-weight:500;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-border);padding:.15rem .55rem;border-radius:999px}
+h2{font-size:1.2rem;font-weight:700;color:var(--text);margin:2.5rem 0 1rem;padding-left:.875rem;border-left:3px solid var(--accent);line-height:1.35}
+h3{font-size:.95rem;font-weight:600;color:var(--accent);margin:1.75rem 0 .5rem}
+h3::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);vertical-align:middle;margin-right:.5rem;position:relative;top:-.05em}
+p{margin-bottom:1rem;font-size:15px}
+ul,ol{margin:.5rem 0 1rem 1.5rem;font-size:15px}
 li{margin-bottom:.3rem}
-pre{background:#fff9f6;border:1px solid #f0d5c0;border-radius:8px;padding:1rem;overflow-x:auto;margin:1rem 0}
-code{font-family:"SF Mono","Fira Code",monospace;font-size:.82rem;color:#c55a28}
-pre code{color:#3a2818}
-blockquote{border-left:3px solid #f0d5c0;padding:.5rem 1rem;margin:1rem 0;color:#8a6048;font-style:italic;font-size:.9rem}
+blockquote{background:var(--accent-bg);border-left:4px solid var(--accent);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1.5rem 0;color:var(--text-muted);font-style:italic;font-size:14px;line-height:1.7}
+pre{background:var(--code-bg);border-radius:10px;padding:1.25rem 1.5rem;overflow-x:auto;margin:1.5rem 0}
+pre code{font-family:'SF Mono','Fira Code',monospace;font-size:12.5px;color:#e2e8f0;line-height:1.75}
+p code,li code{font-family:'SF Mono','Fira Code',monospace;font-size:12.5px;background:var(--accent-bg);color:var(--accent);padding:.15em .4em;border-radius:4px}
+strong{font-weight:600;color:var(--text)}
+.steps{display:flex;flex-direction:column;gap:.75rem;margin:1rem 0}
+.step{display:flex;align-items:flex-start;gap:1rem;background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:1.125rem 1.25rem;transition:box-shadow .15s}
+.step:hover{box-shadow:var(--shadow-hover)}
+.step-num{font-size:.9rem;font-weight:800;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:50%;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
+.step-body strong{display:block;font-size:14px;font-weight:700;color:var(--text);margin-bottom:.25rem}
+.step-body p{font-size:13.5px;color:var(--text-muted);margin:0}
 </style>
 </head>
 <body>
-<header>
-  <span class="site-title" id="header-title"></span>
-</header>
-<div class="page">
-  <nav class="sidebar">
-    <p class="nav-label">目次</p>
-    <ul class="nav-list" id="toc"></ul>
-  </nav>
-  <main>
+<nav class="sidebar">
+  <div class="site-name"><span class="site-dot"></span>Claude Code</div>
+  <p class="nav-label">目次</p>
+  <ul class="nav-list" id="toc"></ul>
+</nav>
+<main>
+  <div class="hero">
     <h1>Claude Code スキル設計ガイド</h1>
-    <p class="meta">サンプルドキュメント — output-brief / article レイアウト</p>
-    <h2 id="overview">概要</h2>
-    <p>Claude Code スキルは、繰り返し使うワークフローを <code>SKILL.md</code> ファイルとして定義し、<code>/skill-name</code> で呼び出せる仕組みです。スキルを設計するときは「コールドスタートのエージェントが迷わず実行できるか」を基準にします。</p>
-    <blockquote>スキルは Claude への指示書であり、人間向けのドキュメントではない。</blockquote>
-    <h2 id="types">スキルの種類</h2>
-    <h3 id="prog">プログラム型</h3>
-    <p>Agent ツールでサブエージェントを呼び出す構造。複雑なタスクを並列・分散して処理できます。</p>
-    <ul>
-      <li>親エージェントがオーケストレーション</li>
-      <li>サブエージェントが実作業を担当</li>
-      <li>完了待ちを明示する</li>
-    </ul>
-    <h3 id="inst">指示文型</h3>
-    <p>Claude への自然言語指示のみで構成。ユーザーとのインタラクションが中心のスキルに向いています。</p>
-    <h2 id="principles">設計原則</h2>
-    <p>以下の3点を常に確認してください。</p>
-    <ol>
-      <li><strong>Progressive Disclosure</strong> — description だけでトリガー判断できること</li>
-      <li><strong>ゲート設計</strong> — 不可逆操作の前に必ず WAIT_FOR を置く</li>
-      <li><strong>1回でまとめて</strong> — ユーザーへの質問は1メッセージに集約する</li>
-    </ol>
-    <h2 id="example">実装例</h2>
-    <pre><code>WAIT_FOR: ユーザーの承認を受けてから次へ進む
+    <div class="meta"><span class="meta-tag">設計</span><span class="meta-tag">スキル</span><span>サンプルドキュメント — output-brief / article レイアウト</span></div>
+  </div>
+  <h2 id="overview">概要</h2>
+  <p>Claude Code スキルは、繰り返し使うワークフローを <code>SKILL.md</code> ファイルとして定義し、<code>/skill-name</code> で呼び出せる仕組みです。スキルを設計するときは「コールドスタートのエージェントが迷わず実行できるか」を基準にします。</p>
+  <blockquote>スキルは Claude への指示書であり、人間向けのドキュメントではない。シンプルで一貫性のある構造が、品質の高い出力につながる。</blockquote>
+  <h2 id="types">スキルの種類</h2>
+  <h3 id="prog">プログラム型</h3>
+  <p>Agent ツールでサブエージェントを呼び出す構造。複雑なタスクを並列・分散して処理できます。</p>
+  <ul>
+    <li>親エージェントがオーケストレーション</li>
+    <li>サブエージェントが実作業を担当</li>
+    <li>完了待ちを <code>WAIT_FOR</code> で明示する</li>
+  </ul>
+  <h3 id="inst">指示文型</h3>
+  <p>Claude への自然言語指示のみで構成。ユーザーとのインタラクションが中心のスキルに向いています。スコープが小さく、判断の分岐が少ない場合に最適です。</p>
+  <h2 id="principles">設計原則</h2>
+  <p>以下の3点を常に確認してください。</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <strong>Progressive Disclosure</strong>
+        <p>description だけでトリガー判断できること</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <strong>ゲート設計</strong>
+        <p>不可逆操作の前に必ず <code>WAIT_FOR</code> を置く</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <strong>1回でまとめて</strong>
+        <p>ユーザーへの質問は1メッセージに集約する</p>
+      </div>
+    </div>
+  </div>
+  <h2 id="example">実装例</h2>
+  <pre><code>WAIT_FOR: ユーザーの承認を受けてから次へ進む
 PROHIBITED: 承認なしにファイルを書き換えること</code></pre>
-    <p>上記のように <code>WAIT_FOR</code> と <code>PROHIBITED</code> を対で使うと、ゲートのスキップを防げます。</p>
-  </main>
-</div>
+  <p>上記のように <code>WAIT_FOR</code> と <code>PROHIBITED</code> を対で使うと、ゲートのスキップを防げます。スキルの品質はゲート設計の厳密さで決まると言っても過言ではありません。</p>
+  <details>
+    <summary>用語集</summary>
+    <p><strong>WAIT_FOR</strong> — この行が現れた直後でユーザー入力を待つ。承認なしに次のステップへ進んではならない。</p>
+    <p><strong>PROHIBITED</strong> — 実行を禁止するアクションを明示する。モデルが勝手に実行しないよう強調する目的で使う。</p>
+    <p><strong>SKILL_DIR</strong> — スキルファイルが置かれているディレクトリの絶対パス。ファイルの読み書きに利用する。</p>
+  </details>
+</main>
 <script>
 const toc=document.getElementById('toc');
 document.querySelectorAll('main h2,main h3').forEach(h=>{
@@ -77,19 +139,11 @@ document.querySelectorAll('main h2,main h3').forEach(h=>{
   toc.appendChild(li);
 });
 const navLinks=[...document.querySelectorAll('#toc a')];
-const linkByHeadingId=new Map(navLinks.map(a=>[a.getAttribute('href').slice(1),a]));
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    if(!entry.isIntersecting)return;
-    const link=linkByHeadingId.get(entry.target.id);
-    if(!link)return;
-    navLinks.forEach(a=>a.classList.remove('active'));
-    link.classList.add('active');
-  });
+const byId=new Map(navLinks.map(a=>[a.getAttribute('href').slice(1),a]));
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(!e.isIntersecting)return;const l=byId.get(e.target.id);if(!l)return;navLinks.forEach(a=>a.classList.remove('active'));l.classList.add('active');});
 },{rootMargin:'-10% 0px -80% 0px'});
-document.querySelectorAll('main h2,main h3').forEach(h=>observer.observe(h));
-const h1=document.querySelector('main h1');
-if(h1)document.getElementById('header-title').textContent=h1.textContent;
+document.querySelectorAll('main h2,main h3').forEach(h=>obs.observe(h));
 </script>
 </body>
 </html>
