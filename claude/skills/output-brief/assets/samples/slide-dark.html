@@ -157,12 +157,17 @@ const ICON_COMPRESS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" 
 const fsBtn=document.getElementById('fsBtn');
 function updateFsIcon(){fsBtn.innerHTML=document.fullscreenElement?ICON_COMPRESS:ICON_EXPAND;}
 function toggleFullscreen(){
-  if(!document.fullscreenElement){document.documentElement.requestFullscreen?.();}
-  else{document.exitFullscreen?.();}
+  if(!document.fullscreenEnabled){fsBtn.style.display='none';return;}
+  const p=document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+  p?.catch(()=>{fsBtn.style.display='none';});
 }
-fsBtn.addEventListener('click',toggleFullscreen);
-document.addEventListener('fullscreenchange',updateFsIcon);
-updateFsIcon();
+if(!document.fullscreenEnabled){
+  fsBtn.style.display='none';
+}else{
+  fsBtn.addEventListener('click',toggleFullscreen);
+  document.addEventListener('fullscreenchange',updateFsIcon);
+  updateFsIcon();
+}
 
 const wrap=document.querySelector('.slides-wrap');
 const slots=[...document.querySelectorAll('.slide-slot')];
