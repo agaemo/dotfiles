@@ -86,7 +86,12 @@ ELSE:
 ENDIF
 
 MULTI_FILE_PROCESS:
-  各ファイルについて READ → EXTRACT → ステップ2・3・4 の順に実行する
+  対象ファイルが2件以上の場合は `fork`（Agent ツール, subagent_type: "fork"）で1ファイル1forkに並列化する:
+    各forkへの指示: "ファイル <path> について、このスキルのステップ1（READ→EXTRACT）〜ステップ4（改善案生成）を実行し、
+      6次元スコア・問題箇所（行番号付き）・改善提案リストを構造化して返してください。EDITは行わないこと（分析のみ）"
+    IMPORTANT — PROHIBITED: forkにファイルの書き換え（EDIT）を行わせること。適用はステップ5で親エージェントのみが行う
+    WAIT_FOR: 全forkの結果
+  対象ファイルが1件のみの場合は、フォールバックとして READ → EXTRACT → ステップ2・3・4 を順に実行する
   全ファイル完了後、ステップ2.5を一度だけ実行する
   CROSS_MODE = true の場合はステップ4.5を実行する
   その後ステップ5に進む
