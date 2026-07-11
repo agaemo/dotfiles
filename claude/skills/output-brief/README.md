@@ -71,6 +71,7 @@
 | 一覧 | `panel` | カードグリッド | 同程度の重要度の項目 |
 | 文書 | `article` | 本文・見出し・コード・引用 | Markdown 的な構造のドキュメント |
 | 表 | `table` | データ比較表 | 複数項目を列ごとに比較するコンテンツ |
+| プレゼン | `slide` | 1セクション1画面のスライド（縦スクロールで送る） | 提案・報告・ピッチ資料 |
 
 #### カラーテーマ
 
@@ -124,6 +125,16 @@
 | green | dark | light |
 |-------|------|-------|
 | [![](assets/previews/table-green.png)](assets/previews/table-green.png) | [![](assets/previews/table-dark.png)](assets/previews/table-dark.png) | [![](assets/previews/table-light.png)](assets/previews/table-light.png) |
+
+##### slide
+
+| warm | cool | blue |
+|------|------|------|
+| [![](assets/previews/slide-warm.png)](assets/previews/slide-warm.png) | [![](assets/previews/slide-cool.png)](assets/previews/slide-cool.png) | [![](assets/previews/slide-blue.png)](assets/previews/slide-blue.png) |
+
+| green | dark | light |
+|-------|------|-------|
+| [![](assets/previews/slide-green.png)](assets/previews/slide-green.png) | [![](assets/previews/slide-dark.png)](assets/previews/slide-dark.png) | [![](assets/previews/slide-light.png)](assets/previews/slide-light.png) |
 
 ---
 
