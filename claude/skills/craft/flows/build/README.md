@@ -34,8 +34,18 @@ flowchart TD
 
     S4{HAS_REVIEW_CHAIN?}
     S4 -->|Yes| S4A["/ultrareview（オプション）"]
-    S4A --> S5["verify→security-reviewer\n→qa→code-reviewer"]
-    S5 --> S6
+    S4A --> S5{plan.mdの\nレビュートラック}
+    S5 -->|A 軽量| S5A["verify→code-reviewer"]
+    S5 -->|B 標準| S5B["verify→qa→code-reviewer"]
+    S5 -->|C フル| S5C["verify→security-reviewer\n→qa→code-reviewer\n→adversarial-reviewer"]
+    S5A --> RESULT{要修正・非承認\nの指摘あり?}
+    S5B --> RESULT
+    S5C --> RESULT
+    RESULT -->|Yes| CONFIRM["ユーザーに確認\n対応 or 現状のまま進める"]
+    CONFIRM -->|対応する| FIX["修正→該当エージェント再実行"]
+    FIX --> RESULT
+    CONFIRM -->|現状のまま| S6
+    RESULT -->|No| S6
     S4 -->|No| S6
 
     S6["STEP 6: CLAUDE.md・README.md 生成\nplan.md の完了マーク更新"]
@@ -52,7 +62,7 @@ flowchart TD
 flowchart LR
     subgraph Track["track-[name]（worktree 分離済み）"]
         direction TB
-        R["docs/working/stories.md の\n担当 US を読む"]
+        R[".craft/stories.md の\n担当 US を読む"]
         R --> I["所有ファイルを実装\n（依存ファイルは読み取り専用）"]
         I --> B{"pnpm build\n成功？"}
         B -->|失敗| I

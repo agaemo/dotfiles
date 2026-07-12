@@ -9,7 +9,7 @@ flowchart TD
 
     subgraph DESIGN["設計フェーズ（メインClaude が対話）"]
         S1["STEP 1: ヒアリング\n業種・ページ構成・色・フォント・\n参考デザイン・FEEL/ANTI-FEEL を\n1メッセージで質問"]
-        S1 --> S1B["デザインブリーフ生成\n→ docs/design-brief.md"]
+        S1 --> S1B["デザインブリーフ生成\n→ .craft/design-brief.md"]
         S1B --> S2["STEP 2: 理解度チェック\n5項目すべて ≥4 になるまでループ"]
         S2 --> GATE{承認}
     end
