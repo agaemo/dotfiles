@@ -11,7 +11,8 @@ flowchart TD
         S1["STEP 1: ヒアリング\n業種・ページ構成・色・フォント・\n参考デザイン・FEEL/ANTI-FEEL を\n1メッセージで質問"]
         S1 --> S1B["デザインブリーフ生成\n→ .craft/design-brief.md"]
         S1B --> S2["STEP 2: 理解度チェック\n5項目すべて ≥4 になるまでループ"]
-        S2 --> GATE{承認}
+        S2 --> S2P["プレビュー生成\n→ .craft/design-preview.html（ローカル）"]
+        S2P --> GATE{承認}
     end
 
     GATE -->|承認| S3
