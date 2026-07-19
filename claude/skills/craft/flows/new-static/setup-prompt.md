@@ -48,8 +48,28 @@ IF FAILED:
 
 --- STEP 2: Astro プロジェクト作成 ---
 
-RUN:
-  mise exec -- pnpm create astro@latest . --template minimal --no-git --yes
+NOTE: この時点で CWD/.craft/design-brief.md が既に存在する（ステップ1で作成済み）。
+  `pnpm create astro@latest .` はディレクトリが非空だと判定すると、意図しない別名の
+  サブディレクトリ（例: ランダムな2単語の名前）にプロジェクトを生成してしまう既知の問題がある。
+  これを避けるため、実行前に .craft/ を一時退避し、実行後に戻す。
+
+IF NOT EXISTS(CWD/.craft):
+  SKIP（退避不要。非空ディレクトリ問題も発生しない）
+ELSE:
+  RUN（3行を1回のBashツール呼び出しで `&&` 連結して実行すること。分割実行すると
+       `$$`（シェルPID）が呼び出しごとに変わり退避先を見失う。CWDのbasenameベースの
+       固定名を使うことで、この呼び出し中に何が起きても一意なパスを保つ）:
+    mv CWD/.craft /tmp/craft-setup-tmp-<CWDのbasename> && \
+    mise exec -- pnpm create astro@latest . --template minimal --no-git --yes && \
+    mv /tmp/craft-setup-tmp-<CWDのbasename> CWD/.craft
+
+  ASSERT: CWD/.craft/design-brief.md が存在すること（退避・復元が正しく行われたか）
+  ASSERT: package.json が CWD 直下に存在すること（サブディレクトリに生成されていないか）
+  IF いずれかの ASSERT が FAILED:
+    REPORT: "Astroのプロジェクト作成でディレクトリがずれた可能性があります。
+      /tmp/craft-setup-tmp-<CWDのbasename> が残っていれば CWD/.craft への復元を試み、
+      それでも解決しなければ生成物の場所を確認してください。"
+    STOP
 
 NOTE: `pnpm create astro@latest` は常に最新版をインストールする。
   メジャーバージョンが変わるとコンポーネント構文・設定ファイルの形式が変わる場合がある。

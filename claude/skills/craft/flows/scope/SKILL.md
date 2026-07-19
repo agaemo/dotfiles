@@ -28,6 +28,11 @@ INFER kind FROM 直前の会話内容:
 
 IF kind が明確に推定できる:
   CONFIRM: 「〇〇（種別名）で進めますか？」と一言確認する
+    IF kind == 1（静的サイト）:
+      確認文に一言添える: 「〇〇で進めますか？（ブラウザでの利用を想定していますか、
+      CLIツールでも良ければ教えてください）」
+      # 推定の根拠が明示語か抽象語かを実行時に判定するのは信頼性が低いため、
+      # kind=1確認時は常に添える。UIが本当に必要かを確認せずWebに決め打ちしないため
   IF ユーザーが承認した:
     委譲先 = (kind に応じて以下のいずれか)
       1 → {SKILL_DIR}/flows/new-static/SKILL.md
@@ -88,6 +93,7 @@ WAIT_FOR: ユーザーの回答
 | UI・API・DB不要、画面モックのみ            | 静的サイト                | 実装済み | new-static    |
 | API・DB・認証など動的機能（Node.js系）     | Webアプリ                 | 実装済み | new-project   |
 | Flutter・React Native・Expo等スマホアプリ  | クロスプラットフォーム    | 実装済み | new-app       |
+| 画面UIが不要、ターミナル上で完結           | CLIツール                 | TODO     | （未実装）     |
 | Google Sheets・Workspace連携が中心         | Google Apps Script        | TODO     | （未実装）     |
 | ネイティブSwift・Kotlin単体実装            | ネイティブアプリ          | TODO     | （未実装）     |
 
