@@ -30,6 +30,16 @@ NOTE: 各 GATE で承認を求める前に以下の形式で進捗を必ず表�
 ```
 STEP 1: intake
   OUTPUT: .craft/requirements.md
+
+  プレビュー生成（GATEの前に必ず実施）:
+    READ {SKILL_DIR}/flows/new-project/preview-generation.md（このプレビュー生成チェーン中に
+    未読の場合のみ。セッションが変わった場合は再度READする。共通ルール・CDN方針・
+    ASSERT/失敗時の代替導線が定義されている）
+    .craft/requirements.md の内容から確認用HTMLを作成する
+      - プロジェクト概要・必須機能・スコープ外・完成の基準を中心に、読みやすい見出し階層で提示する
+      - 治療は実務資料（memo相当）: 誇張した装飾は避ける
+    出力先: .craft/requirements-preview.html
+
   GATE: 承認進捗を表示してからユーザーに内容を提示し、承認を得ること
   PROHIBITED: 承認前に次ステップへ進むこと
 
@@ -40,6 +50,14 @@ STEP 2: refiner
         以下の形式でチェック済みにして残すこと（意思決定の根拠として保持）:
         - [x] [疑問の内容]
               → **回答（YYYY-MM-DD）:** [回答内容]
+
+  プレビュー生成（GATEの前に必ず実施）:
+    READ {SKILL_DIR}/flows/new-project/preview-generation.md（未読の場合のみ）
+    .craft/stories.md の内容から確認用HTMLを作成する
+      - US一覧をカード形式で提示し、受け入れ条件・サイズ・依存を見やすく整理する
+      - 「未解決の疑問」セクションは回答済み(x)/未回答を視覚的に区別する
+    出力先: .craft/stories-preview.html
+
   GATE: 承認進捗を表示してからユーザーに内容を提示し、承認を得ること
   PROHIBITED: 承認前に次ステップへ進むこと
 
@@ -52,6 +70,13 @@ IF HAS_FRONTEND == true:
                 表または箇条書きで明記すること（例: 一覧画面 → [詳細を開く] → 詳細画面）
                 → 基本設計書の画面遷移図はこの記録を元に生成する
 
+    c2. 主要画面のワイヤーフレーム生成（省略禁止）:
+       .craft/design.md の画面一覧から、ユーザーが最も長く滞在する主要画面を1〜2枚選び、
+       design-system.md のトークン（実際の色・タイポ）を使ったラフなレイアウトHTMLを作成する。
+       IMPORTANT: 高精細なモックアップではなく、レイアウトの骨格（ヘッダー・ナビ・主要コンポーネントの
+       配置）が伝わる粒度でよい。作り込みすぎない（1画面あたり実装時間5分以内を目安にする）
+       出力先: .craft/wireframe-preview.html
+
     d. プレビュー生成（GATEの前に必ず実施）:
        READ {SKILL_DIR}/flows/new-project/preview-generation.md（このプレビュー生成チェーン中に
        未読の場合のみ。セッションが変わった場合は再度READする。共通ルール・CDN方針・
@@ -59,11 +84,14 @@ IF HAS_FRONTEND == true:
        .craft/design-brief.md・.craft/design-system.md の内容から、
        カラーパレット（実際のスウォッチ）・タイポグラフィスケール・ブランドアーキタイプ・
        FEEL/ANTI-FEELワードを1枚にまとめる
-         - ライト/ダーク両テーマに対応する
+         - ライト/ダーク両テーマに対応する場合、実際に切り替えて確認できるボタンをプレビュー右上に
+           設置すること（例: `<html data-theme="light">` をJSでトグルする）。
+           「両テーマに対応」と文書だけに書いて実物を見せない状態を禁止する
          - 治療は実務資料（memo/plan相当）: 誇張したヒーロー等は避け、パレット・タイポの実物大提示を主目的にする
        出力先: .craft/design-preview.html
 
-    GATE: 承認進捗を表示してからユーザーに提示し、承認を得ること
+    GATE: 承認進捗を表示してからユーザーに提示し、承認を得ること（design-preview.html と
+          wireframe-preview.html の両方を提示する）
     PROHIBITED: デザイン承認前にコンポーネントを1行も書くこと
     NOTE: デザインによってAPIの形・DBフィールドが変わる場合があるため、planner より前に確定させること
 ENDIF
