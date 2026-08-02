@@ -79,6 +79,41 @@ IF 完成条件が「特定の出力・振る舞いが得られること」を�
 ENDIF
 ```
 
+### ステップ 0.7: Makefile の準備
+
+```
+IMPORTANT: このステップは言語・ランタイムマネージャー・Docker利用有無に関わらず共通で実行する。
+  以降のステップ（動作確認・ビルド確認・実画面レビュー等）は、言語別に分岐せず
+  常に `make <target>` を呼ぶ。新しい言語・ランタイム・仮想化パターンが増えても、
+  対応するのは planner が「開発コマンド」表に書く実行コマンドの中身だけであり、
+  このファイル（build/SKILL.md）自体は変更しない。
+
+READ .craft/plan.md の「開発コマンド」セクション
+
+IF EXISTS(Makefile):
+  既存のMakefileを尊重する（上書きしない）。
+  plan.mdの「開発コマンド」表とターゲット名が食い違う場合は、plan.md側を実態に合わせて修正する。
+
+ELIF 「開発コマンド」セクションが存在し、表の「実行コマンド」列が埋まっている:
+  表の内容から Makefile を生成する（dev/build/test/fmt/lint の5ターゲット）。
+  例:
+    .PHONY: dev build test fmt lint
+    dev:
+    	<表の `make dev` 行の実行コマンド>
+    build:
+    	<表の `make build` 行の実行コマンド>
+    test:
+    	<表の `make test` 行の実行コマンド>
+    fmt:
+    	<表の `make fmt` 行の実行コマンド>
+    lint:
+    	<表の `make lint` 行の実行コマンド>
+
+ELSE （「開発コマンド」セクションが無い、または空欄 — 旧形式のplan.md・再開時等）:
+  Makefileを生成しない。以降のステップでは下記「ステップ2 #フォールバック」の
+  STACK別コマンドを使う。
+```
+
 ### ステップ 1: テスト戦略の決定（STACK != "static" の場合のみ）
 
 ```
@@ -108,11 +143,11 @@ ELSE （トラック設計なし・小規模、または static）:
 --- フェーズ1: クリティカルパス（シリアル） ---
 
 .craft/plan.md の「フェーズ1」ステップを順番に実装する。
-各ステップ完了ごとにビルド確認コマンド（下記「スタック別ビルド確認コマンド」）で型エラーがないことを確認する。
+各ステップ完了ごとに `make build` で型エラーがないことを確認する（Makefileが無い場合は
+下記「#フォールバック」を参照）。
 
 フェーズ1完了後:
-  1. 開発サーバーを起動し、ログイン〜基本ナビゲーションが動作することを確認する
-     （node: `mise exec -- pnpm dev` / flutter: `mise exec -- flutter run`）
+  1. `make dev` で開発サーバーを起動し、ログイン〜基本ナビゲーションが動作することを確認する
   2. バグが見つかった場合は Bug-fix TDD 手順（{SKILL_DIR}/flows/build/tdd-policy.md）で修正してから commit すること
   3. 問題なければフェーズ1の成果を git commit する（フェーズ2の起点になる）
 
@@ -139,13 +174,17 @@ WAIT_FOR: 全トラックエージェントの完了報告を受け取ってか�
     1. worktree で作成されたブランチの差分を確認する
     2. main ブランチにマージする
     3. コンフリクトがあれば解消する
-    4. ビルド確認コマンドで統合ビルドを確認する
+    4. `make build` で統合ビルドを確認する
 
 --- フェーズ3: 統合確認 ---
 
 全トラックのマージ完了後:
-  1. 開発サーバーを起動する
+  1. `make dev` で開発サーバーを起動する
   2. 主要フローを実機で確認する（一覧→登録→詳細→操作→ダッシュボード）
+     IF 認証機能を含む:
+       確認前にテストアカウントを作成し、メールアドレス・パスワード（またはログインURL）を
+       ユーザーに提示すること。「ログインして確認してください」とだけ伝えて、
+       ログイン可能なアカウントの提示を怠らないこと。
   3. バグが見つかった場合は Bug-fix TDD 手順で修正すること:
      READ {SKILL_DIR}/flows/build/tdd-policy.md の「Bug-fix TDD 手順」
   4. `git commit` で統合完了を記録する
@@ -170,12 +209,9 @@ REPEAT:
     IF 外部依存（Firebase・外部API・認証基盤等）が未接続:
       モックで実装し、CLAUDE.md に接続手順を記録する
 
-  動作確認:
-    node:    `mise exec -- pnpm dev` で表示確認
-    flutter: `mise exec -- flutter run` で起動確認
-    static:  `mise exec -- pnpm dev` で表示確認
+  動作確認: `make dev` で起動・表示確認（Makefileが無い場合は下記「#フォールバック」）
 
-  ビルド確認（下記「スタック別ビルド確認コマンド」）を実行する
+  `make build` を実行する
   IF 失敗:
     REPORT: エラー内容を報告する
     修正してから次に進む
@@ -195,23 +231,34 @@ REPEAT:
 UNTIL 未着手のステップがなくなる
 ```
 
-#### スタック別ビルド確認コマンド
+#### フォールバック（.craft/plan.md に「開発コマンド」セクションが無い場合のみ）
+
+ステップ0.7でMakefileが生成できなかった場合（旧形式のplan.md・再開時等）に限り使う。
+通常は `make build` / `make dev` を使うこと。
 
 | STACK | ビルド確認 | 補足 |
 |---|---|---|
 | node | `mise exec -- pnpm build` | Node.js固有の再開時注意点: `{SKILL_DIR}/flows/new-project/agent-chain.md` の「Node.js / Webアプリ固有の再開時注意点」を参照 |
 | flutter | `mise exec -- flutter analyze` | コマンド読み替え・既知の依存競合: `{SKILL_DIR}/flows/new-app/flutter-notes.md` を参照 |
 | static | `mise exec -- pnpm build` | — |
+| その他（Rust等） | 言語標準のビルドコマンド（例: `cargo build`）をmise経由等で実行 | plan.mdの「開発コマンド」セクションが本来の情報源。フォールバックが発生した場合はplan.mdの再生成を検討する |
 
 ### ステップ 3: 実画面レビュー（HAS_FRONTEND == true の場合）
 
 ```
 IF STACK == "static":
   全セクション完了後、Puppeteer MCP が使える場合はスクリーンショットで最終確認する
-ELSE （node・flutter のフロントエンドあり）:
+ELSE （フロントエンドあり）:
   RUN: designer エージェントを呼び出す
     a. Puppeteer MCP でスクリーンショットを撮影
     b. デザインブリーフ・デザインシステムとの差異を確認・修正する
+
+IF Puppeteer MCP が使えない（未起動・未承認等）:
+  FALLBACK: `make dev` でサーバーを起動し、curl 等でHTTPレベルの動作確認を行う
+    （リクエスト送信 → レスポンスのステータス・本文に想定した要素が含まれるかを確認）
+  REPORT TO USER: スクリーンショットではなくHTTPフロー確認で代替したことを明記する
+  IF 認証機能を含む:
+    テストアカウントを作成し、メールアドレス・パスワードをユーザーに提示してから確認すること
 ```
 
 ### ステップ 4: /ultrareview（オプション、HAS_REVIEW_CHAIN == true の場合のみ）
@@ -265,7 +312,7 @@ IF NOT EXISTS(CLAUDE.md) OR （EXISTS するが プロジェクト名・目的�
   INCLUDE（実際の値のみ。プレースホルダー禁止）:
     - プロジェクト名・目的（1〜2文）
     - スタック（実際に使う言語・フレームワーク・主要ライブラリ）
-    - 開発コマンド（dev / test / build の実際のコマンド）
+    - 開発コマンド（`make dev`/`make test`/`make build`等。.craft/plan.md の「開発コマンド」セクション参照）
     - IF HAS_REVIEW_CHAIN: アーキテクチャ（採用パターン名・ディレクトリ構造のポイント・レイヤー間の依存の向き）
     - プロジェクト固有の制約（DBエンジン・実行環境の制限など）
     - .craft/plan.md を参照するよう一言書く
