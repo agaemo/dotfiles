@@ -118,8 +118,12 @@ ELSE （「開発コマンド」セクションが無い、または空欄 — �
 
 ```
 IF テスト環境が未セットアップ:
-  RUN: tester エージェントを呼び出してテスト環境をセットアップする
-       （vitest / pytest のセットアップ手順を案内する。Node.js のデフォルトは vitest 推奨）
+  RUN: tester エージェントを Agent ツール（サブエージェント、fresh general-purpose 等）で呼び出して
+       テスト環境をセットアップする（vitest / pytest のセットアップ手順を案内する。Node.js のデフォルトは vitest 推奨）
+       NOTE: tester はユーザーとの対話（ヒアリング）を必要としない機械的なタスクのため、
+         Agent ツールでサブエージェントとして起動する（intake・designer とは異なり、
+         メインClaudeが直接担当しない）。プロンプトにはこのセッションで把握済みの
+         要件・技術スタック等を渡し、対象プロジェクトへのパスを明記すること。
   NOTE: 後付けでテスト環境を追加するとモック設計が困難になり、テストの書けないコードが残る。
 
   READ {SKILL_DIR}/flows/build/tdd-policy.md ← 対象別のTDD必須/推奨判断を確認してから実装する
@@ -282,6 +286,13 @@ IF 宣言が見つからない（トラック未宣言の計画）:
   A（軽量）: verify → code-reviewer
   B（標準）: verify → qa → code-reviewer
   C（フル）: verify → security-reviewer → qa → code-reviewer → adversarial-reviewer
+
+NOTE: これらのレビュー系エージェントは全て Agent ツール（サブエージェント、fresh general-purpose 等）
+  で起動すること。intake・designer と異なりユーザーとの対話を必要とせず、むしろ
+  「このセッションでの実装の経緯を知らない、独立した視点」であることが指摘の質に直結する
+  （特に adversarial-reviewer は他エージェントの結果を参照せず自身の分析のみで判断する設計）。
+  各エージェントへのプロンプトには、そのエージェントファイル（agents/<name>.md）の役割定義を
+  貼り込み、対象プロジェクトへの絶対パスと、前段エージェントの指摘内容（再レビュー時のみ）を渡すこと。
 
 NOTE: adversarial-reviewer（トラックCのみ）は他エージェントの承認結果に関わらず独立して判定するため、
       先行エージェントが全て承認済みでも省略しないこと。
