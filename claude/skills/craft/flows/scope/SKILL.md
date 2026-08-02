@@ -22,7 +22,8 @@ SKILL_DIR = このSKILL.md（craft/flows/scope/SKILL.md）のパスから2階層
 INFER kind FROM 直前の会話内容:
   キーワード例:
     1（静的サイト）  → LP・ランディングページ・PoC・画面モック・静的
-    2（Webアプリ）   → API・DB・認証・バックエンド・Next.js・サーバー・チャット・管理画面
+    2（Webアプリ）   → API・DB・認証・バックエンド・サーバー・チャット・管理画面・
+                       Next.js・Node.js・Go・Rust・Java・PHP・Ruby・Python 等のサーバーサイド言語
     3（アプリ）      → Flutter・React Native・Expo・iOS・Android・スマホアプリ
     4（既存相談）    → 移行・改善・リファクタ・相談・課題・既存
 
