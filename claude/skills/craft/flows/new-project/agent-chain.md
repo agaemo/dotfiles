@@ -8,7 +8,10 @@ description: new-project セットアップ完了後の設計フェーズ・エ�
 セットアップ完了後は以下の順で必ず実行すること。
 
 > **IMPORTANT — PROHIBITED:** `intake`・`designer` を Agent ツール（サブエージェント）で起動すること
-> 理由: ユーザーとの対話が必要。スキルとして呼び出すか、メインClaude自身が担当すること。
+> 理由: ユーザーとの対話が必要。`{SKILL_DIR}/agents/<name>.md` を READ し、その指示に従って
+> メインClaude自身が直接実行すること（Agentツールは使わない）。
+> 一方 `planner`・`verify`・`security-reviewer`・`qa`・`code-reviewer`・`adversarial-reviewer` は
+> ユーザー対話を必要としない機械的なタスクのため、Agent ツール（サブエージェント）で起動する。
 
 ```
 # SKILL_DIR は呼び出し元（new-project/SKILL.md 等）で定義済みの絶対パス（craftディレクトリを指す）。
@@ -27,14 +30,19 @@ NOTE: 各 GATE で承認を求める前に以下の形式で進捗を必ず表�
   ──────────────────────────────────────────
   NOTE: HAS_FRONTEND == false の場合は「STEP 3: デザイン」の行を省き、Nは4に読み替える
 
-```
-STEP 1: intake
-  OUTPUT: .craft/requirements.md
-
-  プレビュー生成（GATEの前に必ず実施）:
+共通ルール（プレビュー生成）: 以下の各STEPで「プレビュー生成（共通ルール参照）」と書かれた箇所は、
+  GATEの前に必ず次を実施する:
     READ {SKILL_DIR}/flows/new-project/preview-generation.md（このプレビュー生成チェーン中に
     未読の場合のみ。セッションが変わった場合は再度READする。共通ルール・CDN方針・
     ASSERT/失敗時の代替導線が定義されている）
+  その後、各STEPに書かれた固有の内容でHTMLを作成し、指定の出力先に保存する。
+
+```
+STEP 1: intake
+  OUTPUT: .craft/requirements.md
+  ASSERT EXISTS(.craft/requirements.md)
+
+  プレビュー生成（共通ルール参照）:
     .craft/requirements.md の内容から確認用HTMLを作成する
       - プロジェクト概要・必須機能・スコープ外・完成の基準を中心に、読みやすい見出し階層で提示する
       - 治療は実務資料（memo相当）: 誇張した装飾は避ける
@@ -46,13 +54,13 @@ STEP 1: intake
 STEP 2: refiner
   INPUT:  .craft/requirements.md
   OUTPUT: .craft/stories.md
+  ASSERT EXISTS(.craft/stories.md)
   NOTE: 未解決の疑問はユーザーから回答を得た後も削除しない。
         以下の形式でチェック済みにして残すこと（意思決定の根拠として保持）:
         - [x] [疑問の内容]
               → **回答（YYYY-MM-DD）:** [回答内容]
 
-  プレビュー生成（GATEの前に必ず実施）:
-    READ {SKILL_DIR}/flows/new-project/preview-generation.md（未読の場合のみ）
+  プレビュー生成（共通ルール参照）:
     .craft/stories.md の内容から確認用HTMLを作成する
       - US一覧をカード形式で提示し、受け入れ条件・サイズ・依存を見やすく整理する
       - 「未解決の疑問」セクションは回答済み(x)/未回答を視覚的に区別する
@@ -63,12 +71,16 @@ STEP 2: refiner
 
 IF HAS_FRONTEND == true:
   STEP 3: designer ← 省略禁止・planner より先に実施すること
-    a. designer エージェントを呼び出す（内蔵の「テンプレート: デザインブリーフ」を使用） → .craft/design-brief.md
-    b. designer エージェントを呼び出す（内蔵の「テンプレート: デザインシステム」を使用） → .craft/design-system.md
+    a. READ {SKILL_DIR}/agents/designer.md → メインClaude自身が「テンプレート: デザインブリーフ」に従い実行する → .craft/design-brief.md
+    b. 同様に「テンプレート: デザインシステム」に従い実行する → .craft/design-system.md
     c. 画面構成・コンポーネント構成を .craft/design.md に記録
        INCLUDE: 画面遷移（どの画面からどの画面へ・何をトリガーに遷移するか）を
                 表または箇条書きで明記すること（例: 一覧画面 → [詳細を開く] → 詳細画面）
                 → 基本設計書の画面遷移図はこの記録を元に生成する
+
+    ASSERT EXISTS(.craft/design-brief.md)
+    ASSERT EXISTS(.craft/design-system.md)
+    ASSERT EXISTS(.craft/design.md)
 
     c2. 主要画面のワイヤーフレーム生成（省略禁止）:
        .craft/design.md の画面一覧から、ユーザーが最も長く滞在する主要画面を1〜2枚選び、
@@ -77,10 +89,7 @@ IF HAS_FRONTEND == true:
        配置）が伝わる粒度でよい。作り込みすぎない（1画面あたり実装時間5分以内を目安にする）
        出力先: .craft/wireframe-preview.html
 
-    d. プレビュー生成（GATEの前に必ず実施）:
-       READ {SKILL_DIR}/flows/new-project/preview-generation.md（このプレビュー生成チェーン中に
-       未読の場合のみ。セッションが変わった場合は再度READする。共通ルール・CDN方針・
-       ASSERT/失敗時の代替導線が定義されている）
+    d. プレビュー生成（共通ルール参照）:
        .craft/design-brief.md・.craft/design-system.md の内容から、
        カラーパレット（実際のスウォッチ）・タイポグラフィスケール・ブランドアーキタイプ・
        FEEL/ANTI-FEELワードを1枚にまとめる
@@ -94,19 +103,19 @@ IF HAS_FRONTEND == true:
           wireframe-preview.html の両方を提示する）
     PROHIBITED: デザイン承認前にコンポーネントを1行も書くこと
     NOTE: デザインによってAPIの形・DBフィールドが変わる場合があるため、planner より前に確定させること
+ELSE:
+  STEP 3 をスキップし STEP 4 へ進む（design-brief.md・design-system.md・design.md は生成しない）
 ENDIF
 
 STEP 4: planner ← 基本設計を含む場合、このGATEが実質的な基本設計承認になる（DBスキーマ・API設計・セキュリティ設計を含む）
   INPUT:  .craft/stories.md（+ .craft/design-brief.md・.craft/design.md があれば）
   OUTPUT: .craft/plan.md
+  ASSERT EXISTS(.craft/plan.md)
   NOTE: 呼び出し前に「planner へ渡すべき設計判断の確認事項」を参照し、ユーザーに確認すること
         → READ {SKILL_DIR}/flows/new-project/recipes/planner-checklist.md
         IF READ FAILED: REPORT "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/planner-checklist.md" → STOP
 
-  プレビュー生成（GATEの前に必ず実施）:
-    READ {SKILL_DIR}/flows/new-project/preview-generation.md（このプレビュー生成チェーン中に
-    未読の場合のみ。セッションが変わった場合は再度READする。共通ルール・CDN方針・
-    ASSERT/失敗時の代替導線が定義されている）
+  プレビュー生成（共通ルール参照）:
     .craft/plan.md の内容から以下を作成する:
 
     （「基本設計」セクションがある場合の追加提示。下記フィーチャートラックの有無とは独立に判定する）
@@ -171,10 +180,11 @@ STEP 6: 統合設計書生成 ← 理解度確認後の総合確認ゲート
        入力: .craft/plan.md の「基本設計」セクション（DBスキーマ・API設計・画面遷移図・
        セキュリティ設計を転記するのみ）+ design-system.md があれば
 
-  プレビュー生成（GATEの前に必ず実施）:
-    READ {SKILL_DIR}/flows/new-project/preview-generation.md（このプレビュー生成チェーン中に
-    未読の場合のみ。セッションが変わった場合は再度READする。共通ルール・CDN方針・
-    ASSERT/失敗時の代替導線が定義されている）
+  ASSERT EXISTS(.craft/01_requirements_doc.md)
+  ASSERT EXISTS(.craft/02_specifications_doc.md)
+  ASSERT EXISTS(.craft/03_basic_design_doc.md)
+
+  プレビュー生成（共通ルール参照）:
     3文書（01_requirements_doc.md・02_specifications_doc.md・03_basic_design_doc.md）を
     1枚のHTMLにまとめる。個別ファイルのまま提示すると3つを行き来して頭の中で
     統合する手間が残るため、必ず1枚に統合すること。

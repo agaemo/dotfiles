@@ -34,7 +34,8 @@ SET framework = 選択結果（"flutter" / "react-native" / "other"）
 IF framework == "other":
   REPORT: このフローは Flutter / React Native のみ対応しています。
           開発ランタイムの決定は planner が担当するため、要件を伝えた上で
-          intake エージェントから通常のエージェントチェーンを開始してください。
+          intake エージェントから {SKILL_DIR}/flows/new-project/agent-chain.md の
+          標準エージェントチェーンを開始してください。
   STOP
 ```
 
@@ -109,6 +110,9 @@ PROHIBITED: CLAUDE.md および AGENTS.md を生成すること
 RUN: git init
 
 ASSERT EXISTS(.git/)
+IF FAILED:
+  REPORT: "git init に失敗しました。git がインストールされているか確認してください。"
+  STOP
 
 --- STEP 2: ファイル書き出し ---
 
@@ -144,14 +148,16 @@ REPORT: "完了しました"
 
 ### ステップ 4: 完了報告
 
-NOTE: 開発ランタイム（mise.toml作成・`flutter create` / `pnpm create expo-app` 等のscaffold）は
+IMPORTANT: 開発ランタイム（mise.toml作成・`flutter create` / `pnpm create expo-app` 等のscaffold）は
   ここでは決めない。planner が `.craft/plan.md` の「開発ランタイム」節に決定内容を記録し、
   build フロー側（ステップ0.6）が実際にインストール・scaffoldを実行する。
   決定手順・Flutter固有の注意点（バージョン固定・依存競合等）は
   {SKILL_DIR}/flows/new-project/recipes/planner-checklist.md の「開発ランタイムの選定方針」と
-  {SKILL_DIR}/flows/new-app/flutter-notes.md を参照（planner呼び出し前に自動的に参照される）。
-  ステップ2で確認した組織ID・プラットフォーム・アプリ名は、この決定の際に使う情報として
-  会話文脈に残しておくこと（再度質問しない）。
+  {SKILL_DIR}/flows/new-app/flutter-notes.md に記載されている（agents/planner.md が
+  planner呼び出し前にこれらを参照する設計になっている）。
+  ステップ2で確認した組織ID・プラットフォーム・アプリ名は、intake/refiner へのヒアリング回答
+  （`.craft/requirements.md` 等）に明示的に含めること。planner は requirements.md・stories.md を
+  読んでから動くため、会話文脈だけでなく成果物に残っていることを確認する（再度質問しない）。
 
 ```
 REPORT TO USER:
@@ -175,23 +181,14 @@ STEP 3: designer       → .craft/design-brief.md / design-system.md / design.md
 STEP 4: planner        → .craft/plan.md
 STEP 5: 理解度チェック
 STEP 6: 統合設計書生成  → .craft/01_requirements_doc.md / 02_specifications_doc.md / 03_basic_design_doc.md
-STEP 7: build フローへ委譲（実装・実画面レビュー・レビューチェーン・CLAUDE.md生成）
-  READ .craft/plan.md の「開発ランタイム」節の STACK識別子
-  IF 見つからない（旧形式のplan.md等）:
-    WARN: "「開発ランタイム」節にSTACK識別子が見つかりません。framework から推定します。"
-    SET STACK = framework == "flutter" の場合 "flutter"、それ以外（react-native）は "node"
-  ELSE:
-    SET STACK = plan.mdに記載のSTACK識別子
-
-  READ {SKILL_DIR}/flows/build/SKILL.md
-  FOLLOW: そこに記述されたすべての手順を実行する
-    STACK = <上記で確定した値>
-    HAS_REVIEW_CHAIN = true
-    HAS_FRONTEND = true
+STEP 7: {SKILL_DIR}/flows/new-project/agent-chain.md の STEP 7 と同じロジックに従う（build フローへ委譲）
+  ただし STACK識別子が plan.md に見つからない場合のデフォルト値のみ異なる:
+    agent-chain.md の STEP 7 → "node" 固定
+    本フロー（new-app） → framework == "flutter" の場合 "flutter"、それ以外（react-native）は "node"
 ```
 
 各 GATE・テンプレート・フェーズ2の並列実装手順が必要な場合:
-`READ {SKILL_DIR}/flows/new-project/agent-chain.md`（エージェントチェーン全詳細、STEP1-6）
+`READ {SKILL_DIR}/flows/new-project/agent-chain.md`（エージェントチェーン全詳細、STEP1-7）
 
 Flutter コマンド読み替え・ビルド確認コマンド・CLAUDE.md記載事項・再開時注意点:
 `READ {SKILL_DIR}/flows/new-app/flutter-notes.md`（必要になった時点で読む）

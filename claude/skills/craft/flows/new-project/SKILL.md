@@ -14,6 +14,10 @@ SKILL_DIR = このSKILL.md（craft/flows/new-project/SKILL.md）のパスから2
   # 以降の READ {SKILL_DIR}/... は Read ツールで絶対パスに展開して実行すること
 
 REQUIRE: カレントディレクトリがプロジェクトルートであること（cd してから実行すること）
+IF カレントディレクトリが疑わしい（意図したプロジェクトルートか確信が持てない）:
+  ASK USER: "このディレクトリ（<pwd>）をプロジェクトルートとして進めてよいですか？"
+  WAIT_FOR: ユーザーの確認
+  IF 否定された: STOP（正しいディレクトリに cd してから再実行するよう伝える）
 ```
 
 ---
@@ -153,19 +157,31 @@ NOTE: 開発ランタイム（言語・ランタイムマネージャー・フ�
 
 ```
 REPORT TO USER:
-  セットアップが完了しました。
-
-  次のステップ:
-  1. 何を作るか決まっていない場合は「ideatorエージェントを呼び出してください」
-  2. 要件が決まっている場合は「intakeエージェントを呼び出してください」
-
+  セットアップが完了しました。会話の文脈から要件の明確さを判断し、次のステップへ自動的に進みます。
 ```
 
 ---
 
-## 標準エージェントチェーン・オプションエージェント・再開時注意点
+### ステップ 4: エージェントチェーンへ継続（必須）
 
-READ {SKILL_DIR}/flows/new-project/agent-chain.md ← ステップ3完了後、エージェントチェーンを開始する前に読む
-（STEP 1〜6 の設計フェーズ詳細手順・GATEがここに定義されている。STEP 7 で build フローに委譲し、
- 実装・テスト戦略・フェーズ2/3・CLAUDE.md生成は {SKILL_DIR}/flows/build/SKILL.md が担当する）
+```
+IMPORTANT: ステップ3の完了報告後、ユーザーの追加指示を待たずに直ちに本ステップを実行すること。
+  ここで停止しないこと。
+
+IF ここまでの会話から「何を作るか」がまだ固まっていない（アイデア段階）:
+  ideator エージェントを先に呼び出してから、下記の STEP 1（intake）に進む
+ELSE:
+  そのまま下記の STEP 1（intake）から開始する
+
+READ {SKILL_DIR}/flows/new-project/agent-chain.md
+IF READ FAILED:
+  REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/agent-chain.md"
+  STOP
+FOLLOW: そこに記述された STEP 1〜7 をそのまま実行する
+  （STEP 1〜6 の設計フェーズ詳細手順・GATEがここに定義されている。STEP 7 で build フローに委譲し、
+   実装・テスト戦略・フェーズ2/3・CLAUDE.md生成は {SKILL_DIR}/flows/build/SKILL.md が担当する）
+  NOTE: HAS_FRONTEND はステップ1で設定済みの値をそのまま持ち越して使うこと
+```
+
+## 標準エージェントチェーン・オプションエージェント・再開時注意点
 

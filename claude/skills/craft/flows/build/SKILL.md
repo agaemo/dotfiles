@@ -90,14 +90,22 @@ IMPORTANT: このステップも言語・ランタイムマネージャー・Doc
   このファイル（build/SKILL.md）自体は変更しない。
 
 READ .craft/plan.md の「開発ランタイム」セクション
+  # フォーマット（agents/planner.md の出力テンプレート参照）:
+  #   STACK識別子: <値> / 環境管理ツール: <値（mise・devbox・nix-shell・Docker等）>
+  #   セットアップコマンド: ```bash ... ```（複数行、上から順に実行）
+  #   検証コマンド: <値>（単一コマンド）
 
 IF セクションが存在しない、または空欄（旧形式のplan.md等）:
   NOTE: 環境構築の情報源がない。既に環境構築済みの可能性が高い（再開時）。
   SKIP → ステップ0.7へ
 
-ELIF 「環境管理ツール」の設定ファイル（.mise.toml・devbox.json・docker-compose.yml 等、
-      記載された環境管理ツールに対応するファイル）が既に存在する:
-  SKIP（再開時。既に構築済みのため再実行しない）→ ステップ0.7へ
+ELIF 「環境管理ツール」の設定ファイル（.mise.toml〈mise〉・devbox.json〈devbox〉・
+      shell.nix〈nix-shell〉・docker-compose.yml〈Docker〉等、記載された環境管理ツールに
+      対応するファイル）が既に存在する:
+  ASSERT: 「検証コマンド」が成功すること
+  IF 成功: SKIP（再開時。既に構築済みのため再実行しない）→ ステップ0.7へ
+  IF 失敗: GOTO 下記 ELSE節（「初回」ブロック）の IF FAILED 以降を実行する
+    （RUNは実行せず、IF FAILED以降のエラー処理（自己診断・軽微な修正・エスカレーション）のみ適用する）
 
 ELSE（初回。環境管理ツールの設定ファイルがまだ存在しない）:
   RUN: 「セットアップコマンド」に記載のコマンドをそのまま実行する
@@ -128,7 +136,10 @@ ELSE（初回。環境管理ツールの設定ファイルがまだ存在しな�
       3. 手動で環境構築してから再開する
     WAIT_FOR: ユーザーの判断
     IF 1（変更して再試行）:
-      .craft/plan.md の「開発ランタイム」節をユーザー指定の内容に更新してから、本ステップの先頭に戻る
+      .craft/plan.md の「開発ランタイム」節をユーザー指定の内容に更新してから、RUN（セットアップコマンド）から再開する
+      IF このエスカレーション自体が3回目以上（ユーザー指定の内容でも解決しない）:
+        REPORT: "ユーザー指定の内容でも解決しませんでした。手動での環境構築を推奨します。"
+        STOP
     PROHIBITED: ユーザーの判断を待たずに次のステップへ進むこと
 ```
 
@@ -389,7 +400,7 @@ IF NOT EXISTS(CLAUDE.md) OR （EXISTS するが プロジェクト名・目的�
     - プロジェクト固有の制約（DBエンジン・実行環境の制限など）
     - .craft/plan.md を参照するよう一言書く
     - IF STACK == "flutter": Flutter/Firebase 固有の記載事項
-      READ {SKILL_DIR}/flows/new-app/flutter-notes.md の「STEP 11 CLAUDE.md に含める Flutter/Firebase 固有の記載事項」
+      READ {SKILL_DIR}/flows/new-app/flutter-notes.md の「CLAUDE.md に含める Flutter/Firebase 固有の記載事項」
 
   OMIT（書かない）:
     - 本番の認証情報・APIキー・パスワード・実在するユーザー情報

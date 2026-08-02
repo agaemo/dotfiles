@@ -12,7 +12,12 @@ flowchart TD
     DETECT -->|Yes・初回| S0
 
     S0["STEP 0: plan.md / design-system.md を読み\n完了状況を提示"]
-    S0 --> S1{STACK != static?}
+    S0 --> S06{"STEP 0.6: 開発ランタイム\n未構築?"}
+    S06 -->|Yes| RT["セットアップコマンド実行\n失敗時: 自己診断→再試行\n→エスカレーション"]
+    RT --> S07
+    S06 -->|No・構築済み| S07
+    S07["STEP 0.7: Makefile準備"]
+    S07 --> S1{STACK != static?}
     S1 -->|Yes| S1A["STEP 1: テスト戦略決定\ntesterエージェントでTDD環境セットアップ"]
     S1A --> S2
     S1 -->|No| S2
@@ -64,7 +69,7 @@ flowchart LR
         direction TB
         R[".craft/stories.md の\n担当 US を読む"]
         R --> I["所有ファイルを実装\n（依存ファイルは読み取り専用）"]
-        I --> B{"pnpm build\n成功？"}
+        I --> B{"make build\n成功？"}
         B -->|失敗| I
         B -->|成功| V["受け入れ条件を\n1件ずつ確認"]
         V --> REP["完了レポート\n・実装ファイル一覧\n・受け入れ条件充足状況\n・未解決問題"]

@@ -1,14 +1,15 @@
+---
+name: flutter-notes
+description: Flutter/React Native固有のコマンド読み替え・環境構築（mise.toml）・依存競合・CLAUDE.md記載事項・再開時注意点。new-app フロー、planner の開発ランタイム決定時に参照する。
+---
+
 # Flutter 固有メモ（new-app セットアップ後に参照）
 
-## コマンド読み替え（new-project/SKILL.md との差分）
+## 開発コマンドの位置づけ
 
-`flows/new-project/SKILL.md` は Node.js 前提のため、Flutter プロジェクトでは以下に読み替えること。
-
-| new-project の記述 | Flutter での読み替え |
-|-------------------|-------------------|
-| `mise exec -- pnpm build` | `mise exec -- flutter analyze` |
-| `mise exec -- pnpm dev` | `mise exec -- flutter run` |
-| `mise exec -- pnpm test` | `mise exec -- flutter test` |
+実際の呼び出しは常に `make build` / `make dev` / `make test`（Makefileは plan.md の「開発コマンド」表から
+build フローが生成する）。下記の生コマンド（`mise exec -- flutter analyze` 等）は、planner が
+plan.md の「開発コマンド」表の実行コマンド列にそのまま転記する値であり、直接呼び出すものではない。
 
 ## 環境構築・プロジェクト初期化（planner が plan.md の「開発ランタイム」節に転記する情報源）
 
@@ -29,9 +30,12 @@ EOF
 
 mise trust && mise install
 mise exec -- flutter create . --org <組織ID> --platforms <プラットフォーム>
+# <組織ID>・<プラットフォーム> は new-app フロー ステップ2 で確認した実際の値に置き換える
 ```
 
 > **注意:** `flutter = "stable"` は 404 エラーになる。必ず具体的なバージョン番号を指定すること。
+> **注意:** 上記は mise 前提のテンプレート。devbox / nix-shell / Docker を選定した場合は
+> `{SKILL_DIR}/flows/new-project/recipes/planner-checklist.md` の方針に従い、同等の内容を該当形式で記述すること。
 
 #### Firebase Cloud Functions 等の Node.js バックエンドを含む場合
 
@@ -62,7 +66,7 @@ mise exec -- flutter create . --org <組織ID> --platforms <プラットフォ�
 > Hive を使う場合は `hive_generator` を使わず、`TypeAdapter` を手動実装すること（`BinaryReader` / `BinaryWriter` を使う数十行のボイラープレート）。
 > 詳細: `riverpod_generator` は `source_gen ^3.0.0+` を要求するが `hive_generator` は `source_gen ^1.0.0` を要求する。
 
-## STEP 7 実装時の確認コマンド
+## 実装時の確認コマンド（build フロー ステップ2 実装時に使う）
 
 ```bash
 mise exec -- flutter analyze      # 型エラー・静的解析
@@ -71,7 +75,7 @@ mise exec -- flutter run -d chrome  # 起動確認（Web）
 mise exec -- flutter run            # 接続デバイス・シミュレーター
 ```
 
-## STEP 11 CLAUDE.md に含める Flutter/Firebase 固有の記載事項
+## CLAUDE.md に含める Flutter/Firebase 固有の記載事項（build フロー ステップ6 で使う）
 
 通常の項目に加えて以下を必ず記載すること:
 
@@ -105,7 +109,7 @@ Flutter プロジェクトで再開する際は以下を追加で確認するこ
 - Firebase 接続状況を確認する:
     firebase_options.dart が存在しない → モックのまま進める
     CLAUDE.md に Firebase 接続手順が記録されているか確認する
-- ビルド確認コマンドは `mise exec -- flutter analyze` を使う
+- ビルド確認コマンドは `make build`（内部で `mise exec -- flutter analyze` を実行）を使う
 - Riverpod 3.x を使っている場合、StateNotifier は廃止済み
     → Notifier / NotifierProvider を使うこと
 ```
