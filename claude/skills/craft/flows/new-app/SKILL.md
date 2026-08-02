@@ -33,7 +33,8 @@ SET framework = 選択結果（"flutter" / "react-native" / "other"）
 
 IF framework == "other":
   REPORT: このフローは Flutter / React Native のみ対応しています。
-          .mise.toml を手動で作成し、エージェントチェーンから再開してください。
+          開発ランタイムの決定は planner が担当するため、要件を伝えた上で
+          intake エージェントから通常のエージェントチェーンを開始してください。
   STOP
 ```
 
@@ -141,106 +142,16 @@ REPORT: "完了しました"
 
 ---
 
-### ステップ 4: mise.toml の作成と `mise install`
+### ステップ 4: 完了報告
 
-フレームワークと has_functions に応じて以下のテンプレートを使用する。
-
-#### Flutter（has_functions = false）
-
-```bash
-# 利用可能な最新バージョンを確認してから固定すること
-# mise ls-remote flutter | tail -1
-cat > .mise.toml << 'EOF'
-[tools]
-flutter = "3.41.9"  # ← mise ls-remote flutter | tail -1 で確認した値に更新
-
-[env]
-_.path = ["./bin"]
-EOF
-
-mise trust && mise install
-```
-
-> **注意:** `flutter = "stable"` は 404 エラーになる。必ず具体的なバージョン番号を指定すること。
-
-#### Flutter（has_functions = true）
-
-Firebase Cloud Functions など Node.js バックエンドを含む場合。
-
-```bash
-cat > .mise.toml << 'EOF'
-[tools]
-flutter = "3.41.9"  # ← mise ls-remote flutter | tail -1 で確認した値に更新
-node = "22"
-pnpm = "latest"
-
-[env]
-_.path = ["./bin", "./node_modules/.bin"]
-EOF
-
-mise trust && mise install
-```
-
-#### React Native / Expo
-
-```bash
-cat > .mise.toml << 'EOF'
-[tools]
-node = "22"
-pnpm = "latest"
-
-[env]
-_.path = ["./node_modules/.bin"]
-EOF
-
-mise trust && mise install
-```
-
-```
-ASSERT: `mise exec -- flutter --version` が成功すること（Flutter の場合）
-ASSERT: `mise exec -- node --version` が成功すること（Node.js を含む場合）
-IF FAILED: エラー内容を報告し、STOP すること
-```
-
----
-
-### ステップ 5: プロジェクト初期化
-
-#### Flutter
-
-```bash
-# プラットフォームはステップ2で確認した内容を使う
-mise exec -- flutter create . --org {org_id} --platforms {platforms}
-
-# パッケージは flutter pub add で追加する（pubspec.yaml を手編集して pub get より推奨）
-# 例: mise exec -- flutter pub add flutter_riverpod go_router hive_flutter
-
-# 開発用パッケージ
-# 例: mise exec -- flutter pub add --dev build_runner riverpod_generator
-```
-
-> **Flutter 既知の依存競合:**
-> `riverpod_generator` (3.x+) と `hive_generator` は `source_gen` のバージョン要件が競合するため同時利用不可。
-> Hive を使う場合は `hive_generator` を使わず、`TypeAdapter` を手動実装すること（`BinaryReader` / `BinaryWriter` を使う数十行のボイラープレート）。
-> 詳細: `riverpod_generator` は `source_gen ^3.0.0+` を要求するが `hive_generator` は `source_gen ^1.0.0` を要求する。
-
-#### React Native（Expo）
-
-```bash
-mise exec -- pnpm create expo-app . --template blank-typescript
-mise exec -- pnpm install
-```
-
-#### React Native（CLI）
-
-```bash
-mise exec -- pnpm dlx @react-native-community/cli init {app_name} --directory .
-mise exec -- pnpm install
-```
-
----
-
-### ステップ 6: 完了報告
+NOTE: 開発ランタイム（mise.toml作成・`flutter create` / `pnpm create expo-app` 等のscaffold）は
+  ここでは決めない。planner が `.craft/plan.md` の「開発ランタイム」節に決定内容を記録し、
+  build フロー側（ステップ0.6）が実際にインストール・scaffoldを実行する。
+  決定手順・Flutter固有の注意点（バージョン固定・依存競合等）は
+  {SKILL_DIR}/flows/new-project/recipes/planner-checklist.md の「開発ランタイムの選定方針」と
+  {SKILL_DIR}/flows/new-app/flutter-notes.md を参照（planner呼び出し前に自動的に参照される）。
+  ステップ2で確認した組織ID・プラットフォーム・アプリ名は、この決定の際に使う情報として
+  会話文脈に残しておくこと（再度質問しない）。
 
 ```
 REPORT TO USER:
@@ -265,9 +176,16 @@ STEP 4: planner        → .craft/plan.md
 STEP 5: 理解度チェック
 STEP 6: 統合設計書生成  → .craft/01_requirements_doc.md / 02_specifications_doc.md / 03_basic_design_doc.md
 STEP 7: build フローへ委譲（実装・実画面レビュー・レビューチェーン・CLAUDE.md生成）
+  READ .craft/plan.md の「開発ランタイム」節の STACK識別子
+  IF 見つからない（旧形式のplan.md等）:
+    WARN: "「開発ランタイム」節にSTACK識別子が見つかりません。framework から推定します。"
+    SET STACK = framework == "flutter" の場合 "flutter"、それ以外（react-native）は "node"
+  ELSE:
+    SET STACK = plan.mdに記載のSTACK識別子
+
   READ {SKILL_DIR}/flows/build/SKILL.md
   FOLLOW: そこに記述されたすべての手順を実行する
-    STACK = framework == "flutter" の場合 "flutter"、それ以外（react-native）は "node"
+    STACK = <上記で確定した値>
     HAS_REVIEW_CHAIN = true
     HAS_FRONTEND = true
 ```

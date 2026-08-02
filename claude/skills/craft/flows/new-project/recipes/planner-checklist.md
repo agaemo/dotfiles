@@ -30,4 +30,46 @@ plan.md 本文を書く前に、後から変更すると計画全体の再生成
 2. ユーザーが推奨と異なる選択をした場合、その選択を前提にしてから planner を呼び出す
    （= plan.md は最初から確定済みの技術選定で1回で書く。書き直しを前提にしない）
 
+## 開発ランタイムの選定方針（必須）
+
+plan.md の「開発ランタイム」節に書く内容を、plan.md 本文を書く前に確定させること。
+この節がbuildフローが実際に環境構築（ランタイムのインストール・フレームワークのscaffold等）を行う唯一の情報源になるため、
+空欄や曖昧な記載は許されない。
+
+1. **環境管理ツールの決定**
+   - 既存リポジトリに `devbox.json` / `shell.nix` / `docker-compose.yml` がある場合はそれに従う
+   - ユーザーがDockerでの完結を希望する場合はそれに従う
+   - 上記いずれもない場合は `mise` をデフォルトとする（バージョン固定によるグローバル環境汚染防止のため）
+
+2. **言語・ランタイムのバージョン決定**
+   - 既知の組み合わせ（Bun / Python(uv) / Node.js / Flutter / React Native）は
+     `{SKILL_DIR}/flows/new-project/recipes/runtime-*.md`（Node.js系）・
+     `{SKILL_DIR}/flows/new-app/flutter-notes.md`（Flutter）の該当テンプレートに従う
+   - それ以外の言語（Go・Rust・Java 等）は以下の手順で決定する:
+     1. 選定したマネージャーのレジストリで対応バージョンを確認する
+        （例: `mise registry | grep -i <言語>` または公式ドキュメント）
+     2. ランタイムは固定バージョンを指定する（`"latest"` はビルド再現性がなく禁止。
+        パッケージマネージャーは `"latest"` で構わない）
+     3. インストール・検証コマンドを確定する（例: `mise exec -- go version`）
+
+3. **フレームワーク・アプリのscaffold決定**（HAS_FRONTEND == true の場合。new-app 由来の Flutter・React Native も含む）
+   - Webアプリの場合、会話の文脈から Next.js / Vite + React / Hono / Express 等を推定する。判断できない場合はユーザーに確認する
+   - Next.js → `{SKILL_DIR}/flows/new-project/recipes/nextjs-init.md` を読み、scaffoldコマンドを確認する
+   - Vite + React → `{SKILL_DIR}/flows/new-project/recipes/vite-react.md` を読み、scaffoldコマンドを確認する
+   - Flutter → `{SKILL_DIR}/flows/new-app/flutter-notes.md` を読み、`flutter create` コマンド・
+     バージョン固定の注意点（`stable` 指定は404になる）を確認する
+   - React Native (Expo) → `.mise.toml`（`node = "22"`, `pnpm = "latest"`）作成後、
+     `pnpm create expo-app . --template blank-typescript && pnpm install`
+   - React Native (CLI) → 同じ `.mise.toml` 作成後、
+     `pnpm dlx @react-native-community/cli init <アプリ名> --directory . && pnpm install`
+   - リアルタイム通信（WebSocket・チャット・通知）が要件にある場合は
+     `{SKILL_DIR}/flows/new-project/recipes/socketio.md` を読み、実装ステップに組み込む
+
+4. **plan.md への転記**
+   - 1・2で確定した内容 → 「開発ランタイム」節の「環境管理ツール」「セットアップコマンド」「検証コマンド」
+   - 3で確認したscaffoldコマンド → 同じく「開発ランタイム」節の「セットアップコマンド」に追記する
+     （ランタイムのインストールとフレームワークのscaffoldは、buildフローが同じタイミングで
+     一度に実行する一続きの初期化コマンド列として記載すること）
+   - STACK識別子（例: node / flutter / rust / go）も明記する
+
 > **設計判断の記録:** 確認した内容は `.craft/plan.md` の「設計判断」セクションに記録すること。

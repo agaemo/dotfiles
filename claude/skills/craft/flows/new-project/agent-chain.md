@@ -206,10 +206,17 @@ STEP 6: 統合設計書生成 ← 理解度確認後の総合確認ゲート
 
 STEP 7: build フローへ委譲
 
+  READ .craft/plan.md の「開発ランタイム」節の STACK識別子
+  IF 見つからない（旧形式のplan.md等）:
+    WARN: "「開発ランタイム」節にSTACK識別子が見つかりません。デフォルトの node を使用します。"
+    SET STACK = "node"
+  ELSE:
+    SET STACK = plan.mdに記載のSTACK識別子
+
   READ {SKILL_DIR}/flows/build/SKILL.md
   IF READ FAILED: REPORT "フローファイルが見つかりません: {SKILL_DIR}/flows/build/SKILL.md" → STOP
   FOLLOW: そこに記述されたすべての手順を実行する
-    STACK = "node"
+    STACK = <上記で確定した値>
     HAS_REVIEW_CHAIN = true
     HAS_FRONTEND = <このチェーン冒頭で設定済みの変数>
 

@@ -7,7 +7,7 @@ new-project・new-static・new-app の設計フェーズ完了後、または別
 ```mermaid
 flowchart TD
     START([build 起動\n初回 or 再開]) --> DETECT{STACK等の変数を\n受け取った?}
-    DETECT -->|No・再開時| AUTO["自動判定\npubspec.yaml存在→flutter\ndesign-brief.mdのみ存在→static\nそれ以外→node"]
+    DETECT -->|No・再開時| AUTO["自動判定\npubspec.yaml存在→flutter\ndesign-brief.mdのみ存在→static\nplan.mdにSTACK識別子あり→その値\nそれ以外→node"]
     AUTO --> S0
     DETECT -->|Yes・初回| S0
 

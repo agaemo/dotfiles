@@ -11,14 +11,17 @@ SKILL_DIR = このSKILL.md（craft/flows/build/SKILL.md）のパスから2階層
   #      → SKILL_DIR = /Users/alice/.claude/skills/craft
 
 入力（呼び出し元が渡す変数。設計フェーズ完了直後の呼び出しでは必須。渡された場合は下記 AUTO-DETECT より優先する）:
-  STACK            = "node" | "flutter" | "static"
-  HAS_REVIEW_CHAIN = true（node・flutter） / false（static）
+  STACK            = "node" | "flutter" | "static" | その他の言語識別子（例: "rust"・"go"。
+                      plan.md の「開発ランタイム」節の STACK識別子に由来する。この3値以外は
+                      本ファイル内で汎用パス（分岐なし）を通る）
+  HAS_REVIEW_CHAIN = true（static以外） / false（static）
   HAS_FRONTEND     = true / false（フロントエンドUIがあるか）
 
 IF 変数が渡されていない（再開時・トップレベル SKILL.md から直接呼ばれた場合のみ）:
   AUTO-DETECT:
     IF EXISTS(pubspec.yaml):                                  SET STACK = "flutter"
     ELIF EXISTS(.craft/design-brief.md) AND NOT EXISTS(.craft/stories.md): SET STACK = "static"
+    ELIF EXISTS(.craft/plan.md) の「開発ランタイム」節に STACK識別子がある: SET STACK = その値
     ELSE:                                                      SET STACK = "node"
   SET HAS_REVIEW_CHAIN = (STACK != "static")
   SET HAS_FRONTEND     = EXISTS(.craft/design-brief.md) OR EXISTS(.craft/design-system.md)
@@ -77,6 +80,56 @@ IF 完成条件が「特定の出力・振る舞いが得られること」を�
     WAIT_FOR: ユーザーの判断
     PROHIBITED: ユーザーの判断を待たずに実装へ進むこと
 ENDIF
+```
+
+### ステップ 0.6: 開発ランタイムの構築（初回実装時のみ。再開時はスキップ）
+
+```
+IMPORTANT: このステップも言語・ランタイムマネージャー・Docker利用有無に関わらず共通で実行する。
+  対応するのは planner が「開発ランタイム」節に書くセットアップコマンドの中身だけであり、
+  このファイル（build/SKILL.md）自体は変更しない。
+
+READ .craft/plan.md の「開発ランタイム」セクション
+
+IF セクションが存在しない、または空欄（旧形式のplan.md等）:
+  NOTE: 環境構築の情報源がない。既に環境構築済みの可能性が高い（再開時）。
+  SKIP → ステップ0.7へ
+
+ELIF 「環境管理ツール」の設定ファイル（.mise.toml・devbox.json・docker-compose.yml 等、
+      記載された環境管理ツールに対応するファイル）が既に存在する:
+  SKIP（再開時。既に構築済みのため再実行しない）→ ステップ0.7へ
+
+ELSE（初回。環境管理ツールの設定ファイルがまだ存在しない）:
+  RUN: 「セットアップコマンド」に記載のコマンドをそのまま実行する
+    （ランタイムのインストール・（フロントエンドがあれば）フレームワークのscaffold等を含む）
+  ASSERT: 「検証コマンド」が成功すること
+
+  IF FAILED:
+    NOTE: 「開発ランタイム」節は planner 呼び出し時点の想定に基づく設計判断であり、
+      実際に構築して初めて判明する相性問題（バージョン指定がレジストリに存在しない・
+      OS/アーキテクチャ依存のビルド失敗等）が起こりうる。設計ミスとは限らないため、
+      即座にユーザーへ丸投げせず、まず自己診断・軽微な修正を試みること（最大2回まで）。
+
+    ANALYZE: エラー内容から原因を推定する（バージョン指定ミス・レジストリ未登録・
+      OS依存のビルド失敗・ネットワーク等）
+    IF 原因を特定でき、修正が軽微（バージョン変更・コマンドの誤り修正等）と判断できる:
+      FIX: .craft/plan.md の「開発ランタイム」節を実際に機能する内容に更新する
+        （例: 固定バージョンをレジストリに実在する値に修正する）
+      RETRY: セットアップコマンドを再実行する
+      IF 2回試しても解決しない、または原因が特定できない:
+        FOLLOW: 下記「エスカレーション」
+    ELSE:
+      FOLLOW: 下記「エスカレーション」
+
+    --- エスカレーション ---
+    REPORT TO USER: 何が・なぜ失敗したか（試した内容を含む）と選択肢
+      1. 別のバージョン・ランタイムマネージャーに変更して再試行する
+      2. 環境構築なしで進められる範囲（型チェック無し等）に一時的に縮小する
+      3. 手動で環境構築してから再開する
+    WAIT_FOR: ユーザーの判断
+    IF 1（変更して再試行）:
+      .craft/plan.md の「開発ランタイム」節をユーザー指定の内容に更新してから、本ステップの先頭に戻る
+    PROHIBITED: ユーザーの判断を待たずに次のステップへ進むこと
 ```
 
 ### ステップ 0.7: Makefile の準備

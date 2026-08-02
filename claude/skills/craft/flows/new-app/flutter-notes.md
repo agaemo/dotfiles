@@ -10,6 +10,58 @@
 | `mise exec -- pnpm dev` | `mise exec -- flutter run` |
 | `mise exec -- pnpm test` | `mise exec -- flutter test` |
 
+## 環境構築・プロジェクト初期化（planner が plan.md の「開発ランタイム」節に転記する情報源）
+
+### mise.toml テンプレート
+
+#### Firebase Cloud Functions 等の Node.js バックエンドを含まない場合
+
+```bash
+# 利用可能な最新バージョンを確認してから固定すること
+# mise ls-remote flutter | tail -1
+cat > .mise.toml << 'EOF'
+[tools]
+flutter = "3.41.9"  # ← mise ls-remote flutter | tail -1 で確認した値に更新
+
+[env]
+_.path = ["./bin"]
+EOF
+
+mise trust && mise install
+mise exec -- flutter create . --org <組織ID> --platforms <プラットフォーム>
+```
+
+> **注意:** `flutter = "stable"` は 404 エラーになる。必ず具体的なバージョン番号を指定すること。
+
+#### Firebase Cloud Functions 等の Node.js バックエンドを含む場合
+
+```bash
+cat > .mise.toml << 'EOF'
+[tools]
+flutter = "3.41.9"  # ← mise ls-remote flutter | tail -1 で確認した値に更新
+node = "22"
+pnpm = "latest"
+
+[env]
+_.path = ["./bin", "./node_modules/.bin"]
+EOF
+
+mise trust && mise install
+mise exec -- flutter create . --org <組織ID> --platforms <プラットフォーム>
+```
+
+**検証コマンド:** `mise exec -- flutter --version`（Node.js を含む場合は `mise exec -- node --version` も）
+
+### パッケージ追加
+
+`flutter pub add` で追加する（`pubspec.yaml` を手編集して `pub get` より推奨）。
+例: `mise exec -- flutter pub add flutter_riverpod go_router hive_flutter`
+開発用パッケージ例: `mise exec -- flutter pub add --dev build_runner riverpod_generator`
+
+> **既知の依存競合:** `riverpod_generator`（3.x+）と `hive_generator` は `source_gen` のバージョン要件が競合するため同時利用不可。
+> Hive を使う場合は `hive_generator` を使わず、`TypeAdapter` を手動実装すること（`BinaryReader` / `BinaryWriter` を使う数十行のボイラープレート）。
+> 詳細: `riverpod_generator` は `source_gen ^3.0.0+` を要求するが `hive_generator` は `source_gen ^1.0.0` を要求する。
+
 ## STEP 7 実装時の確認コマンド
 
 ```bash

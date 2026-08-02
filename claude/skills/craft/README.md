@@ -63,17 +63,18 @@ flowchart LR
 
 ---
 
-## mise の役割
+## 開発ランタイムの管理
 
-| 管理するもの | 管理しないもの |
-|-------------|--------------|
-| Node.js / Bun / Flutter のバージョン | React, Drizzle 等のアプリライブラリ |
-| pnpm のバージョン | プロジェクト固有の設定ファイル |
+ランタイム（Node.js / Bun / Python / Flutter 等）の選定・インストール・パッケージマネージャーの決定は、
+プロジェクトごとに `planner` が `.craft/plan.md` の「開発ランタイム」節に記録し、
+`build` フロー側（ステップ0.6）が実際に構築する。ハーネステンプレート自体は特定の環境管理ツールを固定しない。
 
-- ランタイムとパッケージマネージャーのバージョンを `.mise.toml` で固定する
-- アプリのライブラリは `pnpm add`（Node.js系）または `flutter pub add`（Flutter）でインストールする（mise は関与しない）
-- `mise install` は新規クローン時・`.mise.toml` 更新時に実行する
-- **Flutter の注意:** `flutter = "stable"` は404エラーになる。`mise ls-remote flutter | tail -1` で最新バージョンを確認して固定すること
+- 決定手順: [flows/new-project/recipes/planner-checklist.md](flows/new-project/recipes/planner-checklist.md) の「開発ランタイムの選定方針」
+- デフォルトは `mise`（バージョン固定によるグローバル環境汚染防止のため）。既存リポジトリに
+  `devbox.json` / `shell.nix` / `docker-compose.yml` がある場合や、Docker完結を希望する場合はそちらに従う
+- Flutter固有の注意点（バージョン固定・依存競合等）: [flows/new-app/flutter-notes.md](flows/new-app/flutter-notes.md)
+- アプリのライブラリは `pnpm add`（Node.js系）・`flutter pub add`（Flutter）等、
+  各エコシステム標準のパッケージマネージャーでインストールする（環境管理ツールは関与しない）
 
 ---
 
@@ -192,7 +193,7 @@ Claude Code のスキルとしては認識されず、メインの SKILL.md か�
 | `new-project` | Webアプリ（Node.js系）のセットアップ手順（ハーネス構築〜設計フェーズ）。実装フェーズは `build` に委譲する。 | [README](flows/new-project/README.md) |
 | `new-static` | 静的サイト（LP・PoC）のセットアップ手順。ヒアリング・デザインブリーフ・初期plan.md生成までを担当し、実装フェーズは `build` に委譲する。 | [README](flows/new-static/README.md) |
 | `new-app` | クロスプラットフォームアプリ（Flutter・React Native・Expo等）のセットアップ手順（ハーネス構築〜設計フェーズ）。Firebase 未取得時のモック実装分岐・`riverpod_generator` + `hive_generator` 競合の注記を含む。実装フェーズは `build` に委譲する。 | — |
-| `build` | `.craft/plan.md` に基づいて実装を進める共通エンジン。new-project・new-static・new-app の設計フェーズ完了後、または別セッションでの再開時に呼ばれる。フィーチャートラック設計の有無でフェーズ1〜3またはシンプルループを選び、スタック別ビルド確認・レビューチェーン・CLAUDE.md生成までを担当する。 | [README](flows/build/README.md) |
+| `build` | `.craft/plan.md` に基づいて実装を進める共通エンジン。new-project・new-static・new-app の設計フェーズ完了後、または別セッションでの再開時に呼ばれる。開発ランタイムの構築（plan.mdの「開発ランタイム」節から）・Makefile準備を最初に行い、フィーチャートラック設計の有無でフェーズ1〜3またはシンプルループを選び、レビューチェーン・CLAUDE.md生成までを担当する。 | [README](flows/build/README.md) |
 | `consult` | 既存システムへの課題相談、または新規構築だが対応レシピがない技術の相談（SIer的に型にはまらない依頼を受け持つ）。移行・リファクタ・現状維持／自前構築・近いカテゴリで妥協・対応しないを整理し、実行まで進める。テスト・品質・QA、DBマイグレーション、リリース計画、IaC、健全性評価、LP公開は相談内容から判定して各専用フローに委譲する。 | [README](flows/consult/README.md) |
 | `db-migration` | DBスキーマ変更（テーブル追加・カラム変更）の安全な実行手順。`consult`から委譲される。 | — |
 | `iac` | Terraform/OpenTofu によるインフラ管理の導入・設計・運用手順。`consult`から委譲される。 | — |
@@ -230,7 +231,7 @@ Claude Code のスキルとしては認識されず、メインの SKILL.md か�
 | ファイル | タイミング | 役割 |
 |---|---|---|
 | `pre-bash.js` | Bash 実行前 | 危険なコマンドのブロック・警告。 |
-| `on-session-start.js` | セッション開始時 | git状態表示・mise install 実行。 |
+| `on-session-start.js` | セッション開始時 | git状態表示・`.mise.toml` が存在する場合のみ `mise install` 実行。 |
 
 `post-write.js`（フォーマッタ）と `on-stop.js`（型チェック・リント）は技術スタックによって内容が変わるため、テンプレートには含めない。
 新規プロジェクト作成時に `planner` エージェントが技術スタックに応じて生成する。

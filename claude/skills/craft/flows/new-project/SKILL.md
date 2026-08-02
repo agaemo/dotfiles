@@ -143,100 +143,13 @@ REPORT: "完了しました"
 
 ---
 
-### ステップ 3: ランタイムマネージャーのセットアップ（メインClaude が実行）
+### ステップ 3: 完了報告
 
-```
-# デフォルト: mise。ユーザーが別のマネージャー（devbox / nix-shell）を使っている場合はそちらに従う。
-# 非標準構成やトラブル時: READ {SKILL_DIR}/flows/new-project/recipes/runtime-notes.md
-
-IF ユーザーが Bun を明示した:
-  READ {SKILL_DIR}/flows/new-project/recipes/runtime-bun-python.md
-  IF READ FAILED:
-    REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/runtime-bun-python.md"
-    STOP
-  FOLLOW: Bun の mise.toml テンプレートを使用する
-  ASSERT: `mise exec -- bun --version` が成功すること
-ELIF ユーザーが Python を明示した:
-  READ {SKILL_DIR}/flows/new-project/recipes/runtime-bun-python.md
-  IF READ FAILED:
-    REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/runtime-bun-python.md"
-    STOP
-  FOLLOW: Python の mise.toml テンプレートを使用する
-  ASSERT: `mise exec -- python --version` と `mise exec -- uv --version` が成功すること
-ELSE:
-  READ {SKILL_DIR}/flows/new-project/recipes/runtime-node.md
-  IF READ FAILED:
-    REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/runtime-node.md"
-    STOP
-  FOLLOW: Node.js の mise.toml テンプレートを使用する（デフォルト・ユーザーに確認不要）
-  ASSERT: `mise exec -- node --version` と `mise exec -- pnpm --version` が成功すること
-ENDIF
-
-IF いずれかの ASSERT が FAILED: エラー内容を報告し、STOP すること
-```
-
----
-
-### ステップ 3.5: フレームワーク・追加パターンの選択
-
-mise install 完了後、会話の文脈からフレームワークと追加パターンを確定する。
-
-# NOTE: このステップはwebフレームワーク選択（Step 3のランタイム選択とは別）
-```
-INFER framework FROM 会話の文脈:
-  Next.js      → フロント+APIルート一体型、SSR/SSG が必要な場合
-  Vite + React → フロントエンドのみ（SPA）、Oxc / Rolldown を試したい場合
-  Hono         → APIのみ・Edge Runtime・軽量な場合
-  Express      → シンプルなAPIサーバーの場合
-  その他       → ユーザーに確認:
-    ASK USER: 使用するフレームワークを教えてください
-    WAIT_FOR: ユーザーの回答
-    SET framework = ユーザーの回答
-
-IF framework == Next.js:
-  READ {SKILL_DIR}/flows/new-project/recipes/nextjs-init.md
-  IF READ FAILED:
-    REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/nextjs-init.md"
-    STOP
-  FOLLOW: Next.js初期化手順を実行する
-  TIMING: このステップで実行し、ステップ4（完了報告）の前に完了させること
-
-IF framework == Vite + React:
-  READ {SKILL_DIR}/flows/new-project/recipes/vite-react.md
-  IF READ FAILED:
-    REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/vite-react.md"
-    STOP
-  FOLLOW: Vite + React 初期化手順を実行する
-  TIMING: このステップで実行し、ステップ4（完了報告）の前に完了させること
-
-# Next.js はバンドラー込み。それ以外で HAS_FRONTEND == true の場合は明示確認する。
-IF HAS_FRONTEND == true AND framework NOT IN [Next.js, Vite + React]:
-  ASK USER:
-    フロントエンドのバンドラー・開発サーバーはどうしますか？
-    開発を継続するなら導入しておくことを推奨します。
-      1. Vite（推奨）— フロントエンド HMR あり・Rolldown/Oxc ベースで高速
-      2. 今は不要（静的ファイルのみ、または後で決める）
-  WAIT_FOR: ユーザーの選択
-  IF 選択 == Vite:
-    READ {SKILL_DIR}/flows/new-project/recipes/vite-react.md
-    IF READ FAILED:
-      REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/vite-react.md"
-      STOP
-    FOLLOW: Vite + React 初期化手順を実行する
-  ENDIF
-
-IF リアルタイム通信（WebSocket・チャット・通知）が要件にある:
-  READ {SKILL_DIR}/flows/new-project/recipes/socketio.md
-  IF READ FAILED:
-    REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/socketio.md"
-    STOP
-  NOTE: Socket.IOのパターンはフェーズ1実装時に参照すること
-# ※ Bun / Python / Node.js の mise.toml は Step 3 で既に適用済み
-```
-
----
-
-### ステップ 4: 完了報告
+NOTE: 開発ランタイム（言語・ランタイムマネージャー・フロントエンドフレームワークのscaffold等）は
+  ここでは決めない。planner が `.craft/plan.md` の「開発ランタイム」節に決定内容を記録し、
+  build フロー側（ステップ0.6）が実際にインストール・scaffoldを実行する。
+  決定手順は {SKILL_DIR}/flows/new-project/recipes/planner-checklist.md の
+  「開発ランタイムの選定方針」を参照（planner呼び出し前に自動的に参照される）。
 
 ```
 REPORT TO USER:
@@ -252,7 +165,7 @@ REPORT TO USER:
 
 ## 標準エージェントチェーン・オプションエージェント・再開時注意点
 
-READ {SKILL_DIR}/flows/new-project/agent-chain.md ← ステップ4完了後、エージェントチェーンを開始する前に読む
+READ {SKILL_DIR}/flows/new-project/agent-chain.md ← ステップ3完了後、エージェントチェーンを開始する前に読む
 （STEP 1〜6 の設計フェーズ詳細手順・GATEがここに定義されている。STEP 7 で build フローに委譲し、
  実装・テスト戦略・フェーズ2/3・CLAUDE.md生成は {SKILL_DIR}/flows/build/SKILL.md が担当する）
 
