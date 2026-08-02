@@ -26,24 +26,28 @@ REQUIRE: カレントディレクトリがプロジェクトルートである�
 ASK USER: "フロントエンドUI（画面）はありますか？（あり / なし）"
 WAIT_FOR: ユーザーの回答
 
-SET has_frontend = (回答が "あり" の場合 true、"なし" の場合 false)
+SET HAS_FRONTEND = (回答が "あり" の場合 true、"なし" の場合 false)
 ```
 
 ---
 
 ### ステップ 2: ファイル書き出し（サブエージェントで実行）
 
-Agent ツールでサブエージェントを起動し、以下のプロンプトを渡す。
-**変数 `<cwd>`・`<template>`・`<has_frontend>` は実際の値に展開してから渡すこと。**
+Agent ツールでサブエージェントを起動し、下記「サブエージェントへのプロンプト」ブロック全文を渡す。
+**変数 `<CWD>`・`<TEMPLATE>`・`<HAS_FRONTEND>` は実際の値に展開してから渡すこと。**
 **TEMPLATEは「このSKILL.mdが存在するディレクトリの2階層上」= craftディレクトリの絶対パス（例: /Users/alice/.claude/skills/craft）を親エージェントが計算して埋め込む。**
 WAIT_FOR: サブエージェントの完了報告（"完了しました"）を受け取ってから続きに進む。
 IF サブエージェントが "完了しました" を報告しない（エラー・中断）:
   REPORT: 失敗したステップと理由をユーザーに伝え、再試行するか確認すること
   STOP
 
+IMPORTANT: 以下の「サブエージェントへのプロンプト」セクション内のコードブロックが、
+  Agent ツールに渡すプロンプトの全文である。この境界の外側（本ステップの説明文）は
+  プロンプトに含めないこと。
+
 ---
 
-**サブエージェントへのプロンプト:**
+**サブエージェントへのプロンプト（ここから ```で囲まれたブロック全体を渡す）:**
 
 ```
 重要: これは新規タスクです。種別判断・確認・質問は一切不要です。下記のSTEPを機械的に
@@ -147,27 +151,28 @@ REPORT: "完了しました"
 
 IF ユーザーが Bun を明示した:
   READ {SKILL_DIR}/flows/new-project/recipes/runtime-bun-python.md
+  IF READ FAILED:
+    REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/runtime-bun-python.md"
+    STOP
   FOLLOW: Bun の mise.toml テンプレートを使用する
+  ASSERT: `mise exec -- bun --version` が成功すること
 ELIF ユーザーが Python を明示した:
   READ {SKILL_DIR}/flows/new-project/recipes/runtime-bun-python.md
+  IF READ FAILED:
+    REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/runtime-bun-python.md"
+    STOP
   FOLLOW: Python の mise.toml テンプレートを使用する
+  ASSERT: `mise exec -- python --version` と `mise exec -- uv --version` が成功すること
 ELSE:
-  # Node.js（デフォルト・ユーザーに確認不要）
-  RUN:
-    cat > .mise.toml << 'EOF'
-    [tools]
-    node = "22"
-    pnpm = "latest"
-
-    [env]
-    _.path = ["./node_modules/.bin"]
-    EOF
-    mise trust && mise install
+  READ {SKILL_DIR}/flows/new-project/recipes/runtime-node.md
+  IF READ FAILED:
+    REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/runtime-node.md"
+    STOP
+  FOLLOW: Node.js の mise.toml テンプレートを使用する（デフォルト・ユーザーに確認不要）
+  ASSERT: `mise exec -- node --version` と `mise exec -- pnpm --version` が成功すること
 ENDIF
 
-ASSERT: `mise exec -- node --version` が成功すること（Python プロジェクトは `python --version`）
-ASSERT: `mise exec -- pnpm --version` が成功すること（Python プロジェクトは `uv --version`）
-IF FAILED: エラー内容を報告し、STOP すること
+IF いずれかの ASSERT が FAILED: エラー内容を報告し、STOP すること
 ```
 
 ---
@@ -190,11 +195,17 @@ INFER framework FROM 会話の文脈:
 
 IF framework == Next.js:
   READ {SKILL_DIR}/flows/new-project/recipes/nextjs-init.md
+  IF READ FAILED:
+    REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/nextjs-init.md"
+    STOP
   FOLLOW: Next.js初期化手順を実行する
   TIMING: このステップで実行し、ステップ4（完了報告）の前に完了させること
 
 IF framework == Vite + React:
   READ {SKILL_DIR}/flows/new-project/recipes/vite-react.md
+  IF READ FAILED:
+    REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/vite-react.md"
+    STOP
   FOLLOW: Vite + React 初期化手順を実行する
   TIMING: このステップで実行し、ステップ4（完了報告）の前に完了させること
 
@@ -208,13 +219,19 @@ IF HAS_FRONTEND == true AND framework NOT IN [Next.js, Vite + React]:
   WAIT_FOR: ユーザーの選択
   IF 選択 == Vite:
     READ {SKILL_DIR}/flows/new-project/recipes/vite-react.md
+    IF READ FAILED:
+      REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/vite-react.md"
+      STOP
     FOLLOW: Vite + React 初期化手順を実行する
   ENDIF
 
 IF リアルタイム通信（WebSocket・チャット・通知）が要件にある:
   READ {SKILL_DIR}/flows/new-project/recipes/socketio.md
+  IF READ FAILED:
+    REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/socketio.md"
+    STOP
   NOTE: Socket.IOのパターンはフェーズ1実装時に参照すること
-# ※ Bun / Python の mise.toml は Step 3 で既に適用済み
+# ※ Bun / Python / Node.js の mise.toml は Step 3 で既に適用済み
 ```
 
 ---

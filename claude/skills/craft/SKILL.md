@@ -9,7 +9,7 @@ description: 新規プロジェクト（静的サイト・Webアプリ・モバ�
 
 ## 実行時の一般原則（craft 配下の全フロー・全エージェントに適用）
 
-**内部変数名をユーザーに見せない。** `STACK`・`HAS_FRONTEND`・`HAS_REVIEW_CHAIN` 等の
+IMPORTANT: **内部変数名をユーザーに見せない。** `STACK`・`HAS_FRONTEND`・`HAS_REVIEW_CHAIN` 等の
 制御変数は、進捗報告・完了報告・確認メッセージなどユーザー向けの出力に変数名のまま
 含めないこと。「HAS_FRONTEND=true のため〜」ではなく「フロントエンドがあるため〜」のように、
 常に人間が読める言葉に変換してから伝える。
@@ -29,12 +29,14 @@ IF .craft/plan.md が存在する:
     選択肢:
       1. plan.md の実装を続ける（中断した実装の再開）
       2. plan.md とは別の新しい要件として進める（fix ファイルを新規作成）
+  WAIT_FOR: ユーザーの選択
   IF ユーザーが 1（再開）を選択:
     FOLLOW: 実装再開フロー（本ファイルの「## 実装再開フロー」セクション）
     STOP: 以降のステップは実行しない
   ELSE:
-    # 新しい要件 → 下記のscope読み込みへそのまま継続する
-    # fix ファイルの作成・plan.md への追記は consult フローのステップ4で行う
+    # 新しい要件として扱う（fix ファイルの作成・plan.md への追記は consult フローの
+    # ステップ4で行われる。ここでは何もしない）
+    CONTINUE: 下記のscope読み込みへ進む
   ENDIF
 ENDIF
 # .craft/plan.md がそもそも存在しない場合も、そのまま下記のscope読み込みへ継続する
@@ -71,5 +73,6 @@ IF READ FAILED:
   STOP
 FOLLOW: そこに記述されたすべての手順を実行する
   NOTE: STACK・HAS_REVIEW_CHAIN・HAS_FRONTEND は呼び出し元変数が無いため
-        build フロー内で自動判定される（pubspec.yaml・design-brief.md 等の有無から推定）
+        build フロー内で自動判定される（pubspec.yaml・design-brief.md 等の有無から推定。
+        判定ロジックの詳細は {SKILL_DIR}/flows/build/SKILL.md の AUTO-DETECT を参照）
 ```
