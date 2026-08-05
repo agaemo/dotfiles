@@ -26,6 +26,9 @@
   --sidebar-active-bg:rgba(52,211,153,.15);
   --sidebar-active-text:#6ee7b7;
   --sidebar-dot:#6ee7b7;
+  --good:#16a34a; --good-bg:#f0fdf4; --good-border:#bbf7d0;
+  --warn:#d97706; --warn-bg:#fffbeb; --warn-border:#fde68a;
+  --crit:#dc2626; --crit-bg:#fef2f2; --crit-border:#fecaca;
 }
 body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased;margin:0;display:grid;grid-template-columns:220px 1fr;min-height:100vh}
 .sidebar{background:var(--sidebar-bg);position:sticky;top:0;height:100vh;overflow-y:auto;padding:2.5rem 1.25rem}
@@ -66,6 +69,63 @@ strong{font-weight:600;color:var(--text)}
 .step-num{font-size:.9rem;font-weight:800;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:50%;width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
 .step-body strong{display:block;font-size:14px;font-weight:700;color:var(--text);margin-bottom:.25rem}
 .step-body p{font-size:13.5px;color:var(--text-muted);margin:0}
+
+/* ==== viz-* コンポーネントライブラリ（外部ライブラリ不使用・CSS/HTML/インラインSVGのみ） ==== */
+.viz-stat-row{display:flex;flex-wrap:wrap;gap:1rem}
+.viz-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:1.1rem 1.35rem;min-width:140px;flex:1}
+.viz-stat-value{font-size:1.9rem;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1.1}
+.viz-stat-label{font-size:12px;color:var(--text-muted);margin-top:.35rem}
+.viz-stat-delta{display:inline-flex;align-items:center;gap:.2rem;font-size:12px;font-weight:600;margin-top:.5rem}
+.viz-stat-delta.up{color:var(--good)}
+.viz-stat-delta.up::before{content:'▲';font-size:9px}
+.viz-stat-delta.down{color:var(--crit)}
+.viz-stat-delta.down::before{content:'▼';font-size:9px}
+.viz-meter-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-muted);margin-bottom:.3rem}
+.viz-meter{background:var(--border);border-radius:999px;height:.5rem;overflow:hidden}
+.viz-meter-fill{height:100%;background:var(--accent);border-radius:999px}
+.viz-donut-row{display:flex;align-items:center;gap:2rem;flex-wrap:wrap}
+.viz-donut{--pct:72;width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--pct)*1%),var(--border) 0);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.viz-donut-hole{width:70%;height:70%;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:800}
+.viz-barchart{display:flex;align-items:flex-end;gap:.9rem;height:120px}
+.viz-barchart-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;height:100%}
+.viz-barchart-bar{width:100%;max-width:36px;background:var(--accent);border-radius:4px 4px 0 0}
+.viz-barchart-label{font-size:11px;color:var(--text-muted);margin-top:.4rem}
+.viz-sparkline{display:block}
+.viz-sparkline polyline{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.viz-sparkline circle{fill:var(--accent)}
+.viz-stars{position:relative;display:inline-block;font-size:1.15rem;line-height:1;letter-spacing:.12em}
+.viz-stars .viz-stars-bg{color:var(--border)}
+.viz-stars .viz-stars-fg{position:absolute;top:0;left:0;overflow:hidden;color:var(--accent);white-space:nowrap}
+.viz-heatmap{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;max-width:320px}
+.viz-heatmap-cell{aspect-ratio:1;border-radius:3px;background:var(--accent)}
+.viz-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:11px;font-weight:600;padding:.28rem .65rem;border-radius:999px;border:1px solid transparent}
+.viz-badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.viz-badge-good{color:var(--good);background:var(--good-bg);border-color:var(--good-border)}
+.viz-badge-good::before{background:var(--good)}
+.viz-badge-warn{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-border)}
+.viz-badge-warn::before{background:var(--warn)}
+.viz-badge-crit{color:var(--crit);background:var(--crit-bg);border-color:var(--crit-border)}
+.viz-badge-crit::before{background:var(--crit)}
+figure.viz-diagram{margin:0}
+figure.viz-diagram svg{width:100%;height:auto;display:block;color:var(--text-muted)}
+figure.viz-diagram .viz-node{fill:var(--surface);stroke:var(--border)}
+figure.viz-diagram .viz-node.accent{fill:var(--accent-bg);stroke:var(--accent)}
+figure.viz-diagram text{fill:var(--text);font-family:inherit}
+figure.viz-diagram figcaption{font-size:12px;color:var(--text-muted);text-align:center;margin-top:.75rem}
+.viz-tree,.viz-tree ul{list-style:none;display:flex;padding-left:0}
+.viz-tree{justify-content:center}
+.viz-tree ul{padding-top:1.75rem;position:relative}
+.viz-tree ul::before{content:'';position:absolute;top:0;left:60px;right:60px;height:1px;background:var(--border)}
+.viz-tree li{position:relative;padding:0 .9rem;text-align:center}
+.viz-tree li::before{content:'';position:absolute;top:-1.75rem;left:50%;width:1px;height:1.75rem;background:var(--border)}
+.viz-tree>li::before{display:none}
+.viz-tree-node{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.55rem 1rem;font-size:12.5px;box-shadow:var(--shadow);white-space:nowrap}
+.viz-tree-node.accent{background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent);font-weight:600}
+.viz-gantt{display:grid;grid-template-columns:110px 1fr;row-gap:.6rem;column-gap:.75rem;align-items:center;font-size:12px}
+.viz-gantt-label{color:var(--text-muted);white-space:nowrap}
+.viz-gantt-track{position:relative;background:var(--border);border-radius:6px;height:1.3rem}
+.viz-gantt-bar{position:absolute;top:0;height:100%;background:var(--accent);border-radius:6px}
+.viz-gantt-value{position:absolute;top:0;height:100%;display:flex;align-items:center;font-size:11px;color:var(--text-muted);white-space:nowrap}
 </style>
 </head>
 <body>
@@ -81,6 +141,11 @@ strong{font-weight:600;color:var(--text)}
   <h2 id="overview">概要</h2>
   <p>Claude Code スキルは、繰り返し使うワークフローを <code>SKILL.md</code> ファイルとして定義し、<code>/skill-name</code> で呼び出せる仕組みです。スキルを設計するときは「コールドスタートのエージェントが迷わず実行できるか」を基準にします。</p>
   <blockquote>スキルは Claude への指示書であり、人間向けのドキュメントではない。シンプルで一貫性のある構造が、品質の高い出力につながる。</blockquote>
+  <div class="viz-stat-row" style="margin:1.5rem 0 .5rem">
+    <div class="viz-stat"><div class="viz-stat-value">28</div><div class="viz-stat-label">登録スキル数</div></div>
+    <div class="viz-stat"><div class="viz-stat-value">4.6</div><div class="viz-stat-label">平均品質スコア（5点満点）</div></div>
+    <div class="viz-stat"><div class="viz-stat-value">92%</div><div class="viz-stat-label">初回承認率</div><div class="viz-stat-delta up">5pt 改善</div></div>
+  </div>
   <h2 id="types">スキルの種類</h2>
   <h3 id="prog">プログラム型</h3>
   <p>Agent ツールでサブエージェントを呼び出す構造。複雑なタスクを並列・分散して処理できます。</p>
@@ -116,6 +181,52 @@ strong{font-weight:600;color:var(--text)}
       </div>
     </div>
   </div>
+  <h2 id="arch-decision">アーキテクチャ判断</h2>
+  <p>タスクを並列・分散して処理する必要があるかどうかで型を選ぶ。</p>
+  <figure class="viz-diagram">
+  <svg viewBox="0 0 520 170" role="img" aria-label="アーキテクチャ判断図: サブエージェントへの並列委譲が必要かどうかで、プログラム型か指示文型かを判断する">
+    <defs>
+      <marker id="ab-arrow1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+      </marker>
+    </defs>
+    <rect class="viz-node accent" x="185" y="10" width="150" height="42" rx="8"/>
+    <text x="260" y="36" text-anchor="middle" font-size="12">並列委譲が必要か</text>
+    <path d="M260,52 L260,78 L110,78 L110,96" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ab-arrow1)"/>
+    <text x="150" y="73" font-size="11">Yes</text>
+    <rect class="viz-node" x="40" y="96" width="140" height="42" rx="8"/>
+    <text x="110" y="122" text-anchor="middle" font-size="12">プログラム型</text>
+    <path d="M260,52 L260,78 L410,78 L410,96" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ab-arrow1)"/>
+    <text x="380" y="73" font-size="11">No</text>
+    <rect class="viz-node" x="340" y="96" width="140" height="42" rx="8"/>
+    <text x="410" y="122" text-anchor="middle" font-size="12">指示文型</text>
+  </svg>
+  <figcaption>並列委譲の要否でプログラム型と指示文型を使い分ける</figcaption>
+  </figure>
+  <h2 id="lifecycle">スキルのライフサイクル</h2>
+  <p>ゲート設計では、不可逆操作の前に必ず承認待ち状態を挟む。</p>
+  <figure class="viz-diagram">
+  <svg viewBox="0 0 460 150" role="img" aria-label="スキルのライフサイクル図: 起動から確認待ちを経て承認・出力に至り、修正要求時は確認待ちに戻る">
+    <defs>
+      <marker id="ab-arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+      </marker>
+    </defs>
+    <rect class="viz-node" x="10" y="60" width="90" height="40" rx="20"/>
+    <text x="55" y="85" text-anchor="middle" font-size="12">起動</text>
+    <path d="M100,80 L185,80" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ab-arrow2)"/>
+    <text x="142" y="73" text-anchor="middle" font-size="10">確認</text>
+    <rect class="viz-node accent" x="185" y="60" width="110" height="40" rx="20"/>
+    <text x="240" y="85" text-anchor="middle" font-size="12">確認待ち</text>
+    <path d="M295,80 L380,80" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ab-arrow2)"/>
+    <text x="337" y="73" text-anchor="middle" font-size="10">承認</text>
+    <rect class="viz-node" x="380" y="60" width="70" height="40" rx="20"/>
+    <text x="415" y="85" text-anchor="middle" font-size="12">出力</text>
+    <path d="M255,60 C240,25 90,25 65,58" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ab-arrow2)"/>
+    <text x="160" y="22" text-anchor="middle" font-size="10">修正要求</text>
+  </svg>
+  <figcaption>WAIT_FOR で承認待ち状態を挟み、修正要求時はそこに戻る</figcaption>
+  </figure>
   <h2 id="example">実装例</h2>
   <pre><code>WAIT_FOR: ユーザーの承認を受けてから次へ進む
 PROHIBITED: 承認なしにファイルを書き換えること</code></pre>

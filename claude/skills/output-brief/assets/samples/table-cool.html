@@ -26,6 +26,9 @@
   --sidebar-active-bg:rgba(167,139,250,.15);
   --sidebar-active-text:#a78bfa;
   --sidebar-dot:#a78bfa;
+  --good:#16a34a; --good-bg:#f0fdf4; --good-border:#bbf7d0;
+  --warn:#d97706; --warn-bg:#fffbeb; --warn-border:#fde68a;
+  --crit:#dc2626; --crit-bg:#fef2f2; --crit-border:#fecaca;
 }
 body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased;margin:0;display:grid;grid-template-columns:220px 1fr;min-height:100vh}
 .sidebar{background:var(--sidebar-bg);position:sticky;top:0;height:100vh;overflow-y:auto;padding:2.5rem 1.25rem}
@@ -66,6 +69,63 @@ details.cell-detail>summary{font-size:12px;color:var(--accent);padding:0;font-we
 details.cell-detail>summary::after{width:.35rem;height:.35rem}
 details.cell-detail[open]>summary{margin-bottom:.375rem;padding-bottom:0;border:none}
 details.cell-detail p{font-size:12.5px;color:var(--text-muted);margin:.375rem 0 0;line-height:1.6}
+
+/* ==== viz-* コンポーネントライブラリ（外部ライブラリ不使用・CSS/HTML/インラインSVGのみ） ==== */
+.viz-stat-row{display:flex;flex-wrap:wrap;gap:1rem}
+.viz-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:1.1rem 1.35rem;min-width:140px;flex:1}
+.viz-stat-value{font-size:1.9rem;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1.1}
+.viz-stat-label{font-size:12px;color:var(--text-muted);margin-top:.35rem}
+.viz-stat-delta{display:inline-flex;align-items:center;gap:.2rem;font-size:12px;font-weight:600;margin-top:.5rem}
+.viz-stat-delta.up{color:var(--good)}
+.viz-stat-delta.up::before{content:'▲';font-size:9px}
+.viz-stat-delta.down{color:var(--crit)}
+.viz-stat-delta.down::before{content:'▼';font-size:9px}
+.viz-meter-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-muted);margin-bottom:.3rem}
+.viz-meter{background:var(--border);border-radius:999px;height:.5rem;overflow:hidden}
+.viz-meter-fill{height:100%;background:var(--accent);border-radius:999px}
+.viz-donut-row{display:flex;align-items:center;gap:2rem;flex-wrap:wrap}
+.viz-donut{--pct:72;width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--pct)*1%),var(--border) 0);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.viz-donut-hole{width:70%;height:70%;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:800}
+.viz-barchart{display:flex;align-items:flex-end;gap:.9rem;height:120px}
+.viz-barchart-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;height:100%}
+.viz-barchart-bar{width:100%;max-width:36px;background:var(--accent);border-radius:4px 4px 0 0}
+.viz-barchart-label{font-size:11px;color:var(--text-muted);margin-top:.4rem}
+.viz-sparkline{display:block}
+.viz-sparkline polyline{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.viz-sparkline circle{fill:var(--accent)}
+.viz-stars{position:relative;display:inline-block;font-size:1.15rem;line-height:1;letter-spacing:.12em}
+.viz-stars .viz-stars-bg{color:var(--border)}
+.viz-stars .viz-stars-fg{position:absolute;top:0;left:0;overflow:hidden;color:var(--accent);white-space:nowrap}
+.viz-heatmap{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;max-width:320px}
+.viz-heatmap-cell{aspect-ratio:1;border-radius:3px;background:var(--accent)}
+.viz-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:11px;font-weight:600;padding:.28rem .65rem;border-radius:999px;border:1px solid transparent}
+.viz-badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.viz-badge-good{color:var(--good);background:var(--good-bg);border-color:var(--good-border)}
+.viz-badge-good::before{background:var(--good)}
+.viz-badge-warn{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-border)}
+.viz-badge-warn::before{background:var(--warn)}
+.viz-badge-crit{color:var(--crit);background:var(--crit-bg);border-color:var(--crit-border)}
+.viz-badge-crit::before{background:var(--crit)}
+figure.viz-diagram{margin:0}
+figure.viz-diagram svg{width:100%;height:auto;display:block;color:var(--text-muted)}
+figure.viz-diagram .viz-node{fill:var(--surface);stroke:var(--border)}
+figure.viz-diagram .viz-node.accent{fill:var(--accent-bg);stroke:var(--accent)}
+figure.viz-diagram text{fill:var(--text);font-family:inherit}
+figure.viz-diagram figcaption{font-size:12px;color:var(--text-muted);text-align:center;margin-top:.75rem}
+.viz-tree,.viz-tree ul{list-style:none;display:flex;padding-left:0}
+.viz-tree{justify-content:center}
+.viz-tree ul{padding-top:1.75rem;position:relative}
+.viz-tree ul::before{content:'';position:absolute;top:0;left:60px;right:60px;height:1px;background:var(--border)}
+.viz-tree li{position:relative;padding:0 .9rem;text-align:center}
+.viz-tree li::before{content:'';position:absolute;top:-1.75rem;left:50%;width:1px;height:1.75rem;background:var(--border)}
+.viz-tree>li::before{display:none}
+.viz-tree-node{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.55rem 1rem;font-size:12.5px;box-shadow:var(--shadow);white-space:nowrap}
+.viz-tree-node.accent{background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent);font-weight:600}
+.viz-gantt{display:grid;grid-template-columns:110px 1fr;row-gap:.6rem;column-gap:.75rem;align-items:center;font-size:12px}
+.viz-gantt-label{color:var(--text-muted);white-space:nowrap}
+.viz-gantt-track{position:relative;background:var(--border);border-radius:6px;height:1.3rem}
+.viz-gantt-bar{position:absolute;top:0;height:100%;background:var(--accent);border-radius:6px}
+.viz-gantt-value{position:absolute;top:0;height:100%;display:flex;align-items:center;font-size:11px;color:var(--text-muted);white-space:nowrap}
 </style>
 </head>
 <body>
@@ -81,37 +141,53 @@ details.cell-detail p{font-size:12.5px;color:var(--text-muted);margin:.375rem 0 
   <div class="section">
     <p class="section-label" id="file-tools">ファイル操作ツール</p>
     <div class="table-wrap"><table>
-      <thead><tr><th>ツール</th><th>主な用途</th><th>Read 前提</th><th>備考</th></tr></thead>
+      <thead><tr><th>ツール</th><th>主な用途</th><th>Read 前提</th><th>状態</th><th>備考</th></tr></thead>
       <tbody>
-        <tr><td>Read</td><td>ファイル読み込み</td><td>—</td><td><details class="cell-detail"><summary>PDF・画像・Notebook 対応</summary><p>offset / limit で部分読み込み可。PDFは最大20ページ。画像はビジュアル表示。</p></details></td></tr>
-        <tr><td>Write</td><td>新規・上書き保存</td><td>既存ファイルは必須</td><td>新規作成時は不要</td></tr>
-        <tr><td>Edit</td><td>差分編集</td><td>必須</td><td>replace_all でリネーム可</td></tr>
-        <tr><td>Bash</td><td>シェルコマンド実行</td><td>—</td><td>副作用に注意</td></tr>
+        <tr><td>Read</td><td>ファイル読み込み</td><td>—</td><td><span class="viz-badge viz-badge-good">安定</span></td><td><details class="cell-detail"><summary>PDF・画像・Notebook 対応</summary><p>offset / limit で部分読み込み可。PDFは最大20ページ。画像はビジュアル表示。</p></details></td></tr>
+        <tr><td>Write</td><td>新規・上書き保存</td><td>既存ファイルは必須</td><td><span class="viz-badge viz-badge-good">安定</span></td><td>新規作成時は不要</td></tr>
+        <tr><td>Edit</td><td>差分編集</td><td>必須</td><td><span class="viz-badge viz-badge-good">安定</span></td><td>replace_all でリネーム可</td></tr>
+        <tr><td>Bash</td><td>シェルコマンド実行</td><td>—</td><td><span class="viz-badge viz-badge-warn">要確認</span></td><td>副作用に注意</td></tr>
       </tbody>
     </table></div>
   </div>
   <div class="section">
     <p class="section-label" id="search-tools">検索・調査ツール</p>
     <div class="table-wrap"><table>
-      <thead><tr><th>ツール</th><th>主な用途</th><th>速度</th><th>特徴</th></tr></thead>
+      <thead><tr><th>ツール</th><th>主な用途</th><th>速度</th><th>使用頻度</th><th>特徴</th></tr></thead>
       <tbody>
-        <tr><td>Bash (grep)</td><td>テキスト検索</td><td><span class="badge">高速</span></td><td>正規表現対応、絞り込み可</td></tr>
-        <tr><td>Bash (find)</td><td>ファイル探索</td><td><span class="badge">高速</span></td><td>パターン・日時・サイズで絞り込み</td></tr>
-        <tr><td>WebSearch</td><td>外部情報検索</td><td>中速</td><td><details class="cell-detail"><summary>最新情報・公式ドキュメント取得に有効</summary><p>キーワード検索。ヒット件数・タイトル・URLが返る。詳細はWebFetchで取得する。</p></details></td></tr>
-        <tr><td>WebFetch</td><td>URL コンテンツ取得</td><td>中速</td><td>HTML → テキスト変換済みで返却</td></tr>
+        <tr><td>Bash (grep)</td><td>テキスト検索</td><td><span class="badge">高速</span></td><td><div class="viz-meter" style="width:90px"><div class="viz-meter-fill" style="width:85%"></div></div></td><td>正規表現対応、絞り込み可</td></tr>
+        <tr><td>Bash (find)</td><td>ファイル探索</td><td><span class="badge">高速</span></td><td><div class="viz-meter" style="width:90px"><div class="viz-meter-fill" style="width:60%"></div></div></td><td>パターン・日時・サイズで絞り込み</td></tr>
+        <tr><td>WebSearch</td><td>外部情報検索</td><td>中速</td><td><div class="viz-meter" style="width:90px"><div class="viz-meter-fill" style="width:45%"></div></div></td><td><details class="cell-detail"><summary>最新情報・公式ドキュメント取得に有効</summary><p>キーワード検索。ヒット件数・タイトル・URLが返る。詳細はWebFetchで取得する。</p></details></td></tr>
+        <tr><td>WebFetch</td><td>URL コンテンツ取得</td><td>中速</td><td><div class="viz-meter" style="width:90px"><div class="viz-meter-fill" style="width:70%"></div></div></td><td>HTML → テキスト変換済みで返却</td></tr>
       </tbody>
     </table></div>
   </div>
   <div class="section">
     <p class="section-label" id="agent-tools">エージェント・タスクツール</p>
     <div class="table-wrap"><table>
-      <thead><tr><th>ツール</th><th>用途</th><th>並列実行</th><th>コスト</th></tr></thead>
+      <thead><tr><th>ツール</th><th>用途</th><th>並列実行</th><th>コスト</th><th>トレンド</th></tr></thead>
       <tbody>
-        <tr><td>Agent</td><td>サブエージェント起動</td><td>可（複数同時）</td><td><span class="badge">高</span></td></tr>
-        <tr><td>TaskCreate</td><td>タスク作成・追跡</td><td>—</td><td>低</td></tr>
-        <tr><td>Monitor</td><td>ファイル・プロセス監視</td><td>可</td><td>低〜中</td></tr>
+        <tr><td>Agent</td><td>サブエージェント起動</td><td>可（複数同時）</td><td><span class="badge">高</span></td><td><svg class="viz-sparkline" viewBox="0 0 60 20" width="60" height="20"><polyline points="0,16 12,12 24,14 36,6 48,8 60,3"/></svg></td></tr>
+        <tr><td>TaskCreate</td><td>タスク作成・追跡</td><td>—</td><td>低</td><td><svg class="viz-sparkline" viewBox="0 0 60 20" width="60" height="20"><polyline points="0,10 12,11 24,8 36,9 48,7 60,7"/></svg></td></tr>
+        <tr><td>Monitor</td><td>ファイル・プロセス監視</td><td>可</td><td>低〜中</td><td><svg class="viz-sparkline" viewBox="0 0 60 20" width="60" height="20"><polyline points="0,17 12,14 24,15 36,10 48,11 60,4"/></svg></td></tr>
       </tbody>
     </table></div>
+  </div>
+  <div class="section">
+    <p class="section-label" id="usage-stats">利用統計</p>
+    <p class="lead">直近6ヶ月の月別利用件数と、曜日×時間帯のアクセス傾向。</p>
+    <div class="viz-barchart" style="margin-bottom:1.5rem">
+      <div class="viz-barchart-col"><div class="viz-barchart-bar" style="height:35%"></div><div class="viz-barchart-label">3月</div></div>
+      <div class="viz-barchart-col"><div class="viz-barchart-bar" style="height:48%"></div><div class="viz-barchart-label">4月</div></div>
+      <div class="viz-barchart-col"><div class="viz-barchart-bar" style="height:55%"></div><div class="viz-barchart-label">5月</div></div>
+      <div class="viz-barchart-col"><div class="viz-barchart-bar" style="height:72%"></div><div class="viz-barchart-label">6月</div></div>
+      <div class="viz-barchart-col"><div class="viz-barchart-bar" style="height:85%"></div><div class="viz-barchart-label">7月</div></div>
+      <div class="viz-barchart-col"><div class="viz-barchart-bar" style="height:100%"></div><div class="viz-barchart-label">8月</div></div>
+    </div>
+    <div class="viz-heatmap">
+      <div class="viz-heatmap-cell" style="opacity:.1"></div><div class="viz-heatmap-cell" style="opacity:.3"></div><div class="viz-heatmap-cell" style="opacity:.15"></div><div class="viz-heatmap-cell" style="opacity:.6"></div><div class="viz-heatmap-cell" style="opacity:.8"></div><div class="viz-heatmap-cell" style="opacity:.2"></div><div class="viz-heatmap-cell" style="opacity:.1"></div><div class="viz-heatmap-cell" style="opacity:.4"></div><div class="viz-heatmap-cell" style="opacity:.9"></div><div class="viz-heatmap-cell" style="opacity:.5"></div><div class="viz-heatmap-cell" style="opacity:.2"></div><div class="viz-heatmap-cell" style="opacity:.1"></div>
+      <div class="viz-heatmap-cell" style="opacity:.2"></div><div class="viz-heatmap-cell" style="opacity:.5"></div><div class="viz-heatmap-cell" style="opacity:.3"></div><div class="viz-heatmap-cell" style="opacity:.7"></div><div class="viz-heatmap-cell" style="opacity:1"></div><div class="viz-heatmap-cell" style="opacity:.4"></div><div class="viz-heatmap-cell" style="opacity:.1"></div><div class="viz-heatmap-cell" style="opacity:.3"></div><div class="viz-heatmap-cell" style="opacity:.6"></div><div class="viz-heatmap-cell" style="opacity:.8"></div><div class="viz-heatmap-cell" style="opacity:.3"></div><div class="viz-heatmap-cell" style="opacity:.1"></div>
+    </div>
   </div>
 </main>
 <script>

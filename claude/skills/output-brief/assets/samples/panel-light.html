@@ -26,6 +26,9 @@
   --sidebar-active-bg:rgba(228,228,231,.15);
   --sidebar-active-text:#d4d4d8;
   --sidebar-dot:#d4d4d8;
+  --good:#16a34a; --good-bg:#f0fdf4; --good-border:#bbf7d0;
+  --warn:#d97706; --warn-bg:#fffbeb; --warn-border:#fde68a;
+  --crit:#dc2626; --crit-bg:#fef2f2; --crit-border:#fecaca;
 }
 body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased;margin:0;display:grid;grid-template-columns:220px 1fr;min-height:100vh}
 .sidebar{background:var(--sidebar-bg);position:sticky;top:0;height:100vh;overflow-y:auto;padding:2.5rem 1.25rem}
@@ -58,6 +61,63 @@ h1{font-size:2.75rem;font-weight:800;color:var(--text);letter-spacing:-.05em;lin
 .card-cmd{font-size:11.5px;color:var(--text-muted);margin-bottom:.6rem}
 .card-desc{font-size:13px;color:var(--text-muted);line-height:1.55;margin-bottom:.75rem}
 .tag{font-size:11px;font-weight:500;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-border);padding:.2rem .55rem;border-radius:999px;white-space:nowrap}
+
+/* ==== viz-* コンポーネントライブラリ（外部ライブラリ不使用・CSS/HTML/インラインSVGのみ） ==== */
+.viz-stat-row{display:flex;flex-wrap:wrap;gap:1rem}
+.viz-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:1.1rem 1.35rem;min-width:140px;flex:1}
+.viz-stat-value{font-size:1.9rem;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1.1}
+.viz-stat-label{font-size:12px;color:var(--text-muted);margin-top:.35rem}
+.viz-stat-delta{display:inline-flex;align-items:center;gap:.2rem;font-size:12px;font-weight:600;margin-top:.5rem}
+.viz-stat-delta.up{color:var(--good)}
+.viz-stat-delta.up::before{content:'▲';font-size:9px}
+.viz-stat-delta.down{color:var(--crit)}
+.viz-stat-delta.down::before{content:'▼';font-size:9px}
+.viz-meter-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-muted);margin-bottom:.3rem}
+.viz-meter{background:var(--border);border-radius:999px;height:.5rem;overflow:hidden}
+.viz-meter-fill{height:100%;background:var(--accent);border-radius:999px}
+.viz-donut-row{display:flex;align-items:center;gap:2rem;flex-wrap:wrap}
+.viz-donut{--pct:72;width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--pct)*1%),var(--border) 0);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.viz-donut-hole{width:70%;height:70%;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:800}
+.viz-barchart{display:flex;align-items:flex-end;gap:.9rem;height:120px}
+.viz-barchart-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;height:100%}
+.viz-barchart-bar{width:100%;max-width:36px;background:var(--accent);border-radius:4px 4px 0 0}
+.viz-barchart-label{font-size:11px;color:var(--text-muted);margin-top:.4rem}
+.viz-sparkline{display:block}
+.viz-sparkline polyline{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.viz-sparkline circle{fill:var(--accent)}
+.viz-stars{position:relative;display:inline-block;font-size:1.15rem;line-height:1;letter-spacing:.12em}
+.viz-stars .viz-stars-bg{color:var(--border)}
+.viz-stars .viz-stars-fg{position:absolute;top:0;left:0;overflow:hidden;color:var(--accent);white-space:nowrap}
+.viz-heatmap{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;max-width:320px}
+.viz-heatmap-cell{aspect-ratio:1;border-radius:3px;background:var(--accent)}
+.viz-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:11px;font-weight:600;padding:.28rem .65rem;border-radius:999px;border:1px solid transparent}
+.viz-badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.viz-badge-good{color:var(--good);background:var(--good-bg);border-color:var(--good-border)}
+.viz-badge-good::before{background:var(--good)}
+.viz-badge-warn{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-border)}
+.viz-badge-warn::before{background:var(--warn)}
+.viz-badge-crit{color:var(--crit);background:var(--crit-bg);border-color:var(--crit-border)}
+.viz-badge-crit::before{background:var(--crit)}
+figure.viz-diagram{margin:0}
+figure.viz-diagram svg{width:100%;height:auto;display:block;color:var(--text-muted)}
+figure.viz-diagram .viz-node{fill:var(--surface);stroke:var(--border)}
+figure.viz-diagram .viz-node.accent{fill:var(--accent-bg);stroke:var(--accent)}
+figure.viz-diagram text{fill:var(--text);font-family:inherit}
+figure.viz-diagram figcaption{font-size:12px;color:var(--text-muted);text-align:center;margin-top:.75rem}
+.viz-tree,.viz-tree ul{list-style:none;display:flex;padding-left:0}
+.viz-tree{justify-content:center}
+.viz-tree ul{padding-top:1.75rem;position:relative}
+.viz-tree ul::before{content:'';position:absolute;top:0;left:60px;right:60px;height:1px;background:var(--border)}
+.viz-tree li{position:relative;padding:0 .9rem;text-align:center}
+.viz-tree li::before{content:'';position:absolute;top:-1.75rem;left:50%;width:1px;height:1.75rem;background:var(--border)}
+.viz-tree>li::before{display:none}
+.viz-tree-node{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.55rem 1rem;font-size:12.5px;box-shadow:var(--shadow);white-space:nowrap}
+.viz-tree-node.accent{background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent);font-weight:600}
+.viz-gantt{display:grid;grid-template-columns:110px 1fr;row-gap:.6rem;column-gap:.75rem;align-items:center;font-size:12px}
+.viz-gantt-label{color:var(--text-muted);white-space:nowrap}
+.viz-gantt-track{position:relative;background:var(--border);border-radius:6px;height:1.3rem}
+.viz-gantt-bar{position:absolute;top:0;height:100%;background:var(--accent);border-radius:6px}
+.viz-gantt-value{position:absolute;top:0;height:100%;display:flex;align-items:center;font-size:11px;color:var(--text-muted);white-space:nowrap}
 </style>
 </head>
 <body>
@@ -73,7 +133,7 @@ h1{font-size:2.75rem;font-weight:800;color:var(--text);letter-spacing:-.05em;lin
   <div class="section">
     <p class="section-label" id="workflow">ワークフロー</p>
     <div class="grid">
-      <div class="card"><span class="card-icon">📋</span><div class="card-name">output-brief</div><div class="card-cmd">/output-brief</div><div class="card-desc">ブリーフィング → 承認 → アウトプット</div><span class="tag">workflow</span></div>
+      <div class="card"><span class="card-icon">📋</span><div class="card-name">output-brief</div><div class="card-cmd">/output-brief</div><div class="card-desc">ブリーフィング → 承認 → アウトプット</div><span class="tag">workflow</span> <span class="viz-badge viz-badge-good">安定稼働</span></div>
       <div class="card"><span class="card-icon">📖</span><div class="card-name">runbook</div><div class="card-cmd">/runbook</div><div class="card-desc">航空SOP方式のチェックリスト生成</div><span class="tag">workflow</span></div>
     </div>
   </div>
@@ -91,6 +151,29 @@ h1{font-size:2.75rem;font-weight:800;color:var(--text);letter-spacing:-.05em;lin
       <div class="card"><span class="card-icon">🎨</span><div class="card-name">algorithmic-art</div><div class="card-cmd">/algorithmic-art</div><div class="card-desc">p5.js を使ったアルゴリズムアートの生成</div><span class="tag">art</span></div>
       <div class="card"><span class="card-icon">🖌️</span><div class="card-name">theme-factory</div><div class="card-cmd">/theme-factory</div><div class="card-desc">スライド・HTML ページへのテーマ適用</div><span class="tag">design</span></div>
     </div>
+  </div>
+  <div class="section">
+    <p class="section-label" id="usage">利用状況</p>
+    <div class="viz-stat-row">
+      <div class="viz-stat"><div class="viz-stat-value">1.2k</div><div class="viz-stat-label">月間起動回数</div><div class="viz-stat-delta up">18% 増加</div></div>
+      <div class="viz-stat"><div class="viz-stat-value">340ms</div><div class="viz-stat-label">平均応答時間</div><div class="viz-stat-delta down">12% 短縮</div></div>
+      <div class="viz-stat" style="display:flex;align-items:center;gap:1rem">
+        <div class="viz-donut" style="--pct:96"><div class="viz-donut-hole">96%</div></div>
+        <div><div class="viz-stat-label" style="margin-top:0">成功率</div><div class="viz-stat-delta up">2pt 改善</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <p class="section-label" id="structure">カテゴリ構成</p>
+    <ul class="viz-tree">
+      <li><div class="viz-tree-node accent">output-brief</div>
+        <ul>
+          <li><div class="viz-tree-node">ワークフロー</div></li>
+          <li><div class="viz-tree-node">開発</div></li>
+          <li><div class="viz-tree-node">デザイン・クリエイティブ</div></li>
+        </ul>
+      </li>
+    </ul>
   </div>
 </main>
 <script>

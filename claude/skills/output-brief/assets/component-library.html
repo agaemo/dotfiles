@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Component Library — output-brief</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#2563eb;
+  --accent-bg:#eff6ff;
+  --accent-border:#bfdbfe;
+  --text:#111827;
+  --text-muted:#6b7280;
+  --bg:#f8fafc;
+  --surface:#ffffff;
+  --border:#e5e7eb;
+  --shadow:0 1px 4px rgba(0,0,0,.06),0 6px 20px rgba(0,0,0,.04);
+  --shadow-hover:0 4px 16px rgba(0,0,0,.10),0 16px 40px rgba(0,0,0,.07);
+  --code-bg:#18181b;
+  --good:#16a34a; --good-bg:#f0fdf4; --good-border:#bbf7d0;
+  --warn:#d97706; --warn-bg:#fffbeb; --warn-border:#fde68a;
+  --crit:#dc2626; --crit-bg:#fef2f2; --crit-border:#fecaca;
+}
+body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.7;-webkit-font-smoothing:antialiased;padding:3rem 4rem;max-width:1000px;margin:0 auto}
+h1{font-size:2rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.5rem}
+p.lead{color:var(--text-muted);margin-bottom:2.5rem}
+h2{font-size:1.05rem;font-weight:700;margin:3rem 0 .5rem;padding-left:.75rem;border-left:3px solid var(--accent)}
+p.desc{font-size:13px;color:var(--text-muted);margin-bottom:1rem}
+.demo{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem;box-shadow:var(--shadow)}
+
+/* ============ A. 統計・データ可視化コンポーネント（viz-* 名前空間） ============ */
+
+.viz-stat-row{display:flex;flex-wrap:wrap;gap:1rem}
+.viz-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:1.1rem 1.35rem;min-width:140px;flex:1}
+.viz-stat-value{font-size:1.9rem;font-weight:800;color:var(--text);letter-spacing:-.03em;line-height:1.1}
+.viz-stat-label{font-size:12px;color:var(--text-muted);margin-top:.35rem}
+.viz-stat-delta{display:inline-flex;align-items:center;gap:.2rem;font-size:12px;font-weight:600;margin-top:.5rem}
+.viz-stat-delta.up{color:var(--good)}
+.viz-stat-delta.up::before{content:'▲';font-size:9px}
+.viz-stat-delta.down{color:var(--crit)}
+.viz-stat-delta.down::before{content:'▼';font-size:9px}
+
+.viz-meter-row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text-muted);margin-bottom:.3rem}
+.viz-meter{background:var(--border);border-radius:999px;height:.5rem;overflow:hidden}
+.viz-meter-fill{height:100%;background:var(--accent);border-radius:999px}
+
+.viz-donut-row{display:flex;align-items:center;gap:2rem;flex-wrap:wrap}
+.viz-donut{--pct:72;width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--accent) calc(var(--pct)*1%),var(--border) 0);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.viz-donut-hole{width:70%;height:70%;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:1.05rem;font-weight:800}
+
+.viz-barchart{display:flex;align-items:flex-end;gap:.9rem;height:120px}
+.viz-barchart-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;flex:1;height:100%}
+.viz-barchart-bar{width:100%;max-width:36px;background:var(--accent);border-radius:4px 4px 0 0}
+.viz-barchart-label{font-size:11px;color:var(--text-muted);margin-top:.4rem}
+
+.viz-sparkline{display:block}
+.viz-sparkline polyline{fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.viz-sparkline circle{fill:var(--accent)}
+
+.viz-stars{position:relative;display:inline-block;font-size:1.15rem;line-height:1;letter-spacing:.12em}
+.viz-stars .viz-stars-bg{color:var(--border)}
+.viz-stars .viz-stars-fg{position:absolute;top:0;left:0;overflow:hidden;color:var(--accent);white-space:nowrap}
+
+.viz-heatmap{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;max-width:320px}
+.viz-heatmap-cell{aspect-ratio:1;border-radius:3px;background:var(--accent)}
+
+.viz-badge{display:inline-flex;align-items:center;gap:.4rem;font-size:11px;font-weight:600;padding:.28rem .65rem;border-radius:999px;border:1px solid transparent}
+.viz-badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.viz-badge-good{color:var(--good);background:var(--good-bg);border-color:var(--good-border)}
+.viz-badge-good::before{background:var(--good)}
+.viz-badge-warn{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-border)}
+.viz-badge-warn::before{background:var(--warn)}
+.viz-badge-crit{color:var(--crit);background:var(--crit-bg);border-color:var(--crit-border)}
+.viz-badge-crit::before{background:var(--crit)}
+
+/* ============ B. 図解コンポーネント／Mermaid代替（viz-* 名前空間） ============ */
+
+figure.viz-diagram{margin:0}
+figure.viz-diagram svg{width:100%;height:auto;display:block;color:var(--text-muted)}
+figure.viz-diagram .viz-node{fill:var(--surface);stroke:var(--border)}
+figure.viz-diagram .viz-node.accent{fill:var(--accent-bg);stroke:var(--accent)}
+figure.viz-diagram text{fill:var(--text);font-family:inherit}
+figure.viz-diagram figcaption{font-size:12px;color:var(--text-muted);text-align:center;margin-top:.75rem}
+
+.viz-tree,.viz-tree ul{list-style:none;display:flex;padding-left:0}
+.viz-tree{justify-content:center}
+.viz-tree ul{padding-top:1.75rem;position:relative}
+.viz-tree ul::before{content:'';position:absolute;top:0;left:60px;right:60px;height:1px;background:var(--border)}
+.viz-tree li{position:relative;padding:0 .9rem;text-align:center}
+.viz-tree li::before{content:'';position:absolute;top:-1.75rem;left:50%;width:1px;height:1.75rem;background:var(--border)}
+.viz-tree>li::before{display:none}
+.viz-tree-node{display:inline-block;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.55rem 1rem;font-size:12.5px;box-shadow:var(--shadow);white-space:nowrap}
+.viz-tree-node.accent{background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent);font-weight:600}
+
+.viz-gantt{display:grid;grid-template-columns:110px 1fr;row-gap:.6rem;column-gap:.75rem;align-items:center;font-size:12px}
+.viz-gantt-label{color:var(--text-muted);white-space:nowrap}
+.viz-gantt-track{position:relative;background:var(--border);border-radius:6px;height:1.3rem}
+.viz-gantt-bar{position:absolute;top:0;height:100%;background:var(--accent);border-radius:6px}
+.viz-gantt-value{position:absolute;top:0;height:100%;display:flex;align-items:center;font-size:11px;color:var(--text-muted);white-space:nowrap}
+</style>
+</head>
+<body>
+
+<h1>output-brief コンポーネントライブラリ</h1>
+<p class="lead">外部ライブラリ不使用（CSS/HTML/インラインSVGのみ）。CSS変数（--accent, --surface, --border 等）はレイアウトサンプルの :root と共通なので、そのまま貼り付ければ6色テーマすべてで自動的に配色される。クラス名は既存レイアウトのクラスと衝突しないよう <code>viz-</code> 名前空間に統一している。</p>
+
+<h2>1. 統計タイル</h2>
+<p class="desc">数値＋ラベル＋前月比。ダッシュボード的な要約に。</p>
+<div class="demo">
+<div class="viz-stat-row">
+  <div class="viz-stat"><div class="viz-stat-value">128</div><div class="viz-stat-label">対応件数</div><div class="viz-stat-delta up">12% 先月比</div></div>
+  <div class="viz-stat"><div class="viz-stat-value">4.2h</div><div class="viz-stat-label">平均対応時間</div><div class="viz-stat-delta down">8% 短縮</div></div>
+  <div class="viz-stat"><div class="viz-stat-value">92%</div><div class="viz-stat-label">解決率</div><div class="viz-stat-delta up">3pt 改善</div></div>
+</div>
+</div>
+
+<h2>2. プログレスバー／メーター</h2>
+<p class="desc">進捗・達成率など単一の割合を示す。</p>
+<div class="demo" style="max-width:360px">
+  <div class="viz-meter-row"><span>予算消化</span><span>68%</span></div>
+  <div class="viz-meter"><div class="viz-meter-fill" style="width:68%"></div></div>
+</div>
+
+<h2>3. ドーナツ（円グラフ）</h2>
+<p class="desc"><code>conic-gradient()</code> のみで実現。単一割合の強調表示に。</p>
+<div class="demo">
+<div class="viz-donut-row">
+  <div class="viz-donut" style="--pct:72"><div class="viz-donut-hole">72%</div></div>
+  <div class="viz-donut" style="--pct:35"><div class="viz-donut-hole">35%</div></div>
+</div>
+</div>
+
+<h2>4. 簡易棒グラフ</h2>
+<p class="desc">flexboxの高さ比率のみで表現する単系列の比較。</p>
+<div class="demo">
+<div class="viz-barchart">
+  <div class="viz-barchart-col"><div class="viz-barchart-bar" style="height:40%"></div><div class="viz-barchart-label">1月</div></div>
+  <div class="viz-barchart-col"><div class="viz-barchart-bar" style="height:65%"></div><div class="viz-barchart-label">2月</div></div>
+  <div class="viz-barchart-col"><div class="viz-barchart-bar" style="height:55%"></div><div class="viz-barchart-label">3月</div></div>
+  <div class="viz-barchart-col"><div class="viz-barchart-bar" style="height:90%"></div><div class="viz-barchart-label">4月</div></div>
+  <div class="viz-barchart-col"><div class="viz-barchart-bar" style="height:100%"></div><div class="viz-barchart-label">5月</div></div>
+</div>
+</div>
+
+<h2>5. スパークライン</h2>
+<p class="desc">インラインSVGの polyline。文中に小さく埋め込むトレンド表示。</p>
+<div class="demo">
+<svg class="viz-sparkline" viewBox="0 0 160 40" width="160" height="40">
+  <polyline points="0,30 20,25 40,28 60,15 80,20 100,8 120,12 140,4 160,6"/>
+  <circle cx="160" cy="6" r="3"/>
+</svg>
+</div>
+
+<h2>6. 星評価</h2>
+<p class="desc">2枚重ねのUnicode★で端数も表現できる（例: 3.5/5）。</p>
+<div class="demo">
+<span class="viz-stars">
+  <span class="viz-stars-bg">★★★★★</span>
+  <span class="viz-stars-fg" style="width:70%">★★★★★</span>
+</span>
+</div>
+
+<h2>7. ヒートマップグリッド</h2>
+<p class="desc">GitHub風。セルの不透明度で強弱を表す（単一色相＝magnitude表現）。</p>
+<div class="demo">
+<div class="viz-heatmap">
+  <div class="viz-heatmap-cell" style="opacity:.1"></div><div class="viz-heatmap-cell" style="opacity:.3"></div><div class="viz-heatmap-cell" style="opacity:.15"></div><div class="viz-heatmap-cell" style="opacity:.6"></div><div class="viz-heatmap-cell" style="opacity:.8"></div><div class="viz-heatmap-cell" style="opacity:.2"></div><div class="viz-heatmap-cell" style="opacity:.1"></div><div class="viz-heatmap-cell" style="opacity:.4"></div><div class="viz-heatmap-cell" style="opacity:.9"></div><div class="viz-heatmap-cell" style="opacity:.5"></div><div class="viz-heatmap-cell" style="opacity:.2"></div><div class="viz-heatmap-cell" style="opacity:.1"></div>
+  <div class="viz-heatmap-cell" style="opacity:.2"></div><div class="viz-heatmap-cell" style="opacity:.5"></div><div class="viz-heatmap-cell" style="opacity:.3"></div><div class="viz-heatmap-cell" style="opacity:.7"></div><div class="viz-heatmap-cell" style="opacity:1"></div><div class="viz-heatmap-cell" style="opacity:.4"></div><div class="viz-heatmap-cell" style="opacity:.1"></div><div class="viz-heatmap-cell" style="opacity:.3"></div><div class="viz-heatmap-cell" style="opacity:.6"></div><div class="viz-heatmap-cell" style="opacity:.8"></div><div class="viz-heatmap-cell" style="opacity:.3"></div><div class="viz-heatmap-cell" style="opacity:.1"></div>
+</div>
+</div>
+
+<h2>8. ステータスバッジ</h2>
+<p class="desc">成功／警告／エラーの状態色は --accent と独立した予約色（テーマ共通）。色だけに頼らずアイコン代わりのドット＋ラベルで示す。</p>
+<div class="demo" style="display:flex;gap:.5rem;flex-wrap:wrap">
+  <span class="viz-badge viz-badge-good">正常</span>
+  <span class="viz-badge viz-badge-warn">要確認</span>
+  <span class="viz-badge viz-badge-crit">エラー</span>
+</div>
+
+<h2>9. 分岐フロー図（if/else）</h2>
+<p class="desc">Mermaid flowchartの代替。座標は内容に応じて調整する。</p>
+<div class="demo">
+<figure class="viz-diagram">
+<svg viewBox="0 0 520 170" role="img" aria-label="条件分岐図: 入力を判定し、条件を満たせば処理A、満たさなければ処理Bを実行する">
+  <defs>
+    <marker id="cl-arrow1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+  <rect class="viz-node accent" x="210" y="10" width="100" height="42" rx="8"/>
+  <text x="260" y="36" text-anchor="middle" font-size="12">条件判定</text>
+  <path d="M260,52 L260,78 L110,78 L110,96" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#cl-arrow1)"/>
+  <text x="150" y="73" font-size="11">Yes</text>
+  <rect class="viz-node" x="60" y="96" width="100" height="42" rx="8"/>
+  <text x="110" y="122" text-anchor="middle" font-size="12">処理A</text>
+  <path d="M260,52 L260,78 L410,78 L410,96" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#cl-arrow1)"/>
+  <text x="380" y="73" font-size="11">No</text>
+  <rect class="viz-node" x="360" y="96" width="100" height="42" rx="8"/>
+  <text x="410" y="122" text-anchor="middle" font-size="12">処理B</text>
+</svg>
+<figcaption>条件によって処理Aと処理Bに分岐する</figcaption>
+</figure>
+</div>
+
+<h2>10. シーケンス図</h2>
+<p class="desc">Mermaid sequenceDiagramの代替。ライフラインは縦線、やり取りは横矢印。</p>
+<div class="demo">
+<figure class="viz-diagram">
+<svg viewBox="0 0 480 200" role="img" aria-label="シーケンス図: クライアントがサーバーへログイン要求を送り、サーバーがトークンを返す">
+  <defs>
+    <marker id="cl-arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+  <text x="80" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">クライアント</text>
+  <text x="400" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="var(--text)">サーバー</text>
+  <line x1="80" y1="28" x2="80" y2="185" stroke="var(--border)" stroke-width="1"/>
+  <line x1="400" y1="28" x2="400" y2="185" stroke="var(--border)" stroke-width="1"/>
+  <line x1="80" y1="70" x2="400" y2="70" stroke="currentColor" stroke-width="1.5" marker-end="url(#cl-arrow2)"/>
+  <text x="240" y="63" text-anchor="middle" font-size="11">POST /login</text>
+  <line x1="400" y1="130" x2="80" y2="130" stroke="currentColor" stroke-width="1.5" marker-end="url(#cl-arrow2)"/>
+  <text x="240" y="123" text-anchor="middle" font-size="11">200 OK + token</text>
+</svg>
+<figcaption>ログイン要求とトークン応答のやり取り</figcaption>
+</figure>
+</div>
+
+<h2>11. 階層ツリー（組織図）</h2>
+<p class="desc">Mermaid graph（tree構造）の代替。ネストした &lt;ul&gt; と疑似要素の接続線のみ。</p>
+<div class="demo">
+<ul class="viz-tree">
+  <li><div class="viz-tree-node accent">親</div>
+    <ul>
+      <li><div class="viz-tree-node">子A</div></li>
+      <li><div class="viz-tree-node">子B</div></li>
+      <li><div class="viz-tree-node">子C</div></li>
+    </ul>
+  </li>
+</ul>
+</div>
+
+<h2>12. 状態遷移図</h2>
+<p class="desc">Mermaid stateDiagramの代替。ノード間をSVG矢印で接続し、ループはカーブpathで表現。</p>
+<div class="demo">
+<figure class="viz-diagram">
+<svg viewBox="0 0 460 150" role="img" aria-label="状態遷移図: 待機中から実行中を経て終了に至り、失敗時は待機中に戻る">
+  <defs>
+    <marker id="cl-arrow3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+  <rect class="viz-node" x="20" y="60" width="90" height="40" rx="20"/>
+  <text x="65" y="85" text-anchor="middle" font-size="12">待機中</text>
+  <path d="M110,80 L195,80" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#cl-arrow3)"/>
+  <text x="152" y="73" text-anchor="middle" font-size="10">開始</text>
+  <rect class="viz-node accent" x="195" y="60" width="90" height="40" rx="20"/>
+  <text x="240" y="85" text-anchor="middle" font-size="12">実行中</text>
+  <path d="M285,80 L370,80" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#cl-arrow3)"/>
+  <text x="327" y="73" text-anchor="middle" font-size="10">完了</text>
+  <rect class="viz-node" x="370" y="60" width="70" height="40" rx="20"/>
+  <text x="405" y="85" text-anchor="middle" font-size="12">終了</text>
+  <path d="M255,60 C240,25 90,25 65,58" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#cl-arrow3)"/>
+  <text x="160" y="22" text-anchor="middle" font-size="10">失敗・再試行</text>
+</svg>
+<figcaption>待機・実行・終了の3状態を遷移する（失敗時は待機に戻る）</figcaption>
+</figure>
+</div>
+
+<h2>13. ガントチャート風</h2>
+<p class="desc">CSS gridのみで期間バーを表現する簡易スケジュール表示。</p>
+<div class="demo">
+<div class="viz-gantt">
+  <div class="viz-gantt-label">要件定義</div>
+  <div class="viz-gantt-track"><div class="viz-gantt-bar" style="left:0%;width:20%"></div><div class="viz-gantt-value" style="left:calc(20% + .5rem)">2週間</div></div>
+  <div class="viz-gantt-label">設計</div>
+  <div class="viz-gantt-track"><div class="viz-gantt-bar" style="left:18%;width:25%"></div><div class="viz-gantt-value" style="left:calc(43% + .5rem)">3週間</div></div>
+  <div class="viz-gantt-label">実装</div>
+  <div class="viz-gantt-track"><div class="viz-gantt-bar" style="left:40%;width:45%"></div><div class="viz-gantt-value" style="left:calc(85% + .5rem)">6週間</div></div>
+  <div class="viz-gantt-label">テスト</div>
+  <div class="viz-gantt-track"><div class="viz-gantt-bar" style="left:82%;width:18%"></div></div>
+</div>
+</div>
+
+<h2>14. 画面遷移図</h2>
+<p class="desc">画面をノード、遷移をアクション名付き矢印で表現する。</p>
+<div class="demo">
+<figure class="viz-diagram">
+<svg viewBox="0 0 830 230" role="img" aria-label="画面遷移図: ログイン画面からホーム画面、商品詳細画面、決済画面を経て完了画面に至る。ログイン失敗時はエラー表示を経てログイン画面に戻る">
+  <defs>
+    <marker id="scr-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+  <g>
+    <rect class="viz-node accent" x="90" y="20" width="120" height="56" rx="8"/>
+    <rect x="100" y="30" width="100" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1"/>
+    <text x="150" y="60" text-anchor="middle" font-size="12">ログイン画面</text>
+  </g>
+  <path d="M210,48 L265,48" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#scr-arrow)"/>
+  <text x="237" y="41" text-anchor="middle" font-size="10">ログイン成功</text>
+  <g>
+    <rect class="viz-node" x="270" y="20" width="120" height="56" rx="8"/>
+    <rect x="280" y="30" width="100" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1"/>
+    <text x="330" y="60" text-anchor="middle" font-size="12">ホーム画面</text>
+  </g>
+  <path d="M390,48 L445,48" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#scr-arrow)"/>
+  <text x="417" y="41" text-anchor="middle" font-size="10">商品タップ</text>
+  <g>
+    <rect class="viz-node" x="450" y="20" width="120" height="56" rx="8"/>
+    <rect x="460" y="30" width="100" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1"/>
+    <text x="510" y="60" text-anchor="middle" font-size="12">商品詳細画面</text>
+  </g>
+  <path d="M570,48 L625,48" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#scr-arrow)"/>
+  <text x="597" y="41" text-anchor="middle" font-size="10">購入ボタン</text>
+  <g>
+    <rect class="viz-node" x="630" y="20" width="120" height="56" rx="8"/>
+    <rect x="640" y="30" width="100" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1"/>
+    <text x="690" y="60" text-anchor="middle" font-size="12">決済画面</text>
+  </g>
+  <path d="M690,76 L690,120 L750,120 L750,145" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#scr-arrow)"/>
+  <text x="720" y="115" text-anchor="middle" font-size="10">完了</text>
+  <g>
+    <rect class="viz-node accent" x="690" y="150" width="120" height="56" rx="8"/>
+    <rect x="700" y="160" width="100" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1"/>
+    <text x="750" y="190" text-anchor="middle" font-size="12">完了画面</text>
+  </g>
+  <path d="M150,76 L150,120 L90,120 L90,150" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#scr-arrow)"/>
+  <text x="120" y="115" text-anchor="middle" font-size="10">ログイン失敗</text>
+  <g>
+    <rect class="viz-node" x="90" y="150" width="120" height="56" rx="8"/>
+    <rect x="100" y="160" width="100" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1"/>
+    <text x="150" y="190" text-anchor="middle" font-size="12">エラー表示</text>
+  </g>
+  <path d="M90,150 C40,110 40,60 88,44" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#scr-arrow)"/>
+  <text x="48" y="100" text-anchor="middle" font-size="10">戻る</text>
+</svg>
+<figcaption>画面はヘッダーバー付きのノードで表し、矢印にはトリガーとなるアクション名を添える</figcaption>
+</figure>
+</div>
+
+<h2>15. クラス図</h2>
+<p class="desc">継承（中空三角）と集約/コンポジション（ひし形）を区別して描く。</p>
+<div class="demo">
+<figure class="viz-diagram">
+<svg viewBox="0 0 600 300" role="img" aria-label="クラス図: ZooクラスがAnimalを集約し、DogとCatがAnimalを継承する">
+  <defs>
+    <marker id="cd-tri" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="12" markerHeight="12" orient="auto-start-reverse">
+      <path d="M1,1 L11,6 L1,11 z" fill="var(--surface)" stroke="currentColor" stroke-width="1"/>
+    </marker>
+    <marker id="cd-diamond" viewBox="0 0 14 10" refX="1" refY="5" markerWidth="14" markerHeight="10" orient="auto-start-reverse">
+      <path d="M1,5 L7,1 L13,5 L7,9 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <rect class="viz-node" x="20" y="20" width="160" height="86" rx="4"/>
+  <line x1="20" y1="46" x2="180" y2="46" stroke="var(--border)"/>
+  <text x="100" y="38" text-anchor="middle" font-size="12" font-weight="700">Zoo</text>
+  <text x="30" y="62" font-size="10.5" font-family="monospace">- animals: Animal[]</text>
+  <line x1="20" y1="72" x2="180" y2="72" stroke="var(--border)"/>
+  <text x="30" y="88" font-size="10.5" font-family="monospace">+ addAnimal(a)</text>
+
+  <rect class="viz-node accent" x="360" y="20" width="200" height="104" rx="4"/>
+  <line x1="360" y1="50" x2="560" y2="50" stroke="var(--accent-border)"/>
+  <text x="460" y="38" text-anchor="middle" font-size="12" font-weight="700">«abstract» Animal</text>
+  <text x="370" y="66" font-size="10.5" font-family="monospace">- name: string</text>
+  <text x="370" y="80" font-size="10.5" font-family="monospace">- age: int</text>
+  <line x1="360" y1="90" x2="560" y2="90" stroke="var(--accent-border)"/>
+  <text x="370" y="106" font-size="10.5" font-family="monospace">+ makeSound(): void</text>
+
+  <rect class="viz-node" x="280" y="200" width="130" height="70" rx="4"/>
+  <line x1="280" y1="226" x2="410" y2="226" stroke="var(--border)"/>
+  <text x="345" y="218" text-anchor="middle" font-size="12" font-weight="700">Dog</text>
+  <text x="290" y="248" font-size="10.5" font-family="monospace">+ makeSound()</text>
+
+  <rect class="viz-node" x="450" y="200" width="130" height="70" rx="4"/>
+  <line x1="450" y1="226" x2="580" y2="226" stroke="var(--border)"/>
+  <text x="515" y="218" text-anchor="middle" font-size="12" font-weight="700">Cat</text>
+  <text x="460" y="248" font-size="10.5" font-family="monospace">+ makeSound()</text>
+
+  <path d="M180,55 L360,68" fill="none" stroke="currentColor" stroke-width="1.5" marker-start="url(#cd-diamond)"/>
+  <text x="200" y="48" font-size="10">1</text>
+  <text x="335" y="60" font-size="10">*</text>
+
+  <path d="M345,200 L420,124" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#cd-tri)"/>
+  <path d="M515,200 L470,124" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#cd-tri)"/>
+</svg>
+<figcaption>Zoo は Animal を集約（ひし形）し、Dog / Cat は Animal を継承する（中空三角）</figcaption>
+</figure>
+</div>
+
+<h2>16. ER図（エンティティ関連図）</h2>
+<p class="desc">テーブルをボックス、リレーションをカーディナリティ（一/多）記号付きの線で表す。</p>
+<div class="demo">
+<figure class="viz-diagram">
+<svg viewBox="0 0 700 260" role="img" aria-label="ER図: UsersはOrdersを複数持ち、OrdersはOrderItemsを複数持ち、OrderItemsはProductsを1つ参照する">
+  <defs>
+    <marker id="er-one" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M5,0 L5,10" stroke="currentColor" stroke-width="1.3"/>
+    </marker>
+    <marker id="er-many" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="10" markerHeight="10" orient="auto">
+      <path d="M9,5 L0,0 M9,5 L0,5 M9,5 L0,10" fill="none" stroke="currentColor" stroke-width="1.1"/>
+    </marker>
+  </defs>
+
+  <rect class="viz-node accent" x="20" y="20" width="140" height="92" rx="4"/>
+  <text x="90" y="38" text-anchor="middle" font-size="12" font-weight="700">Users</text>
+  <line x1="20" y1="46" x2="160" y2="46" stroke="var(--accent-border)"/>
+  <text x="30" y="62" font-size="10.5" font-family="monospace">PK id</text>
+  <text x="30" y="78" font-size="10.5" font-family="monospace">name</text>
+  <text x="30" y="94" font-size="10.5" font-family="monospace">email</text>
+
+  <rect class="viz-node" x="280" y="20" width="150" height="92" rx="4"/>
+  <text x="355" y="38" text-anchor="middle" font-size="12" font-weight="700">Orders</text>
+  <line x1="280" y1="46" x2="430" y2="46" stroke="var(--border)"/>
+  <text x="290" y="62" font-size="10.5" font-family="monospace">PK id</text>
+  <text x="290" y="78" font-size="10.5" font-family="monospace">FK user_id</text>
+  <text x="290" y="94" font-size="10.5" font-family="monospace">created_at</text>
+
+  <rect class="viz-node" x="280" y="160" width="150" height="92" rx="4"/>
+  <text x="355" y="178" text-anchor="middle" font-size="12" font-weight="700">OrderItems</text>
+  <line x1="280" y1="186" x2="430" y2="186" stroke="var(--border)"/>
+  <text x="290" y="202" font-size="10.5" font-family="monospace">PK id</text>
+  <text x="290" y="218" font-size="10.5" font-family="monospace">FK order_id</text>
+  <text x="290" y="234" font-size="10.5" font-family="monospace">FK product_id</text>
+
+  <rect class="viz-node" x="540" y="160" width="140" height="92" rx="4"/>
+  <text x="610" y="178" text-anchor="middle" font-size="12" font-weight="700">Products</text>
+  <line x1="540" y1="186" x2="680" y2="186" stroke="var(--border)"/>
+  <text x="550" y="202" font-size="10.5" font-family="monospace">PK id</text>
+  <text x="550" y="218" font-size="10.5" font-family="monospace">name</text>
+  <text x="550" y="234" font-size="10.5" font-family="monospace">price</text>
+
+  <path d="M160,66 L280,66" fill="none" stroke="currentColor" stroke-width="1.3" marker-start="url(#er-one)" marker-end="url(#er-many)"/>
+  <path d="M355,112 L355,160" fill="none" stroke="currentColor" stroke-width="1.3" marker-start="url(#er-one)" marker-end="url(#er-many)"/>
+  <path d="M540,206 L430,206" fill="none" stroke="currentColor" stroke-width="1.3" marker-start="url(#er-one)" marker-end="url(#er-many)"/>
+</svg>
+<figcaption>線の端の記号: 縦棒=1、三本線=多（crow's foot記法）</figcaption>
+</figure>
+</div>
+
+<h2>17. ユースケース図</h2>
+<p class="desc">システム境界内にユースケース（楕円）、外にアクター（スティックフィギュア）を配置する。</p>
+<div class="demo">
+<figure class="viz-diagram">
+<svg viewBox="0 0 620 260" role="img" aria-label="ユースケース図: 顧客は商品検索・カート追加・注文ができ、管理者は在庫管理ができる">
+  <rect x="140" y="20" width="400" height="220" rx="12" fill="none" stroke="var(--border)" stroke-dasharray="4 3"/>
+  <text x="340" y="14" text-anchor="middle" font-size="11" font-weight="700" fill="var(--text)">ECサイト</text>
+
+  <g>
+    <circle cx="50" cy="70" r="12" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="50" y1="82" x2="50" y2="120" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="50" y1="95" x2="32" y2="108" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="50" y1="95" x2="68" y2="108" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="50" y1="120" x2="35" y2="150" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="50" y1="120" x2="65" y2="150" stroke="currentColor" stroke-width="1.5"/>
+    <text x="50" y="168" text-anchor="middle" font-size="11" fill="var(--text)">顧客</text>
+  </g>
+
+  <ellipse class="viz-node" cx="260" cy="65" rx="90" ry="28"/>
+  <text x="260" y="70" text-anchor="middle" font-size="11.5">商品を検索する</text>
+  <ellipse class="viz-node" cx="260" cy="135" rx="90" ry="28"/>
+  <text x="260" y="140" text-anchor="middle" font-size="11.5">カートに追加する</text>
+  <ellipse class="viz-node" cx="260" cy="205" rx="90" ry="28"/>
+  <text x="260" y="210" text-anchor="middle" font-size="11.5">注文する</text>
+
+  <line x1="65" y1="90" x2="180" y2="65" stroke="currentColor" stroke-width="1.2"/>
+  <line x1="65" y1="90" x2="180" y2="135" stroke="currentColor" stroke-width="1.2"/>
+  <line x1="65" y1="95" x2="180" y2="205" stroke="currentColor" stroke-width="1.2"/>
+
+  <ellipse class="viz-node accent" cx="470" cy="135" rx="90" ry="28"/>
+  <text x="470" y="140" text-anchor="middle" font-size="11.5">在庫を管理する</text>
+
+  <g>
+    <circle cx="580" cy="120" r="12" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="580" y1="132" x2="580" y2="170" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="580" y1="145" x2="562" y2="158" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="580" y1="145" x2="598" y2="158" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="580" y1="170" x2="565" y2="200" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="580" y1="170" x2="595" y2="200" stroke="currentColor" stroke-width="1.5"/>
+    <text x="580" y="218" text-anchor="middle" font-size="11" fill="var(--text)">管理者</text>
+  </g>
+  <line x1="560" y1="135" x2="572" y2="147" stroke="currentColor" stroke-width="1.2"/>
+</svg>
+<figcaption>アクターと、境界内のユースケース（楕円）を線で結ぶ</figcaption>
+</figure>
+</div>
+
+<h2>18. アクティビティ図</h2>
+<p class="desc">開始（●）・終了（◎）・分岐（◇）・アクション（角丸矩形）を組み合わせたUMLスタイルのフロー。</p>
+<div class="demo">
+<figure class="viz-diagram">
+<svg viewBox="0 0 560 260" role="img" aria-label="アクティビティ図: 注文受付後に在庫を確認し、在庫があれば出荷、なければ欠品通知して終了する">
+  <defs>
+    <marker id="ad-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+
+  <circle cx="60" cy="40" r="9" fill="currentColor"/>
+  <path d="M60,49 L60,70" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ad-arrow)"/>
+
+  <rect class="viz-node" x="10" y="75" width="100" height="40" rx="10"/>
+  <text x="60" y="99" text-anchor="middle" font-size="11">注文受付</text>
+  <path d="M60,115 L60,140" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ad-arrow)"/>
+
+  <polygon class="viz-node" points="60,140 110,175 60,210 10,175"/>
+  <text x="60" y="179" text-anchor="middle" font-size="10.5">在庫あり?</text>
+
+  <path d="M110,175 L220,175" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ad-arrow)"/>
+  <text x="165" y="168" text-anchor="middle" font-size="10">Yes</text>
+  <rect class="viz-node accent" x="225" y="155" width="110" height="40" rx="10"/>
+  <text x="280" y="179" text-anchor="middle" font-size="11">出荷準備</text>
+  <path d="M335,175 L400,175" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ad-arrow)"/>
+  <rect class="viz-node" x="405" y="155" width="90" height="40" rx="10"/>
+  <text x="450" y="179" text-anchor="middle" font-size="11">発送</text>
+
+  <path d="M60,210 L60,235 L470,235" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ad-arrow)"/>
+  <text x="70" y="228" text-anchor="middle" font-size="10">No</text>
+  <rect class="viz-node" x="200" y="215" width="110" height="40" rx="10"/>
+  <text x="255" y="239" text-anchor="middle" font-size="11">欠品通知</text>
+
+  <path d="M450,195 L450,215 L470,235" fill="none" stroke="currentColor" stroke-width="1.5" marker-end="url(#ad-arrow)"/>
+  <circle cx="480" cy="235" r="10" fill="none" stroke="currentColor" stroke-width="1.5"/>
+  <circle cx="480" cy="235" r="5" fill="currentColor"/>
+</svg>
+<figcaption>塗り円=開始、二重丸=終了、菱形=分岐。在庫の有無で出荷または欠品通知に分岐し、最終ノードで合流する</figcaption>
+</figure>
+</div>
+
+<h2>19. コンポーネント図</h2>
+<p class="desc">モジュールをコンポーネントアイコン付きの箱で表し、提供インターフェース（ロリポップ）・要求インターフェース（ソケット）で依存を示す。</p>
+<div class="demo">
+<figure class="viz-diagram">
+<svg viewBox="0 0 600 140" role="img" aria-label="コンポーネント図: WebフロントエンドがAPIゲートウェイの認証インターフェースを利用し、APIゲートウェイがユーザーDBのデータインターフェースを利用する">
+  <g>
+    <rect class="viz-node" x="20" y="35" width="140" height="60" rx="4"/>
+    <rect x="10" y="46" width="14" height="9" fill="var(--surface)" stroke="currentColor" stroke-width="1"/>
+    <rect x="10" y="66" width="14" height="9" fill="var(--surface)" stroke="currentColor" stroke-width="1"/>
+    <text x="90" y="61" text-anchor="middle" font-size="9.5" fill="var(--text-muted)">«component»</text>
+    <text x="90" y="76" text-anchor="middle" font-size="11.5" font-weight="600">Webフロントエンド</text>
+  </g>
+
+  <line x1="160" y1="65" x2="215" y2="65" stroke="currentColor" stroke-width="1.3"/>
+  <circle cx="222" cy="65" r="7" fill="var(--surface)" stroke="currentColor" stroke-width="1.3"/>
+  <path d="M236,55 A14,14 0 0 1 236,75" fill="none" stroke="currentColor" stroke-width="1.3"/>
+  <text x="200" y="52" text-anchor="middle" font-size="9.5">認証</text>
+
+  <g>
+    <rect class="viz-node accent" x="245" y="35" width="140" height="60" rx="4"/>
+    <rect x="235" y="46" width="14" height="9" fill="var(--surface)" stroke="currentColor" stroke-width="1"/>
+    <rect x="235" y="66" width="14" height="9" fill="var(--surface)" stroke="currentColor" stroke-width="1"/>
+    <text x="315" y="61" text-anchor="middle" font-size="9.5" fill="var(--text-muted)">«component»</text>
+    <text x="315" y="76" text-anchor="middle" font-size="11.5" font-weight="600">APIゲートウェイ</text>
+  </g>
+
+  <line x1="385" y1="65" x2="440" y2="65" stroke="currentColor" stroke-width="1.3"/>
+  <circle cx="447" cy="65" r="7" fill="var(--surface)" stroke="currentColor" stroke-width="1.3"/>
+  <path d="M461,55 A14,14 0 0 1 461,75" fill="none" stroke="currentColor" stroke-width="1.3"/>
+  <text x="425" y="52" text-anchor="middle" font-size="9.5">データ</text>
+
+  <g>
+    <rect class="viz-node" x="470" y="35" width="110" height="60" rx="4"/>
+    <rect x="460" y="46" width="14" height="9" fill="var(--surface)" stroke="currentColor" stroke-width="1"/>
+    <rect x="460" y="66" width="14" height="9" fill="var(--surface)" stroke="currentColor" stroke-width="1"/>
+    <text x="525" y="61" text-anchor="middle" font-size="9.5" fill="var(--text-muted)">«component»</text>
+    <text x="525" y="76" text-anchor="middle" font-size="11.5" font-weight="600">ユーザーDB</text>
+  </g>
+</svg>
+<figcaption>丸=提供インターフェース（ロリポップ）、弧=要求インターフェース（ソケット）</figcaption>
+</figure>
+</div>
+
+</body>
+</html>
