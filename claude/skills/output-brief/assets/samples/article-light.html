@@ -54,11 +54,19 @@ details[open]>summary{margin-bottom:.875rem;padding-bottom:.875rem;border-bottom
 @media(max-width:768px){
   body{grid-template-columns:1fr}
   .toc-toggle{display:flex;align-items:center;gap:.4rem;position:fixed;top:1rem;left:1rem;z-index:60;background:var(--sidebar-bg);color:var(--sidebar-text);border:none;border-radius:8px;padding:.5rem .75rem;font-size:12.5px;font-weight:600;box-shadow:var(--shadow-hover);cursor:pointer}
-  .sidebar{position:fixed;top:0;left:0;width:82%;max-width:280px;transform:translateX(-100%);transition:transform .25s ease;z-index:55;box-shadow:var(--shadow-hover)}
+  .sidebar{position:fixed;top:0;left:0;width:82%;max-width:280px;padding:4.75rem 1.25rem 2.5rem;transform:translateX(-100%);transition:transform .25s ease;z-index:55;box-shadow:var(--shadow-hover)}
   .sidebar.open{transform:translateX(0)}
   .sidebar-backdrop.open{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50}
   main{padding:4.5rem 1.5rem 2rem}
   .content{max-width:100%}
+}
+.sidebar-collapse{display:none}
+@media(min-width:769px){
+  .sidebar-collapse{display:flex;align-items:center;justify-content:center;position:fixed;top:2.5rem;left:220px;width:1.6rem;height:1.6rem;margin-left:-.8rem;padding:0;border-radius:50%;background:var(--sidebar-bg);color:var(--sidebar-text);border:1px solid rgba(255,255,255,.18);cursor:pointer;z-index:65;transition:left .2s ease;font-size:11px;line-height:1}
+  .sidebar-collapse:hover{background:rgba(255,255,255,.14)}
+  body.sidebar-collapsed{grid-template-columns:0px 1fr}
+  body.sidebar-collapsed .sidebar{overflow:hidden;padding-left:0;padding-right:0}
+  body.sidebar-collapsed .sidebar-collapse{left:0}
 }
 h1{font-size:2.5rem;font-weight:800;color:var(--text);letter-spacing:-.05em;line-height:1.15;margin-bottom:.75rem}
 .meta{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-size:13px;color:var(--text-muted);margin-bottom:0;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
@@ -153,6 +161,7 @@ figure.viz-diagram figcaption{font-size:12px;color:var(--text-muted);text-align:
   <p class="nav-label">目次</p>
   <ul class="nav-list" id="toc"></ul>
 </nav>
+<button class="sidebar-collapse" id="sidebarCollapse" type="button" aria-label="目次を折りたたむ" aria-expanded="true">&#8249;</button>
 <main>
 <div class="content">
   <div class="hero">
@@ -280,11 +289,18 @@ document.querySelectorAll('main h2,main h3').forEach(h=>obs.observe(h));
 const tocToggle=document.getElementById('tocToggle');
 const sidebarEl=document.getElementById('sidebar');
 const tocBackdrop=document.getElementById('tocBackdrop');
-function closeSidebar(){sidebarEl.classList.remove('open');tocBackdrop.classList.remove('open');tocToggle.setAttribute('aria-expanded','false');}
-function openSidebar(){sidebarEl.classList.add('open');tocBackdrop.classList.add('open');tocToggle.setAttribute('aria-expanded','true');}
+function closeSidebar(){sidebarEl.classList.remove('open');tocBackdrop.classList.remove('open');tocToggle.setAttribute('aria-expanded','false');tocToggle.innerHTML='&#9776; 目次';}
+function openSidebar(){sidebarEl.classList.add('open');tocBackdrop.classList.add('open');tocToggle.setAttribute('aria-expanded','true');tocToggle.innerHTML='&#10005; 閉じる';}
 tocToggle?.addEventListener('click',()=>{sidebarEl.classList.contains('open')?closeSidebar():openSidebar();});
 tocBackdrop?.addEventListener('click',closeSidebar);
 navLinks.forEach(a=>a.addEventListener('click',closeSidebar));
+const sidebarCollapseBtn=document.getElementById('sidebarCollapse');
+sidebarCollapseBtn?.addEventListener('click',()=>{
+  const collapsed=document.body.classList.toggle('sidebar-collapsed');
+  sidebarCollapseBtn.setAttribute('aria-expanded',String(!collapsed));
+  sidebarCollapseBtn.innerHTML=collapsed?'&#8250;':'&#8249;';
+  sidebarCollapseBtn.setAttribute('aria-label',collapsed?'目次を開く':'目次を折りたたむ');
+});
 document.querySelectorAll('.code-copy').forEach(btn=>{
   btn.addEventListener('click',()=>{
     const code=btn.closest('.code-block').querySelector('code').innerText;
