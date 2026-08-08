@@ -38,7 +38,8 @@ body{font-family:'Inter','Noto Sans JP',system-ui,sans-serif;background:var(--bg
 .nav-list a:hover{background:rgba(255,255,255,.07);opacity:1}
 .nav-list a.active{background:var(--sidebar-active-bg);color:var(--sidebar-active-text);font-weight:500;opacity:1}
 .nav-sub a{padding-left:1.25rem;font-size:12px;opacity:.55}
-main{padding:3.5rem 4rem;max-width:900px}
+main{padding:3.5rem 4rem}
+.content{max-width:840px;margin:0 auto}
 .hero{margin-bottom:2.5rem;padding-bottom:0}
 .sub{font-size:14.5px;color:var(--text-muted);margin-top:.5rem}
 details{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin:1.25rem 0}
@@ -48,12 +49,22 @@ details>summary::after{content:'';display:block;width:.45rem;height:.45rem;borde
 details[open]>summary::after{transform:rotate(-135deg)}
 details[open]>summary{margin-bottom:.875rem;padding-bottom:.875rem;border-bottom:1px solid var(--border)}
 .mermaid-caption{font-size:12px;color:var(--text-muted);text-align:center;margin-top:-.75rem;margin-bottom:1.5rem;display:block}
-@media(max-width:768px){body{grid-template-columns:1fr}.sidebar{display:none}main{padding:2rem 1.5rem;max-width:100%}}
+.toc-toggle{display:none}
+.sidebar-backdrop{display:none}
+@media(max-width:768px){
+  body{grid-template-columns:1fr}
+  .toc-toggle{display:flex;align-items:center;gap:.4rem;position:fixed;top:1rem;left:1rem;z-index:60;background:var(--sidebar-bg);color:var(--sidebar-text);border:none;border-radius:8px;padding:.5rem .75rem;font-size:12.5px;font-weight:600;box-shadow:var(--shadow-hover);cursor:pointer}
+  .sidebar{position:fixed;top:0;left:0;width:82%;max-width:280px;transform:translateX(-100%);transition:transform .25s ease;z-index:55;box-shadow:var(--shadow-hover)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-backdrop.open{display:block;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50}
+  main{padding:4.5rem 1.5rem 2rem}
+  .content{max-width:100%}
+}
 h1{font-size:2.5rem;font-weight:800;color:var(--text);letter-spacing:-.05em;line-height:1.15;margin-bottom:.75rem}
 .meta{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;font-size:13px;color:var(--text-muted);margin-bottom:0;padding-bottom:1.25rem;border-bottom:1px solid var(--border)}
 .meta-tag{font-size:11px;font-weight:500;color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-border);padding:.15rem .55rem;border-radius:999px}
 h2{font-size:1.2rem;font-weight:700;color:var(--text);margin:2.5rem 0 1rem;padding-left:.875rem;border-left:3px solid var(--accent);line-height:1.35}
-h3{font-size:.95rem;font-weight:600;color:var(--accent);margin:1.75rem 0 .5rem}
+h3{font-size:1.05rem;font-weight:700;color:var(--accent);margin:1.75rem 0 .5rem;letter-spacing:-.01em}
 h3::before{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);vertical-align:middle;margin-right:.5rem;position:relative;top:-.05em}
 p{margin-bottom:1rem;font-size:15px}
 ul,ol{margin:.5rem 0 1rem 1.5rem;font-size:15px}
@@ -61,6 +72,13 @@ li{margin-bottom:.3rem}
 blockquote{background:var(--accent-bg);border-left:4px solid var(--accent);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1.5rem 0;color:var(--text-muted);font-style:italic;font-size:14px;line-height:1.7}
 pre{background:var(--code-bg);border-radius:10px;padding:1.25rem 1.5rem;overflow-x:auto;margin:1.5rem 0}
 pre code{font-family:'SF Mono','Fira Code',monospace;font-size:12.5px;color:#e2e8f0;line-height:1.75}
+.code-block{margin:1.5rem 0;border-radius:10px;overflow:hidden}
+.code-block pre{margin:0;border-radius:0}
+.code-block-header{display:flex;align-items:center;justify-content:space-between;padding:.5rem .9rem;background:var(--code-bg);border-bottom:1px solid rgba(255,255,255,.1)}
+.code-lang{font-size:11px;color:#a1a1aa;font-family:'SF Mono','Fira Code',monospace;text-transform:uppercase;letter-spacing:.04em}
+.code-copy{font-size:11px;color:#e2e8f0;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:.25rem .6rem;cursor:pointer;transition:background .12s}
+.code-copy:hover{background:rgba(255,255,255,.16)}
+.code-copy.copied{color:var(--good)}
 p code,li code{font-family:'SF Mono','Fira Code',monospace;font-size:12.5px;background:var(--accent-bg);color:var(--accent);padding:.15em .4em;border-radius:4px}
 strong{font-weight:600;color:var(--text)}
 .steps{display:flex;flex-direction:column;gap:.75rem;margin:1rem 0}
@@ -129,11 +147,14 @@ figure.viz-diagram figcaption{font-size:12px;color:var(--text-muted);text-align:
 </style>
 </head>
 <body>
-<nav class="sidebar">
+<button class="toc-toggle" id="tocToggle" type="button" aria-label="目次を開く" aria-expanded="false">&#9776; 目次</button>
+<div class="sidebar-backdrop" id="tocBackdrop"></div>
+<nav class="sidebar" id="sidebar">
   <p class="nav-label">目次</p>
   <ul class="nav-list" id="toc"></ul>
 </nav>
 <main>
+<div class="content">
   <div class="hero">
     <h1>Claude Code スキル設計ガイド</h1>
     <div class="meta"><span class="meta-tag">設計</span><span class="meta-tag">スキル</span><span>サンプルドキュメント — output-brief / article レイアウト</span></div>
@@ -228,8 +249,11 @@ figure.viz-diagram figcaption{font-size:12px;color:var(--text-muted);text-align:
   <figcaption>WAIT_FOR で承認待ち状態を挟み、修正要求時はそこに戻る</figcaption>
   </figure>
   <h2 id="example">実装例</h2>
-  <pre><code>WAIT_FOR: ユーザーの承認を受けてから次へ進む
+  <div class="code-block">
+    <div class="code-block-header"><span class="code-lang">text</span><button class="code-copy" type="button" data-copy>コピー</button></div>
+    <pre><code>WAIT_FOR: ユーザーの承認を受けてから次へ進む
 PROHIBITED: 承認なしにファイルを書き換えること</code></pre>
+  </div>
   <p>上記のように <code>WAIT_FOR</code> と <code>PROHIBITED</code> を対で使うと、ゲートのスキップを防げます。スキルの品質はゲート設計の厳密さで決まると言っても過言ではありません。</p>
   <details>
     <summary>用語集</summary>
@@ -237,6 +261,7 @@ PROHIBITED: 承認なしにファイルを書き換えること</code></pre>
     <p><strong>PROHIBITED</strong> — 実行を禁止するアクションを明示する。モデルが勝手に実行しないよう強調する目的で使う。</p>
     <p><strong>SKILL_DIR</strong> — スキルファイルが置かれているディレクトリの絶対パス。ファイルの読み書きに利用する。</p>
   </details>
+</div>
 </main>
 <script>
 const toc=document.getElementById('toc');
@@ -252,6 +277,25 @@ const obs=new IntersectionObserver(entries=>{
   entries.forEach(e=>{if(!e.isIntersecting)return;const l=byId.get(e.target.id);if(!l)return;navLinks.forEach(a=>a.classList.remove('active'));l.classList.add('active');});
 },{rootMargin:'-10% 0px -80% 0px'});
 document.querySelectorAll('main h2,main h3').forEach(h=>obs.observe(h));
+const tocToggle=document.getElementById('tocToggle');
+const sidebarEl=document.getElementById('sidebar');
+const tocBackdrop=document.getElementById('tocBackdrop');
+function closeSidebar(){sidebarEl.classList.remove('open');tocBackdrop.classList.remove('open');tocToggle.setAttribute('aria-expanded','false');}
+function openSidebar(){sidebarEl.classList.add('open');tocBackdrop.classList.add('open');tocToggle.setAttribute('aria-expanded','true');}
+tocToggle?.addEventListener('click',()=>{sidebarEl.classList.contains('open')?closeSidebar():openSidebar();});
+tocBackdrop?.addEventListener('click',closeSidebar);
+navLinks.forEach(a=>a.addEventListener('click',closeSidebar));
+document.querySelectorAll('.code-copy').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const code=btn.closest('.code-block').querySelector('code').innerText;
+    navigator.clipboard.writeText(code).then(()=>{
+      const orig=btn.textContent;
+      btn.textContent='コピー済み';
+      btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied');},1500);
+    });
+  });
+});
 </script>
 </body>
 </html>
