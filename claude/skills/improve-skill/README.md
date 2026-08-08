@@ -9,7 +9,22 @@
 /improve-skill <ファイルパス>        # 単体
 /improve-skill path/a.md path/b.md  # 複数
 /improve-skill all                  # .claude/skills/ 全件
+/improve-skill <ファイルパス> --evolve [世代数]  # 進化モード（下記）
 ```
+
+## 進化モード（--evolve）
+
+通常モードは単一系統のhill climbing（1候補を毎世代少しずつ改良）。
+`--evolve` は複数候補を並列生成し、Pareto frontierと交叉（system-aware merge）で進化的に改善する。
+
+- 毎世代3個体をforkで並列生成（[A][B]寄り変異・[C][D]寄り変異・交叉）
+- 6次元スコア[A]〜[F]のいずれかで他候補に劣らない候補群（Pareto frontier）を維持
+- frontierが1世代更新されなければ打ち切り。デフォルト2世代
+- 単一ファイルのみ対応（`all` / 複数パス不可）
+
+GEPA（arxiv:2507.19457）は「タスクインスタンスごとのスコア」でPareto frontierを構成するが、
+このスキルにタスクインスタンスの概念はないため、代わりに既存の6次元評価スコアをPareto軸として用いる
+（GEPAの仕組みをこのスキルのドメインに適応させた実装であり、原論文の忠実な再現ではない）。
 
 ## 6次元の静的評価
 

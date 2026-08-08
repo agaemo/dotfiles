@@ -13,6 +13,7 @@ description: スキルファイルを静的解析・実行シミュレーショ�
 - `/improve-skill <ファイルパス>` — 指定スキルを改善する
 - `/improve-skill` — 引数なしの場合はファイルパスをユーザーに確認する
 - `/improve-skill <ファイルパス> --cross` — 親スキルと、そこから呼び出される子スキルをまとめて改善する
+- `/improve-skill <ファイルパス> --evolve [世代数]` — 複数候補を並列生成し、Pareto frontierと交叉（system-aware merge）で進化的に改善する（デフォルト2世代。単一ファイルのみ対応）
 
 ---
 
@@ -36,23 +37,43 @@ IF AUTO_MODE = true:
   - 過去イテレーションでユーザーが選択しなかった提案の「場所: L<行番号>」+「分類: [A〜F]」
 ENDIF
 
-FILE_ARGS: 引数からスコア閾値テキスト（"点"・"以上"・"超える"・"score"・"まで"・"目標" 等を含むトークン）および "--cross" を除いた部分
+FILE_ARGS: 引数からスコア閾値テキスト（"点"・"以上"・"超える"・"score"・"まで"・"目標" 等を含むトークン）、
+           "--cross"、"--evolve" および "--evolve" 直後の数値トークンを除いた部分
            以降の引数解析（"all" 判定・複数パス判定・単一パス読み込み）はすべて FILE_ARGS を参照する
-
-DETECT CROSS_MODE:
-  "--cross" が引数に含まれる かつ FILE_ARGS が単一ファイルパス（"all" および複数パスは除く）の場合: CROSS_MODE = true
-  それ以外: CROSS_MODE = false
 
 IF FILE_ARGS が空（引数なし、またはスコア閾値テキストのみ）:
   ASK USER: 対象スキルのパスを教えてください（"all" で .claude/skills/ 全件）
   WAIT_FOR: ユーザーの回答
   FILE_ARGS = ユーザーの回答
-  IF "--cross" が元の引数に含まれる かつ FILE_ARGS が単一ファイルパス（"all" および複数パスは除く）:
-    CROSS_MODE = true
-  ENDIF
 ENDIF
 
-IF FILE_ARGS が "all":
+DETECT CROSS_MODE:
+  "--cross" が元の引数に含まれる かつ FILE_ARGS が単一ファイルパス（"all" および複数パスは除く）の場合: CROSS_MODE = true
+  それ以外: CROSS_MODE = false
+
+DETECT EVOLVE_MODE（ステップ全体で参照する変数として保持）:
+  "--evolve" が元の引数に含まれる かつ FILE_ARGS が単一ファイルパス（"all" および複数パスは除く）の場合: EVOLVE_MODE = true
+  それ以外: EVOLVE_MODE = false
+  IF EVOLVE_MODE = true:
+    GENERATIONS = "--evolve" 直後のトークンが数値ならその値、なければデフォルト 2
+    IF GENERATIONS > 5:
+      WARN: "世代数は最大5までのため5に制限します（指定値: <GENERATIONS>）"
+      GENERATIONS = 5
+    ENDIF
+    IF CROSS_MODE = true:
+      WARN: "--cross と --evolve は同時指定できません。--evolve を優先します"
+      CROSS_MODE = false
+    ENDIF
+  ENDIF
+
+IF EVOLVE_MODE = true:
+  READ: <対象スキルファイル>  ← FILE_ARGS のパス
+  IF ファイルが存在しない:
+    REPORT: "ファイルが見つかりません: <パス>"
+    STOP
+  ENDIF
+  → EVOLVE_PROCESS を実行する
+ELIF FILE_ARGS が "all":
   LIST: .claude/skills/ 内の全 .md ファイルを対象にする
   → MULTI_FILE_PROCESS を実行する
 ELIF FILE_ARGS が複数パス（スペース区切りで2つ以上のファイルパス）:
@@ -96,6 +117,84 @@ MULTI_FILE_PROCESS:
   その後ステップ5に進む
   ステップ5では全提案を "#<ファイルindex>-<提案番号>" 形式で表示し
   "1-1 2-3 / all / skip" 形式で選択させる
+
+EVOLVE_PROCESS:
+  ※ GEPA（arxiv:2507.19457）の「候補プール＋Pareto選択＋system-aware merge」を、
+    タスクインスタンス単位のPareto軸を持たないこのスキルのドメインに適応させたもの。
+    Pareto軸はタスクインスタンスの代わりに既存の6次元スコア[A]〜[F]を用いる（ドメイン適応）。
+
+  EXTRACT を実行する
+  BASE = 対象ファイルの現在の内容
+  BASEのステップ2評価を実行し、POOL = [{候補: BASE, スコア: <6次元スコア>}]
+  FRONTIER = POOL（初期状態はBASEのみ）
+  進化ログ = []
+
+  FOR generation = 1 to GENERATIONS:
+    実行するforkを決定する:
+      generation = 1: fork 1・fork 2（変異のみ、fork3は実行しない）
+      generation >= 2 かつ FRONTIER に「互いに異なる次元で他方より優れている候補」のペアが存在する: fork 1・fork 2・fork 3（変異+交叉）
+        親候補ペアの選び方: そのペアをFRONTIERから1組選ぶ
+      generation >= 2 かつ 該当するペアが存在しない（FRONTIERがBASEのみ等）: fork 1・fork 2のみ（fork3はスキップ）
+
+    fork（Agent ツール, subagent_type: "fork"）で決定した個体を並列生成する:
+      fork 1（変異・[A][B]寄り）: "ファイル <path> の内容を基に、このスキルのステップ2(6次元評価)〜ステップ4(改善提案生成)を実行し、
+        HIGH優先度の提案のうち [A]トークン効率・[B]明瞭性 を優先して反映した改良版全文を1パターン作成してください。
+        EDITは行わず、改良版全文・6次元スコア・変更点サマリーを返り値として返すこと（分析・生成のみ、ファイル書き換え禁止）"
+      fork 2（変異・[C][D]寄り）: 同上、ただし [C]完全性・[D]ゲート設計/スコープ純粋性 を優先
+      fork 3（交叉。実行条件は上記の通り）:
+        "以下に2つの改良版全文とその6次元スコアを渡します。それぞれが他方より優れている次元を特定し、
+        両者の強みを組み合わせた新しい改良版全文を1パターン作成してください: FRONTIER のうち互いに異なる次元で優れている候補ペアを1組渡す。
+        EDITは行わず、改良版全文・6次元スコア・どの次元をどちらの親から取り込んだかの説明を返り値として返すこと"
+      IMPORTANT — PROHIBITED: forkにファイルの書き換え（EDIT）を行わせること
+      WAIT_FOR: 全forkの結果
+      IF いずれかのforkが改良版全文・6次元スコアを返さなかった（フォーマット不正・処理失敗を含む）:
+        WARN: "fork<番号>が有効な結果を返しませんでした。この候補を破棄して続行します"
+        その候補を以降の処理から除外する
+
+    FOR EACH 生成された候補（有効な結果を返したもののみ）:
+      IF POOL 内のどの候補と比べても6次元すべてで劣っていない（=非劣性）:
+        POOL に追加する
+      ELSE:
+        候補を破棄する（POOLに追加しない）
+    FRONTIER = POOL のうち非劣性候補（6次元のいずれかで他候補に劣らない）の集合
+
+    RECORD 進化ログ: "世代<generation>: FRONTIER <FRONTIERのサイズ>件、最高平均 X.X/5"
+
+    IF generation >= 2 かつ 今世代でFRONTIERに新規候補が追加されなかった:
+      REPORT: "FRONTIERが更新されなかったため世代<generation>で打ち切ります"
+      BREAK
+    ENDIF
+    IF 今世代で候補が1件も生成されなかった（全forkが無効な結果）:
+      REPORT: "候補が生成できなかったため世代<generation>で打ち切ります"
+      BREAK
+    ENDIF
+
+  FINAL_CANDIDATE = FRONTIER のうち6次元平均スコアが最高の候補
+    （同点の場合はBASEとの変更行数（追加+削除の合計）が少ない方を優先）
+
+  SHOW USER:
+    ── 進化ログ ────────────────────────────────
+    世代1: FRONTIER X件、最高平均 X.X/5
+    世代2: FRONTIER X件、最高平均 X.X/5（...世代分）
+    ────────────────────────────────────────────
+    ── 最終候補スコア ──────────────────────────
+    [A]〜[F] の6次元スコア（ステップ5と同じフォーマット）
+    ────────────────────────────────────────────
+    変更点サマリー（原本との差分概要。交叉由来の変更はどちらの候補由来か明記）
+
+  IMPORTANT: EVOLVE_PROCESSの適用ゲートはAUTO_MODEの値に関わらず常にWAIT_FORする
+    （全文置換という不可逆度の高い操作のため、通常ステップ5のAUTO_MODE自動適用は適用しない）
+  ASK USER:
+    "この改良版を適用しますか？"
+    "[1]: 適用する  [2]: 適用しない（内容確認のみで終了）"
+  WAIT_FOR: ユーザーの選択
+  IF 適用する:
+    EDIT: 対象ファイル全体を FINAL_CANDIDATE の内容に置き換える
+    VERIFY: 変更後の内容を READ して意図通りか確認する（差異があれば再EDIT、最大2回）
+    REPORT: "進化モードで改良版を適用しました: <ファイルパス>（<実行した世代数>世代、FRONTIER最終<X>件）"
+  ELSE:
+    REPORT: "適用をスキップしました"
+  STOP
 
 EXTRACT（コンテキスト内に保持し、ステップ2〜4で参照する）:
   - スキルの目的（frontmatter の description）
