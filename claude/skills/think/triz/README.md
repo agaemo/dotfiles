@@ -1,7 +1,6 @@
 # triz
 
-Genrich Altshuller が40万件のソ連特許を分析して開発した体系的発明方法論 TRIZ（1956〜）を
-2エージェントで実装したスキル。矛盾を特定し、発明原理から解決の方向性を引き出す。
+TRIZ（発明的問題解決の理論）を2エージェントで実装したスキル。矛盾を特定し、発明原理から解決の方向性を引き出す。
 
 ## できること・できないこと
 
@@ -11,7 +10,7 @@ Genrich Altshuller が40万件のソ連特許を分析して開発した体系�
 | 発明原理を使って矛盾を解消する方向性を示す | 設計・実装の詳細を決定すること |
 | 技術的矛盾・物理的矛盾の両方に対応する | 矛盾が明確でない漠然とした問いへの回答 |
 
-TRIZ は「妥協によるバランス」ではなく「矛盾そのものの解消」を目指す（Altshuller, 1996）。
+TRIZ は「妥協によるバランス」ではなく「矛盾そのものの解消」を目指す。
 
 ## 使い方
 
@@ -28,7 +27,7 @@ TRIZ は「妥協によるバランス」ではなく「矛盾そのものの解
 
 ```mermaid
 flowchart TD
-    Start([/triz input]) --> F1[contradiction-finder: 矛盾の特定]
+    Start([/think triz input]) --> F1[contradiction-finder: 矛盾の特定]
     F1 --> F2[principle-matcher: 発明原理の適用]
     F2 --> Report[レポート生成・保存]
     Report --> Dialog{対話}
@@ -45,7 +44,7 @@ flowchart TD
 
 ## 発明原理の選定について
 
-TRIZ の原論文（Altshuller, 1996）では40の発明原理が定義されているが、
+TRIZ の原論文では40の発明原理が定義されているが、
 このスキルでは**22原理に絞って実装**している。
 
 ### 除外した18原理と理由
@@ -106,7 +105,3 @@ TRIZ の原論文（Altshuller, 1996）では40の発明原理が定義されて
 
 工学的な問題（材料設計・製造プロセスなど）に使う場合は、
 除外した18原理を `principle-matcher.md` に追記して再適用することを推奨する。
-
-## 参考文献
-
-Altshuller, G. (1996). *And Suddenly the Inventor Appeared: TRIZ, the Creative Problem Solving*. Technical Innovation Center.
