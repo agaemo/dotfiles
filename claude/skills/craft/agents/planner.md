@@ -258,6 +258,8 @@ project-root/
 - post-write hook: [コマンド例]
 - stop hook: [コマンド例]
 - settings.json への登録を実装ステップに含めること
+- IMPORTANT: コマンド内でプロジェクトのファイルパスを参照する場合、CWDの絶対パスを直書きしない。
+  `${CLAUDE_PROJECT_DIR}`プレースホルダーを使う（他環境での動作不能・個人情報露出を防ぐため）
 
 ### .gitignore 確認項目
 - [ ] DBファイル（例: `data/*.db`）

@@ -140,14 +140,17 @@ READ  TEMPLATE/hooks/pre-bash.js         → WRITE CWD/.claude/hooks/pre-bash.js
 ASSERT EXISTS(CWD/.claude/hooks/on-session-start.js)
 ASSERT EXISTS(CWD/.claude/hooks/pre-bash.js)
 
---- STEP 4: settings.json の書き出し（絶対パス埋め込み） ---
+--- STEP 4: settings.json の書き出し ---
 
 READ TEMPLATE/settings.json
-REPLACE ALL: ".claude/hooks/" → "<CWD>/.claude/hooks/"
-  # ※ <CWD> は親エージェントが実際の値に展開してから渡すこと
+REPLACE ALL: ".claude/hooks/" → "${CLAUDE_PROJECT_DIR}/.claude/hooks/"
+  # IMPORTANT: CWDの実際の絶対パスを書き込まないこと。`${CLAUDE_PROJECT_DIR}`は
+  # Claude Code公式のプレースホルダーで、hook実行時のカレントディレクトリに関わらず
+  # プロジェクトルートを指す。絶対パス直書きは他環境での動作不能・個人情報露出の原因になる
 WRITE CWD/.claude/settings.json
 
 ASSERT EXISTS(CWD/.claude/settings.json)
+ASSERT: 書き出した CWD/.claude/settings.json に CWD の実際の絶対パス文字列が含まれていないこと
 
 --- STEP 5: 完了報告 ---
 

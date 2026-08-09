@@ -116,12 +116,14 @@ ENDIF
 --- STEP 3: settings.json の書き出し（最初に実施してパーミッション設定を有効化） ---
 
 READ TEMPLATE/settings.json
-CWD の絶対パスを使って以下の置換を行う（"CWD" をそのまま書かず、CWD の値で展開した絶対パスを使うこと）:
-  REPLACE ALL: ".claude/hooks/" → "{CWD の値}/.claude/hooks/"
-  例 (CWD = /Users/alice/myproject): ".claude/hooks/" → "/Users/alice/myproject/.claude/hooks/"
+REPLACE ALL: ".claude/hooks/" → "${CLAUDE_PROJECT_DIR}/.claude/hooks/"
+  IMPORTANT: CWDの実際の絶対パスを書き込まないこと。`${CLAUDE_PROJECT_DIR}`はClaude Code
+  公式のプレースホルダーで、hook実行時のカレントディレクトリに関わらずプロジェクトルートを
+  指す。絶対パス直書きは他環境での動作不能・個人情報露出の原因になる
 WRITE CWD/.claude/settings.json  ← Write ツールを使うこと（Bash 禁止）
 
 ASSERT EXISTS(CWD/.claude/settings.json)
+ASSERT: 書き出した CWD/.claude/settings.json に CWD の実際の絶対パス文字列が含まれていないこと
 IF FAILED:
   REPORT: エラー内容を報告してユーザーに確認を求める
   STOP

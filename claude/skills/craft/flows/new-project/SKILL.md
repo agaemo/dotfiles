@@ -118,17 +118,31 @@ FOREACH row IN 以下の対応表:
   | hooks/on-session-start.js  | .claude/hooks/on-session-start.js       |
   | hooks/pre-bash.js          | .claude/hooks/pre-bash.js               |
 
---- STEP 4: settings.json の書き出し（絶対パス埋め込み） ---
+--- STEP 4: settings.json の書き出し ---
 
 READ TEMPLATE/settings.json
-REPLACE ALL: ".claude/hooks/" → "<CWD>/.claude/hooks/"  # CWD の実際の値に展開（例: /Users/alice/myproject）
+REPLACE ALL: ".claude/hooks/" → "${CLAUDE_PROJECT_DIR}/.claude/hooks/"
 WRITE CWD/.claude/settings.json
 
-例 (CWD = /Users/alice/myproject の場合):
+IMPORTANT: CWDの実際の絶対パス（`<CWD>`のような形）を書き込まないこと。
+`${CLAUDE_PROJECT_DIR}`はClaude Code公式のプレースホルダーで、hook実行時のカレント
+ディレクトリに関わらずプロジェクトルートを指す（https://code.claude.com/docs/en/hooks）。
+絶対パスを直接埋め込むと (1) 他の環境にリポジトリをそのまま渡すとhookが動かない
+(2) ユーザー名・ローカルのディレクトリ構成が公開リポジトリ等で露出する、という
+2つの問題がある。
+
+例:
   変換前: "command": "node .claude/hooks/on-stop.js"
-  変換後: "command": "node /Users/alice/myproject/.claude/hooks/on-stop.js"
+  変換後: "command": "node ${CLAUDE_PROJECT_DIR}/.claude/hooks/on-stop.js"
+
+NOTE: `${CLAUDE_PROJECT_DIR}`のようなプレースホルダーを含むshell form（1つの文字列で
+コマンドを書く形式）の場合は、変数展開時にパスへ空白が含まれても壊れないようダブルクォートで
+囲む慣習がある（例: `node "${CLAUDE_PROJECT_DIR}"/.claude/hooks/on-stop.js`）。将来
+このテンプレートの`command`をshell formのまま複雑化する場合は、この点に注意すること。
 
 ASSERT EXISTS(CWD/.claude/settings.json)
+ASSERT: 書き出した CWD/.claude/settings.json に CWD の実際の絶対パス文字列が
+  含まれていないこと（confirms `${CLAUDE_PROJECT_DIR}`への置換が正しく行われたか）
 
 --- STEP 5: セットアップ確認（安全網） ---
 
