@@ -21,22 +21,22 @@ SKILL_DIR = このSKILL.mdが存在するディレクトリの絶対パス
 
 REQUIRE: カレントディレクトリがプロジェクトルートであること
 
-IF NOT EXISTS(.craft/):
-  MKDIR .craft/
+IF NOT EXISTS(.craft/docs/):
+  MKDIR .craft/docs/
 ENDIF
 
-IF NOT EXISTS(.craft/design-brief.md):
+IF NOT EXISTS(.craft/docs/design-brief.md):
   READ {SKILL_DIR}/design-brief-template.md
-  WRITE .craft/design-brief.md（内容: 上記テンプレートをそのまま。REQUIRE でカレントディレクトリ = プロジェクトルートが保証されているため相対パスで書く）
+  WRITE .craft/docs/design-brief.md（内容: 上記テンプレートをそのまま。REQUIRE でカレントディレクトリ = プロジェクトルートが保証されているため相対パスで書く）
 ENDIF
 
-ASSERT EXISTS(.craft/design-brief.md)
+ASSERT EXISTS(.craft/docs/design-brief.md)
 
 --- コンセプトの取り込み（/craft を呼ぶ前の会話に企画内容が含まれる場合） ---
 
 IF ここまでの会話の中で、何を作るか・核となる仕組み・名称など
    デザイン（見た目）以前の企画がすでに固まっている:
-  SELF: .craft/design-brief.md の「0. コンセプト」に、その内容をそのまま記録する
+  SELF: .craft/docs/design-brief.md の「0. コンセプト」に、その内容をそのまま記録する
   NOTE: 以下のヒアリングでは、ここに書いた内容を再度質問しないこと
 
 --- ヒアリング（SELF = メインClaudeがユーザーに直接質問する） ---
@@ -57,7 +57,7 @@ WAIT_FOR: ユーザーの回答
 
 --- デザインブリーフ作成（SELF = メインClaudeが記入する） ---
 
-SELF: ヒアリング回答をもとに .craft/design-brief.md の全TODOを埋める
+SELF: ヒアリング回答をもとに .craft/docs/design-brief.md の全TODOを埋める
   - ブランドアーキタイプはヒアリング結果から推定して選択する
   - 「9. 機能要件・完成条件」の「画面構成・核となる操作」「完成条件」には質問8・9の回答を
     そのまま記入する（「完成条件の実現可能性」欄は空欄のままでよい。build フローの
@@ -123,16 +123,16 @@ UNTIL ALL(score >= 4)
   READ {SKILL_DIR}/../new-project/preview-generation.md（このプレビュー生成チェーン中に
   未読の場合のみ。セッションが変わった場合は再度READする。共通ルール・CDN方針・
   ASSERT/失敗時の代替導線が定義されている）
-  .craft/design-brief.md の内容から、カラーパレット（実際のスウォッチ）・
+  .craft/docs/design-brief.md の内容から、カラーパレット（実際のスウォッチ）・
   タイポグラフィの印象・ブランドアーキタイプ・FEEL/ANTI-FEELワード・ページ構成を
   1枚にまとめる
     - artifact-design skillの既定方針（ライト/ダーク両テーマ対応）は維持したまま、
       ヒアリングで確認した明暗の方針を初期表示（:root のデフォルト値）に反映する
-  出力先: .craft/design-preview.html
+  出力先: .craft/previews/design-preview.html
 
 GATE: ユーザー承認
   SHOW USER:
-    "デザインブリーフが完成しました（プレビュー: .craft/design-preview.html）。この方針で実装を進めますか？"
+    "デザインブリーフが完成しました（プレビュー: .craft/previews/design-preview.html）。この方針で実装を進めますか？"
   WAIT_FOR: ユーザーが明示的に承認する
   PROHIBITED: 承認を受け取る前にステップ3へ進むこと
   IF NOT CONFIRMED: STOP
@@ -163,14 +163,14 @@ IF サブエージェントが "完了しました" を報告しない（エラ�
 
 ---
 
-### ステップ 3.5: 初期 .craft/plan.md 生成
+### ステップ 3.5: 初期 .craft/docs/plan.md 生成
 
 セットアップ完了後、デザインブリーフのページ・セクション構成から実装計画を作る。
 
 ```
-IF NOT EXISTS(.craft/plan.md):
-  ANALYZE: .craft/design-brief.md のページ構成・セクション構成を読み取る
-  WRITE .craft/plan.md
+IF NOT EXISTS(.craft/docs/plan.md):
+  ANALYZE: .craft/docs/design-brief.md のページ構成・セクション構成を読み取る
+  WRITE .craft/docs/plan.md
     INCLUDE:
       - プロジェクト名・目的（1〜2文。「0. コンセプト」があれば参照する）
       - 完成条件（「9. 機能要件・完成条件」の内容をそのまま転記する）
@@ -181,7 +181,7 @@ IF NOT EXISTS(.craft/plan.md):
     NOTE: 完成条件の達成が新規のロジック・アルゴリズム・独自フォーマット等（設計しながら
           決める核となる仕組み）に依存する場合は、それを担うセクションを最優先（先頭）に
           配置する。build フロー側で実装前に実現可能性を検証するため
-  ASSERT EXISTS(.craft/plan.md)
+  ASSERT EXISTS(.craft/docs/plan.md)
 ```
 
 ---
@@ -201,7 +201,7 @@ FOLLOW: そこに記述されたすべての手順を実行する
   HAS_FRONTEND = true
 
 NOTE: セクション単位の実装・モバイルファースト対応・Puppeteer での最終確認・
-      CLAUDE.md / README.md 生成・.craft/plan.md の更新は build フロー側で行われる。
+      CLAUDE.md / README.md 生成・.craft/docs/plan.md の更新は build フロー側で行われる。
 ```
 
 ---

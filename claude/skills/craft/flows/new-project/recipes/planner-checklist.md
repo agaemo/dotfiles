@@ -56,7 +56,10 @@ IMPORTANT: plan.md の「開発ランタイム」節に書く内容を、plan.md
    - 既存リポジトリに `devbox.json` / `shell.nix` / `docker-compose.yml` がある場合はそれに従う
      （新規プロジェクトでは通常該当しない。既存システムへの機能追加時に該当する）
    - ユーザーがDockerでの完結を希望する場合はそれに従う
-   - 上記いずれもない場合は `mise` をデフォルトとする（バージョン固定によるグローバル環境汚染防止のため）
+   - IMPORTANT: 上記いずれもない場合は `mise` をデフォルトとする。個別の言語専用バージョンマネージャー
+     （rustup単体・pyenv単体・nvm単体等）を先に提案しないこと — miseの`core`バックエンドが
+     大半の言語をカバーし、内部でその言語の標準ツール（rustup等）を使って導入する。
+     「miseで対応できるか」を必ず最初に確認してから、対応できない場合のみ個別ツールを検討する
 
 2. **言語・ランタイムのバージョン決定**
    - 既知の組み合わせ（Bun / Python(uv) / Node.js / Flutter / React Native）は
@@ -79,6 +82,7 @@ IMPORTANT: plan.md の「開発ランタイム」節に書く内容を、plan.md
    | Flutter | `{SKILL_DIR}/flows/new-app/flutter-notes.md` を読み、`flutter create` コマンド・バージョン固定の注意点（`stable` 指定は404になる）を確認する |
    | React Native (Expo・既定) | `.mise.toml`（`node = "22"`, `pnpm = "latest"`）作成後、`pnpm create expo-app . --template blank-typescript && pnpm install` |
    | React Native (CLI) | ユーザーがCLI構成を明示的に希望した場合のみ選ぶ。同じ `.mise.toml` 作成後、`pnpm dlx @react-native-community/cli init <アプリ名> --directory . && pnpm install` |
+   | Tauri（Rust製デスクトップアプリ） | `{SKILL_DIR}/flows/new-project/recipes/tauri-init.md` を読み、scaffoldコマンド・マージ時の`.gitignore`衝突対策・`panic="abort"`の扱いを確認する |
 
    Webアプリの場合、会話の文脈から Next.js / Vite + React / Hono / Express 等を推定する。判断できない場合はユーザーに確認する。
    リアルタイム通信（WebSocket・チャット・通知）が要件にある場合は
@@ -92,4 +96,4 @@ IMPORTANT: plan.md の「開発ランタイム」節に書く内容を、plan.md
    - STACK識別子（英小文字・言語名のみ。例: node / flutter / rust / go。「Node.js」等の表記は不可）も明記する。
      既存の特別扱い値（static・flutter・node）と衝突しないよう注意する
 
-> **設計判断の記録:** 確認した内容は `.craft/plan.md` の「設計判断」セクションに記録すること。
+> **設計判断の記録:** 確認した内容は `.craft/docs/plan.md` の「設計判断」セクションに記録すること。

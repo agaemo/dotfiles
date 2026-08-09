@@ -39,65 +39,65 @@ NOTE: 各 GATE で承認を求める前に以下の形式で進捗を必ず表�
 
 ```
 STEP 1: intake
-  OUTPUT: .craft/requirements.md
-  ASSERT EXISTS(.craft/requirements.md)
+  OUTPUT: .craft/docs/requirements.md
+  ASSERT EXISTS(.craft/docs/requirements.md)
 
   プレビュー生成（共通ルール参照）:
-    .craft/requirements.md の内容から確認用HTMLを作成する
+    .craft/docs/requirements.md の内容から確認用HTMLを作成する
       - プロジェクト概要・必須機能・スコープ外・完成の基準を中心に、読みやすい見出し階層で提示する
       - 治療は実務資料（memo相当）: 誇張した装飾は避ける
-    出力先: .craft/requirements-preview.html
+    出力先: .craft/previews/requirements-preview.html
 
   GATE: 承認進捗を表示してからユーザーに内容を提示し、承認を得ること
   PROHIBITED: 承認前に次ステップへ進むこと
 
 STEP 2: refiner
-  INPUT:  .craft/requirements.md
-  OUTPUT: .craft/stories.md
-  ASSERT EXISTS(.craft/stories.md)
+  INPUT:  .craft/docs/requirements.md
+  OUTPUT: .craft/docs/stories.md
+  ASSERT EXISTS(.craft/docs/stories.md)
   NOTE: 未解決の疑問はユーザーから回答を得た後も削除しない。
         以下の形式でチェック済みにして残すこと（意思決定の根拠として保持）:
         - [x] [疑問の内容]
               → **回答（YYYY-MM-DD）:** [回答内容]
 
   プレビュー生成（共通ルール参照）:
-    .craft/stories.md の内容から確認用HTMLを作成する
+    .craft/docs/stories.md の内容から確認用HTMLを作成する
       - US一覧をカード形式で提示し、受け入れ条件・サイズ・依存を見やすく整理する
       - 「未解決の疑問」セクションは回答済み(x)/未回答を視覚的に区別する
-    出力先: .craft/stories-preview.html
+    出力先: .craft/previews/stories-preview.html
 
   GATE: 承認進捗を表示してからユーザーに内容を提示し、承認を得ること
   PROHIBITED: 承認前に次ステップへ進むこと
 
 IF HAS_FRONTEND == true:
   STEP 3: designer ← 省略禁止・planner より先に実施すること
-    a. READ {SKILL_DIR}/agents/designer.md → メインClaude自身が「テンプレート: デザインブリーフ」に従い実行する → .craft/design-brief.md
-    b. 同様に「テンプレート: デザインシステム」に従い実行する → .craft/design-system.md
-    c. 画面構成・コンポーネント構成を .craft/design.md に記録
+    a. READ {SKILL_DIR}/agents/designer.md → メインClaude自身が「テンプレート: デザインブリーフ」に従い実行する → .craft/docs/design-brief.md
+    b. 同様に「テンプレート: デザインシステム」に従い実行する → .craft/docs/design-system.md
+    c. 画面構成・コンポーネント構成を .craft/docs/design.md に記録
        INCLUDE: 画面遷移（どの画面からどの画面へ・何をトリガーに遷移するか）を
                 表または箇条書きで明記すること（例: 一覧画面 → [詳細を開く] → 詳細画面）
                 → 基本設計書の画面遷移図はこの記録を元に生成する
 
-    ASSERT EXISTS(.craft/design-brief.md)
-    ASSERT EXISTS(.craft/design-system.md)
-    ASSERT EXISTS(.craft/design.md)
+    ASSERT EXISTS(.craft/docs/design-brief.md)
+    ASSERT EXISTS(.craft/docs/design-system.md)
+    ASSERT EXISTS(.craft/docs/design.md)
 
     c2. 主要画面のワイヤーフレーム生成（省略禁止）:
-       .craft/design.md の画面一覧から、ユーザーが最も長く滞在する主要画面を1〜2枚選び、
+       .craft/docs/design.md の画面一覧から、ユーザーが最も長く滞在する主要画面を1〜2枚選び、
        design-system.md のトークン（実際の色・タイポ）を使ったラフなレイアウトHTMLを作成する。
        IMPORTANT: 高精細なモックアップではなく、レイアウトの骨格（ヘッダー・ナビ・主要コンポーネントの
        配置）が伝わる粒度でよい。作り込みすぎない（1画面あたり実装時間5分以内を目安にする）
-       出力先: .craft/wireframe-preview.html
+       出力先: .craft/previews/wireframe-preview.html
 
     d. プレビュー生成（共通ルール参照）:
-       .craft/design-brief.md・.craft/design-system.md の内容から、
+       .craft/docs/design-brief.md・.craft/docs/design-system.md の内容から、
        カラーパレット（実際のスウォッチ）・タイポグラフィスケール・ブランドアーキタイプ・
        FEEL/ANTI-FEELワードを1枚にまとめる
          - ライト/ダーク両テーマに対応する場合、実際に切り替えて確認できるボタンをプレビュー右上に
            設置すること（例: `<html data-theme="light">` をJSでトグルする）。
            「両テーマに対応」と文書だけに書いて実物を見せない状態を禁止する
          - 治療は実務資料（memo/plan相当）: 誇張したヒーロー等は避け、パレット・タイポの実物大提示を主目的にする
-       出力先: .craft/design-preview.html
+       出力先: .craft/previews/design-preview.html
 
     GATE: 承認進捗を表示してからユーザーに提示し、承認を得ること（design-preview.html と
           wireframe-preview.html の両方を提示する）
@@ -108,15 +108,15 @@ ELSE:
 ENDIF
 
 STEP 4: planner ← 基本設計を含む場合、このGATEが実質的な基本設計承認になる（DBスキーマ・API設計・セキュリティ設計を含む）
-  INPUT:  .craft/stories.md（+ .craft/design-brief.md・.craft/design.md があれば）
-  OUTPUT: .craft/plan.md
-  ASSERT EXISTS(.craft/plan.md)
+  INPUT:  .craft/docs/stories.md（+ .craft/docs/design-brief.md・.craft/docs/design.md があれば）
+  OUTPUT: .craft/docs/plan.md
+  ASSERT EXISTS(.craft/docs/plan.md)
   NOTE: 呼び出し前に「planner へ渡すべき設計判断の確認事項」を参照し、ユーザーに確認すること
         → READ {SKILL_DIR}/flows/new-project/recipes/planner-checklist.md
         IF READ FAILED: REPORT "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/planner-checklist.md" → STOP
 
   プレビュー生成（共通ルール参照）:
-    .craft/plan.md の内容から以下を作成する:
+    .craft/docs/plan.md の内容から以下を作成する:
 
     （「基本設計」セクションがある場合の追加提示。下記フィーチャートラックの有無とは独立に判定する）
     IF 「基本設計」セクションがある:
@@ -133,7 +133,7 @@ STEP 4: planner ← 基本設計を含む場合、このGATEが実質的な基�
     ENDIF
 
     - 治療は実務資料（plan相当）: 図解による理解のしやすさを優先し、誇張した装飾は避ける
-    出力先: .craft/plan-preview.html
+    出力先: .craft/previews/plan-preview.html
 
   GATE: 承認進捗を表示してからユーザーに計画を提示し、承認を得ること
     NOTE: DB・API・認証を伴う場合、ここでDBスキーマ・API設計・セキュリティ設計が確定する。
@@ -172,17 +172,17 @@ STEP 6: 統合設計書生成 ← 理解度確認後の総合確認ゲート
   IF READ FAILED: REPORT "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/templates.md" → STOP
 
   生成する3文書:
-    a. templates.md の「テンプレート: 要求定義書」を参照 → .craft/01_requirements_doc.md
-       入力: .craft/requirements.md
-    b. templates.md の「テンプレート: 要件定義書」を参照 → .craft/02_specifications_doc.md
-       入力: .craft/stories.md
-    c. templates.md の「テンプレート: 基本設計書」を参照 → .craft/03_basic_design_doc.md
-       入力: .craft/plan.md の「基本設計」セクション（DBスキーマ・API設計・画面遷移図・
+    a. templates.md の「テンプレート: 要求定義書」を参照 → .craft/docs/01_requirements_doc.md
+       入力: .craft/docs/requirements.md
+    b. templates.md の「テンプレート: 要件定義書」を参照 → .craft/docs/02_specifications_doc.md
+       入力: .craft/docs/stories.md
+    c. templates.md の「テンプレート: 基本設計書」を参照 → .craft/docs/03_basic_design_doc.md
+       入力: .craft/docs/plan.md の「基本設計」セクション（DBスキーマ・API設計・画面遷移図・
        セキュリティ設計を転記するのみ）+ design-system.md があれば
 
-  ASSERT EXISTS(.craft/01_requirements_doc.md)
-  ASSERT EXISTS(.craft/02_specifications_doc.md)
-  ASSERT EXISTS(.craft/03_basic_design_doc.md)
+  ASSERT EXISTS(.craft/docs/01_requirements_doc.md)
+  ASSERT EXISTS(.craft/docs/02_specifications_doc.md)
+  ASSERT EXISTS(.craft/docs/03_basic_design_doc.md)
 
   プレビュー生成（共通ルール参照）:
     3文書（01_requirements_doc.md・02_specifications_doc.md・03_basic_design_doc.md）を
@@ -194,7 +194,7 @@ STEP 6: 統合設計書生成 ← 理解度確認後の総合確認ゲート
       - 基本設計書の「画面遷移図」セクションは、plan.md の「基本設計 > 画面遷移図」をそのまま
         転記して箱＋矢印で図解する（design.md へは戻らない。plan-preview.htmlと同様の方針）
       - 治療は文書（読み物）: 長文を読ませる前提のタイポグラフィ・余白を優先し、装飾は最小限にする
-    出力先: .craft/spec-review.html
+    出力先: .craft/previews/spec-review.html
 
   GATE: 以下の形式でユーザーに一括提示し、承認を得ること:
 
@@ -206,17 +206,17 @@ STEP 6: 統合設計書生成 ← 理解度確認後の総合確認ゲート
     👉 STEP 5: 統合設計書（承認待ち）
     ──────────────────────────────────────────────
 
-    以下の内容を確認してください（.craft/spec-review.html）。これらの内容で開発を開始します。
+    以下の内容を確認してください（.craft/previews/spec-review.html）。これらの内容で開発を開始します。
 
     承認いただけましたか？
 
   PROHIBITED: 3文書の承認前に実装を開始すること
   NOTE: 文書の内容に矛盾が見つかった場合は、該当する元ドキュメント（requirements.md 等）を修正してから再生成し、
-        .craft/spec-review.html も再生成すること
+        .craft/previews/spec-review.html も再生成すること
 
 STEP 7: build フローへ委譲
 
-  READ .craft/plan.md の「開発ランタイム」節の STACK識別子
+  READ .craft/docs/plan.md の「開発ランタイム」節の STACK識別子
   IF 見つからない（旧形式のplan.md等）:
     WARN: "「開発ランタイム」節にSTACK識別子が見つかりません。デフォルトの node を使用します。"
     SET STACK = "node"

@@ -93,6 +93,7 @@ WAIT_FOR: ユーザーの回答
 |--------------------------------------------|--------------------------|----------|---------------|
 | UI・API・DB不要、画面モックのみ            | 静的サイト                | 実装済み | new-static    |
 | API・DB・認証など動的機能（Node.js系）     | Webアプリ                 | 実装済み | new-project   |
+| Tauri・Electron等 Web技術ベースのデスクトップアプリ | デスクトップアプリ | 実装済み | new-project（`recipes/tauri-init.md`等のscaffold手順を参照） |
 | Flutter・React Native・Expo等スマホアプリ  | クロスプラットフォーム    | 実装済み | new-app       |
 | 画面UIが不要、ターミナル上で完結           | CLIツール                 | TODO     | （未実装）     |
 | Google Sheets・Workspace連携が中心         | Google Apps Script        | TODO     | （未実装）     |

@@ -29,9 +29,9 @@ SKILL_DIR = このSKILL.mdが存在するディレクトリの絶対パス
   # 例: /Users/alice/.claude/skills/craft
   # このファイルを読んだパスから導出すること
 
-IF .craft/plan.md が存在する:
+IF .craft/docs/plan.md が存在する:
   # plan.md は初期設計ドキュメント。「既存実装の再開」か「新しい要件」かを明示的に確認する
-  GATE: 「.craft/plan.mdが見つかりました。今回の依頼はどちらですか？」とユーザーに確認する
+  GATE: 「.craft/docs/plan.mdが見つかりました。今回の依頼はどちらですか？」とユーザーに確認する
     選択肢:
       1. plan.md の実装を続ける（中断した実装の再開）
       2. plan.md とは別の新しい要件として進める（fix ファイルを新規作成）
@@ -45,7 +45,7 @@ IF .craft/plan.md が存在する:
     CONTINUE: 下記のscope読み込みへ進む
   ENDIF
 ENDIF
-# .craft/plan.md がそもそも存在しない場合も、そのまま下記のscope読み込みへ継続する
+# .craft/docs/plan.md がそもそも存在しない場合も、そのまま下記のscope読み込みへ継続する
 
 READ {SKILL_DIR}/flows/scope/SKILL.md
 IF READ FAILED:
@@ -69,7 +69,7 @@ NOTE: FOLLOW 実行中にエラーや予期しない STOP が発生した場合�
 
 （本セクションはステップ0の分岐からのみ到達する。SKILL_DIR はステップ0で定義済みの値をそのまま使う）
 
-`.craft/plan.md` が存在する状態から実装を続ける場合は、build フローに委譲する。
+`.craft/docs/plan.md` が存在する状態から実装を続ける場合は、build フローに委譲する。
 初回実装（各 new-xxx フローの設計完了後）と同じエンジンを使うため、手順の二重管理がない。
 
 ```

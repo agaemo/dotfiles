@@ -1,6 +1,6 @@
 ---
 name: build
-description: .craft/plan.md に基づいて実装を進める共通エンジン。設計フェーズ（intake〜planner、またはヒアリング→design-brief）完了直後の初回実装、または別セッションでの再開時に呼び出される。new-project・new-static・new-app から共通で利用する。
+description: .craft/docs/plan.md に基づいて実装を進める共通エンジン。設計フェーズ（intake〜planner、またはヒアリング→design-brief）完了直後の初回実装、または別セッションでの再開時に呼び出される。new-project・new-static・new-app から共通で利用する。
 ---
 
 # build（実装フェーズ・共通エンジン）
@@ -20,19 +20,19 @@ SKILL_DIR = このSKILL.md（craft/flows/build/SKILL.md）のパスから2階層
 IF 変数が渡されていない（再開時・トップレベル SKILL.md から直接呼ばれた場合のみ）:
   AUTO-DETECT:
     IF EXISTS(pubspec.yaml):                                  SET STACK = "flutter"
-    ELIF EXISTS(.craft/design-brief.md) AND NOT EXISTS(.craft/stories.md): SET STACK = "static"
-    ELIF EXISTS(.craft/plan.md) の「開発ランタイム」節に STACK識別子がある: SET STACK = その値
+    ELIF EXISTS(.craft/docs/design-brief.md) AND NOT EXISTS(.craft/docs/stories.md): SET STACK = "static"
+    ELIF EXISTS(.craft/docs/plan.md) の「開発ランタイム」節に STACK識別子がある: SET STACK = その値
     ELSE:                                                      SET STACK = "node"
   SET HAS_REVIEW_CHAIN = (STACK != "static")
-  SET HAS_FRONTEND     = EXISTS(.craft/design-brief.md) OR EXISTS(.craft/design-system.md)
+  SET HAS_FRONTEND     = EXISTS(.craft/docs/design-brief.md) OR EXISTS(.craft/docs/design-system.md)
 ENDIF
 
-ASSERT EXISTS(.craft/plan.md)
+ASSERT EXISTS(.craft/docs/plan.md)
 IF NOT EXISTS:
   REPORT: "plan.mdが見つかりません。設計フェーズ（intake〜planner、またはヒアリング→design-brief）を先に完了してください。"
   STOP
 
-IMPORTANT: .craft/plan.md は呼び出し元フローで既にユーザー承認済みの計画である前提のため、
+IMPORTANT: .craft/docs/plan.md は呼び出し元フローで既にユーザー承認済みの計画である前提のため、
   本フロー内の実装・commit・ファイル生成・public/ クリーンアップはユーザーへの確認なしに進めること。
   PROHIBITED: plan.md に記載のないファイル・スコープ外の変更を加えること
 ```
@@ -44,19 +44,32 @@ IMPORTANT: .craft/plan.md は呼び出し元フローで既にユーザー承認
 ### ステップ 0: 前提確認
 
 ```
-READ .craft/plan.md
-READ .craft/design-system.md（存在すれば）
+READ .craft/docs/plan.md
+READ .craft/docs/design-system.md（存在すれば）
 
 REPORT TO USER: 完了状況
   - 完了済みのステップ（対応するコード・ファイルが存在するか確認）
   - 未着手のステップ
   - 外部依存で未接続のもの（Firebase・外部API・認証基盤等）
+
+IF plan.md に「技術調査の結果」等、外部システムの仕様（API・イベント名・機能の存在有無等）に
+   ついてplanner（WebSearch）が断定した記述があり、かつその前提が基本設計の中核を占める
+   （例: 通信方式・検知可否の判断がその調査結果に丸ごと依存している）:
+  IMPORTANT: 実装へ進む前に、その断定内容を最低1回、メインのClaude自身が独立にWebSearch等で
+    裏付けを取ること。特に「当初の懸念・制約をすべて都合よく解消する」ような調査結果は、
+    確証バイアス・ハルシネーションのリスクが高いため必ず再検証すること
+    （planner自身の自己申告のみで進めない。verify等の後続レビューはコードのレビューであり、
+    この種の前提の正しさまでは検証しない）
+  IF 独立検証で食い違いが見つかった:
+    REPORT TO USER: 食い違いの内容と、plan.mdの修正が必要な旨
+    WAIT_FOR: ユーザーの判断
+    PROHIBITED: 未検証のまま、または食い違いを無視して実装を進めること
 ```
 
 ### ステップ 0.5: 完成条件の実現可能性チェック（該当する場合のみ）
 
 ```
-READ .craft/plan.md・.craft/design-brief.md（存在すれば）の完成条件を確認する
+READ .craft/docs/plan.md・.craft/docs/design-brief.md（存在すれば）の完成条件を確認する
 
 IF 完成条件が「特定の出力・振る舞いが得られること」を明記しており、
    かつその達成が今から設計する新規のロジック・アルゴリズム・独自フォーマット・DSL等
@@ -71,7 +84,7 @@ IF 完成条件が「特定の出力・振る舞いが得られること」を�
     理由: 後から「仕様上その出力が原理的に出せない」と判明すると、UI実装が手戻りになる
 
   IF 検証できた:
-    .craft/plan.md に検証方法・結果を1〜2文で記録してから通常の実装に進む
+    .craft/docs/plan.md に検証方法・結果を1〜2文で記録してから通常の実装に進む
   IF 検証できなかった（完成条件を満たせない、または見積もりで大幅な追加設計が必要と分かった）:
     REPORT TO USER: 検証結果（何が・なぜ困難か）と選択肢
       1. 完成条件を実現可能な範囲に調整する
@@ -89,7 +102,7 @@ IMPORTANT: このステップも言語・ランタイムマネージャー・Doc
   対応するのは planner が「開発ランタイム」節に書くセットアップコマンドの中身だけであり、
   このファイル（build/SKILL.md）自体は変更しない。
 
-READ .craft/plan.md の「開発ランタイム」セクション
+READ .craft/docs/plan.md の「開発ランタイム」セクション
   # フォーマット（agents/planner.md の出力テンプレート参照）:
   #   STACK識別子: <値> / 環境管理ツール: <値（mise・devbox・nix-shell・Docker等）>
   #   セットアップコマンド: ```bash ... ```（複数行、上から順に実行）
@@ -121,7 +134,7 @@ ELSE（初回。環境管理ツールの設定ファイルがまだ存在しな�
     ANALYZE: エラー内容から原因を推定する（バージョン指定ミス・レジストリ未登録・
       OS依存のビルド失敗・ネットワーク等）
     IF 原因を特定でき、修正が軽微（バージョン変更・コマンドの誤り修正等）と判断できる:
-      FIX: .craft/plan.md の「開発ランタイム」節を実際に機能する内容に更新する
+      FIX: .craft/docs/plan.md の「開発ランタイム」節を実際に機能する内容に更新する
         （例: 固定バージョンをレジストリに実在する値に修正する）
       RETRY: セットアップコマンドを再実行する
       IF 2回試しても解決しない、または原因が特定できない:
@@ -136,7 +149,7 @@ ELSE（初回。環境管理ツールの設定ファイルがまだ存在しな�
       3. 手動で環境構築してから再開する
     WAIT_FOR: ユーザーの判断
     IF 1（変更して再試行）:
-      .craft/plan.md の「開発ランタイム」節をユーザー指定の内容に更新してから、RUN（セットアップコマンド）から再開する
+      .craft/docs/plan.md の「開発ランタイム」節をユーザー指定の内容に更新してから、RUN（セットアップコマンド）から再開する
       IF このエスカレーション自体が3回目以上（ユーザー指定の内容でも解決しない）:
         REPORT: "ユーザー指定の内容でも解決しませんでした。手動での環境構築を推奨します。"
         STOP
@@ -151,8 +164,13 @@ IMPORTANT: このステップは言語・ランタイムマネージャー・Doc
   常に `make <target>` を呼ぶ。新しい言語・ランタイム・仮想化パターンが増えても、
   対応するのは planner が「開発コマンド」表に書く実行コマンドの中身だけであり、
   このファイル（build/SKILL.md）自体は変更しない。
+  IMPORTANT: この原則はMakefile生成直後だけでなく、build フロー実行中ずっと守ること。
+  `mise exec -- <コマンド>`・`cargo ...`・`pnpm ...`等を Makefile 経由せず直接実行しないこと。
+  IMPORTANT: Makefile生成後に、表に無いコマンド（例: 音源・アセット再生成、特定のサブコマンド等）が
+  実装中に必要になった場合は、直接実行せず対応するMakefileターゲットを追加してから使うこと。
+  「Makefileにターゲットが無いから直接実行した」は誤り — 無ければ追加する。
 
-READ .craft/plan.md の「開発コマンド」セクション
+READ .craft/docs/plan.md の「開発コマンド」セクション
 
 IF EXISTS(Makefile):
   既存のMakefileを尊重する（上書きしない）。
@@ -202,7 +220,7 @@ IF テスト環境が未セットアップ:
 ### ステップ 2: 実装
 
 ```
-IF .craft/plan.md に「フィーチャートラック設計」セクションがある:
+IF .craft/docs/plan.md に「フィーチャートラック設計」セクションがある:
   FOLLOW: 下記「A. フェーズ実装（トラック設計あり）」
 ELSE （トラック設計なし・小規模、または static）:
   FOLLOW: 下記「B. シンプルループ（トラック設計なし）」
@@ -213,7 +231,7 @@ ELSE （トラック設計なし・小規模、または static）:
 ```
 --- フェーズ1: クリティカルパス（シリアル） ---
 
-.craft/plan.md の「フェーズ1」ステップを順番に実装する。
+.craft/docs/plan.md の「フェーズ1」ステップを順番に実装する。
 各ステップ完了ごとに `make build` で型エラーがないことを確認する（Makefileが無い場合は
 下記「#フォールバック」を参照）。
 
@@ -228,7 +246,7 @@ ELSE （トラック設計なし・小規模、または static）:
 
 --- フェーズ2: 並列フィーチャートラック（worktree 分離） ---
 
-.craft/plan.md の「フェーズ2」に定義された各トラックを、
+.craft/docs/plan.md の「フェーズ2」に定義された各トラックを、
 **isolation: "worktree" + run_in_background: true** でバックグラウンド並列実行する。
 
 各トラックに渡すプロンプト:
@@ -267,7 +285,7 @@ WAIT_FOR: 全トラックエージェントの完了報告を受け取ってか�
 
 ```
 REPEAT:
-  未着手のステップを .craft/plan.md の順番で1件選ぶ
+  未着手のステップを .craft/docs/plan.md の順番で1件選ぶ
   実装する
     IF STACK == "static":
       セクション単位（.astro コンポーネント）で実装する。
@@ -287,7 +305,7 @@ REPEAT:
     REPORT: エラー内容を報告する
     修正してから次に進む
 
-  IF .craft/plan.md の該当ステップを「完了」にマークする
+  IF .craft/docs/plan.md の該当ステップを「完了」にマークする
 
   IF STACK == "static" かつ 今回のステップでユーザーが直接目にする画面要素
      （新規ページ・大きな新規コンポーネント・見た目や操作が変わる変更）を実装した:
@@ -305,7 +323,7 @@ REPEAT:
 UNTIL 未着手のステップがなくなる
 ```
 
-#### フォールバック（.craft/plan.md に「開発コマンド」セクションが無い場合のみ）
+#### フォールバック（.craft/docs/plan.md に「開発コマンド」セクションが無い場合のみ）
 
 ステップ0.7でMakefileが生成できなかった場合（旧形式のplan.md・再開時等）に限り使う。
 通常は `make build` / `make dev` を使うこと。
@@ -350,7 +368,7 @@ CHECK: コンポーネント設計・アクセシビリティ・型安全性
 ### ステップ 5: レビューチェーン（HAS_REVIEW_CHAIN == true の場合のみ）
 
 ```
-.craft/plan.md 冒頭の「レビュートラック」宣言（A/B/C）を確認する。
+.craft/docs/plan.md 冒頭の「レビュートラック」宣言（A/B/C）を確認する。
 IF 宣言が見つからない（トラック未宣言の計画）:
   SET レビュートラック = "C"（安全側に倒し、フルチェーンを適用する）
 
@@ -395,10 +413,10 @@ IF NOT EXISTS(CLAUDE.md) OR （EXISTS するが プロジェクト名・目的�
   INCLUDE（実際の値のみ。プレースホルダー禁止）:
     - プロジェクト名・目的（1〜2文）
     - スタック（実際に使う言語・フレームワーク・主要ライブラリ）
-    - 開発コマンド（`make dev`/`make test`/`make build`等。.craft/plan.md の「開発コマンド」セクション参照）
+    - 開発コマンド（`make dev`/`make test`/`make build`等。.craft/docs/plan.md の「開発コマンド」セクション参照）
     - IF HAS_REVIEW_CHAIN: アーキテクチャ（採用パターン名・ディレクトリ構造のポイント・レイヤー間の依存の向き）
     - プロジェクト固有の制約（DBエンジン・実行環境の制限など）
-    - .craft/plan.md を参照するよう一言書く
+    - .craft/docs/plan.md を参照するよう一言書く
     - IF STACK == "flutter": Flutter/Firebase 固有の記載事項
       READ {SKILL_DIR}/flows/new-app/flutter-notes.md の「CLAUDE.md に含める Flutter/Firebase 固有の記載事項」
 
@@ -425,10 +443,10 @@ IF NOT EXISTS(README.md):
   OMIT: 本番の認証情報・APIキー・パスワード
   ASSERT EXISTS(README.md)
 
---- .craft/plan.md の更新 ---
+--- .craft/docs/plan.md の更新 ---
 
 完了したステップをすべて「完了」にマークしてから保存する。
-NOTE: build フローの再開（/craft で「続きをお願いします」）は .craft/plan.md の存在に依存する。
+NOTE: build フローの再開（/craft で「続きをお願いします」）は .craft/docs/plan.md の存在に依存する。
 
 --- public/ クリーンアップ（HAS_FRONTEND == true かつ STACK == "node" の場合） ---
 
@@ -446,7 +464,7 @@ IF 削除候補が1件以上ある:
 
 --- 完了報告 ---
 
-ASSERT: CLAUDE.md・README.md・.craft/plan.md が全て存在すること（自己検証。いずれか欠けている場合は該当セクションに戻って再実行する）
+ASSERT: CLAUDE.md・README.md・.craft/docs/plan.md が全て存在すること（自己検証。いずれか欠けている場合は該当セクションに戻って再実行する）
 
 IF HAS_FRONTEND == true:
   ENSURE: 開発サーバーが起動中であること
@@ -468,9 +486,13 @@ REPORT TO USER:
       例: http://localhost:8080
     IF 認証機能を含む:
       - テストユーザー: ユーザー名 / パスワード（make seed の出力をそのまま掲載）
+    - 停止方法を明記すること（例: 「Ctrl+Cで終了」「`pkill -f <プロセス名>`」等、実際に有効な手段）。
+      IMPORTANT: デスクトップアプリ（Tauri/Electron等）でウィンドウを閉じてもプロセスが
+      常駐し続ける設計の場合は特に必須。「ウィンドウを閉じれば終わる」と誤解されないよう、
+      実際に必要な操作（アプリメニューから終了・プロセスをkill等）を伝えること
   NOTE: サーバー状態（起動中 or 停止中）を必ず明記すること。
     「動作確認できます」だけでは不十分。
 
   IF 未完了タスクが残っている状態で終了する場合:
-    SAVE TO MEMORY（auto-memory に記録）は不要（.craft/plan.md に記録済みのため）
+    SAVE TO MEMORY（auto-memory に記録）は不要（.craft/docs/plan.md に記録済みのため）
 ```

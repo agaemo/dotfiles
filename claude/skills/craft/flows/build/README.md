@@ -1,6 +1,6 @@
 # build（実装フェーズ）フロー
 
-`.craft/plan.md` に基づいて実装を進める共通エンジン。`SKILL.md` に定義。
+`.craft/docs/plan.md` に基づいて実装を進める共通エンジン。`SKILL.md` に定義。
 new-project・new-static・new-app の設計フェーズ完了後、または別セッションでの再開時に、
 同じこのフローが呼ばれる（実装ロジックの二重管理をなくすため）。
 
@@ -67,7 +67,7 @@ flowchart TD
 flowchart LR
     subgraph Track["track-[name]（worktree 分離済み）"]
         direction TB
-        R[".craft/stories.md の\n担当 US を読む"]
+        R[".craft/docs/stories.md の\n担当 US を読む"]
         R --> I["所有ファイルを実装\n（依存ファイルは読み取り専用）"]
         I --> B{"make build\n成功？"}
         B -->|失敗| I

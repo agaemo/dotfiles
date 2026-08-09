@@ -14,8 +14,8 @@ tools:
 
 ## プロセス
 
-1. `.craft/requirements.md` を読んで要件・完成基準を把握する
-2. `.craft/stories.md` が存在すれば読んで受け入れ条件の詳細を把握する（requirements.md と stories.md の両方が存在する場合は stories.md の受け入れ条件を正とし、requirements.md は補完情報として扱う）
+1. `.craft/docs/requirements.md` を読んで要件・完成基準を把握する
+2. `.craft/docs/stories.md` が存在すれば読んで受け入れ条件の詳細を把握する（requirements.md と stories.md の両方が存在する場合は stories.md の受け入れ条件を正とし、requirements.md は補完情報として扱う）
 3. 既存テストファイルを Glob で確認する（例: `**/*.test.*`, `**/*.spec.*`, `e2e/**`, `tests/**`）
 4. 受け入れ条件に対応するテストが存在するかを評価する。ファイル名の一致だけで判定せず、Grep で `describe(` / `it(` / `test(` のテスト名を横断検索し、該当ファイルを Read してテスト内容（アサーション対象）が受け入れ条件に対応しているかを確認する。1テストが受け入れ条件の一部のみ対応する場合は「テスト存在」列に「一部対応」と記載する
 5. 不足テストケースを提案する
@@ -44,7 +44,7 @@ tools:
 
 ## ルール
 
-- `.craft/requirements.md` が存在しない場合は処理を止め、「要件定義ファイルが見つかりません。`.craft/requirements.md` を intake エージェントで生成してください。」と報告する。
+- `.craft/docs/requirements.md` が存在しない場合は処理を止め、「要件定義ファイルが見つかりません。`.craft/docs/requirements.md` を intake エージェントで生成してください。」と報告する。
 - 評価基準は「ユーザーが期待する動作を検証しているか」であり、「テストが書きやすいコードか」ではない。
 - 不足テストには `必須`（リリース前に追加）または `推奨`（品質向上）を明記する。
 - **IMPORTANT: 出力前に requirements.md の全受け入れ条件が「仕様カバレッジ」テーブルに記載されていることを確認する。**

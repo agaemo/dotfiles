@@ -159,14 +159,14 @@ REPORT: "完了しました"
 ### ステップ 4: 完了報告
 
 IMPORTANT: 開発ランタイム（mise.toml作成・`flutter create` / `pnpm create expo-app` 等のscaffold）は
-  ここでは決めない。planner が `.craft/plan.md` の「開発ランタイム」節に決定内容を記録し、
+  ここでは決めない。planner が `.craft/docs/plan.md` の「開発ランタイム」節に決定内容を記録し、
   build フロー側（ステップ0.6）が実際にインストール・scaffoldを実行する。
   決定手順・Flutter固有の注意点（バージョン固定・依存競合等）は
   {SKILL_DIR}/flows/new-project/recipes/planner-checklist.md の「開発ランタイムの選定方針」と
   {SKILL_DIR}/flows/new-app/flutter-notes.md に記載されている（agents/planner.md が
   planner呼び出し前にこれらを参照する設計になっている）。
   ステップ2で確認した組織ID・プラットフォーム・アプリ名は、intake/refiner へのヒアリング回答
-  （`.craft/requirements.md` 等）に明示的に含めること。planner は requirements.md・stories.md を
+  （`.craft/docs/requirements.md` 等）に明示的に含めること。planner は requirements.md・stories.md を
   読んでから動くため、会話文脈だけでなく成果物に残っていることを確認する（再度質問しない）。
 
 ```
@@ -185,12 +185,12 @@ REPORT TO USER:
 セットアップ完了後は以下の順で実行すること。
 
 ```
-STEP 1: intake         → .craft/requirements.md
-STEP 2: refiner        → .craft/stories.md
-STEP 3: designer       → .craft/design-brief.md / design-system.md / design.md
-STEP 4: planner        → .craft/plan.md
+STEP 1: intake         → .craft/docs/requirements.md
+STEP 2: refiner        → .craft/docs/stories.md
+STEP 3: designer       → .craft/docs/design-brief.md / design-system.md / design.md
+STEP 4: planner        → .craft/docs/plan.md
 STEP 5: 理解度チェック
-STEP 6: 統合設計書生成  → .craft/01_requirements_doc.md / 02_specifications_doc.md / 03_basic_design_doc.md
+STEP 6: 統合設計書生成  → .craft/docs/01_requirements_doc.md / 02_specifications_doc.md / 03_basic_design_doc.md
 STEP 7: {SKILL_DIR}/flows/new-project/agent-chain.md の STEP 7 と同じロジックに従う（build フローへ委譲）
   ただし STACK識別子が plan.md に見つからない場合のデフォルト値のみ異なる:
     agent-chain.md の STEP 7 → "node" 固定

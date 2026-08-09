@@ -228,18 +228,18 @@ IF ユーザーが移行・リファクタ、または自前で構築を選択:
   CREATE_PR    = ユーザーが PR 作成を希望した場合
   LOCAL_ONLY   = ユーザーが issue も PR も不要と回答した場合
 
-  # fix ファイルを作成して .craft/plan.md に追記する（issue/PR の有無にかかわらず常に実施）
-  IF .craft/ ディレクトリが存在する:
-    FIX_FILE = .craft/{YYYYMMDD}-{slug}.md
+  # fix ファイルを作成して .craft/docs/plan.md に追記する（issue/PR の有無にかかわらず常に実施）
+  IF .craft/docs/ ディレクトリが存在する:
+    FIX_FILE = .craft/docs/{YYYYMMDD}-{slug}.md
       # YYYYMMDD: 今日の日付, slug: 変更内容を英数字+ハイフンで短く表現（例: kanban-fixes）
     WRITE {FIX_FILE}: 以下の内容を記録する
       - ## 課題: 今回対応した問題の概要
       - ## 実行計画: フェーズ一覧と変更ファイル
       - ## 残作業（手動確認）: 自動検証できなかった項目
-    IF .craft/plan.md に「## 修正ファイル一覧」セクションが存在する:
+    IF .craft/docs/plan.md に「## 修正ファイル一覧」セクションが存在する:
       そのセクションに「| [{FIX_FILE}]({FIX_FILE}) | {概要1行} |」を追記する
     ELSE:
-      .craft/plan.md の末尾に以下を追記する:
+      .craft/docs/plan.md の末尾に以下を追記する:
         ## 修正ファイル一覧
         | ファイル | 概要 |
         |---|---|

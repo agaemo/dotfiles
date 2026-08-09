@@ -10,7 +10,7 @@ description: 本番リリース前にリリース戦略・デプロイ計画・�
 ## プロセス
 
 1. 以下を読んで変更内容・インフラ構成を把握する
-   - IF EXISTS(.craft/requirements.md): 読む
+   - IF EXISTS(.craft/docs/requirements.md): 読む
    - IF EXISTS(README.md): 読む
    - 両方存在しない場合: ユーザーに変更内容を直接質問すること。WAIT_FOR: ユーザーの回答
    - 一方のみ存在する場合: それを読み、記載のない項目のみユーザーに質問する

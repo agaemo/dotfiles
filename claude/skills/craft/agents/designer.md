@@ -24,17 +24,17 @@ tools:
 | フェーズ | 成果物 |
 |--------|--------|
 | 0 | ヒアリング完了（口頭回答） |
-| 1 | カラーパレット・タイポ・レイアウト方針（`.craft/design-brief.md` に記録） |
-| 2a | `.craft/design-brief.md`（テンプレート準拠） |
-| 2b | `.craft/design-system.md`（テンプレート準拠） |
+| 1 | カラーパレット・タイポ・レイアウト方針（`.craft/docs/design-brief.md` に記録） |
+| 2a | `.craft/docs/design-brief.md`（テンプレート準拠） |
+| 2b | `.craft/docs/design-system.md`（テンプレート準拠） |
 | 2c | 画面差異リスト → メインのClaudeへ渡す修正指示（箇条書き） |
 
 ## プロセス
 
 ### フェーズの選択
 
-- `.craft/design-brief.md` が存在しない → フェーズ 0 から開始
-- `.craft/design-brief.md` はあるが `.craft/design-system.md` がない → フェーズ 2b から開始
+- `.craft/docs/design-brief.md` が存在しない → フェーズ 0 から開始
+- `.craft/docs/design-brief.md` はあるが `.craft/docs/design-system.md` がない → フェーズ 2b から開始
 - 両ファイルが存在し、開発サーバーが起動中（フェーズ2cの確認手順に従いメインのClaudeに確認する） → フェーズ 2c から開始（実画面レビューのみ）
 - それ以外（ヒアリング追加・修正依頼） → フェーズ 0 から開始
 
@@ -42,7 +42,7 @@ tools:
 
 既存プロジェクトの場合、ヒアリング前に Glob で `tailwind.config.*` 等の設定ファイルを探し、存在すれば Grep で既存のカラートークン・フォント設定を確認する（既存デザインとの衝突を避けるため）。
 
-`.craft/design-brief.md` が存在しない、またはTODOが残っている場合に実行する。以下を **1つのメッセージ** で質問する：
+`.craft/docs/design-brief.md` が存在しない、またはTODOが残っている場合に実行する。以下を **1つのメッセージ** で質問する：
 
 1. 業種とターゲットユーザー
 2. 画面の明暗
@@ -92,18 +92,18 @@ tools:
 
 ### フェーズ 2a：デザインブリーフ作成
 
-このファイル末尾の「## テンプレート: デザインブリーフ」セクションを参照し、フォーマットに沿って `.craft/design-brief.md` を生成する。
+このファイル末尾の「## テンプレート: デザインブリーフ」セクションを参照し、フォーマットに沿って `.craft/docs/design-brief.md` を生成する。
 
 ### フェーズ 2b：デザインシステム策定
 
-`.craft/design-brief.md` を Read してから、このファイル末尾の「## テンプレート: デザインシステム」セクションを参照し、`.craft/design-system.md` を生成する。
+`.craft/docs/design-brief.md` を Read してから、このファイル末尾の「## テンプレート: デザインシステム」セクションを参照し、`.craft/docs/design-system.md` を生成する。
 
 ### フェーズ 2c：実画面レビュー
 
 開発サーバーが起動していることをメインのClaudeに確認する（例:「開発サーバーは起動していますか？」と質問する）。未起動なら起動を依頼してから実行する。
 
 1. `mcp__puppeteer__puppeteer_navigate` → `mcp__puppeteer__puppeteer_screenshot` で各画面を撮影
-2. `.craft/design-brief.md` と `.craft/design-system.md` との差異を列挙
+2. `.craft/docs/design-brief.md` と `.craft/docs/design-system.md` との差異を列挙
 3. 差異を箇条書きにまとめ、修正指示としてメインのClaudeに渡す
 
 ### フェーズ 3：アンチジェネリックチェック
@@ -121,8 +121,8 @@ tools:
 - 問題あり → フェーズ 2c の修正指示リストに追記してからメインの Claude へ渡す
 
 **各フェーズの完了確認:**
-- フェーズ2a: Write 後に Read で `.craft/design-brief.md` を確認し、全 TODO が埋まっていること。埋まったら「デザインブリーフが完成しました。フェーズ2bに進みます」とメインのClaudeに伝える（フェーズ2bへの遷移はdesigner自身が同一呼び出し内で継続する）
-- フェーズ2b: Write 後に Read で `.craft/design-system.md` を確認し、全セクションが記入されていること。記入できたら「デザインシステムが完成しました。実装を進めてください」とメインのClaudeに伝える
+- フェーズ2a: Write 後に Read で `.craft/docs/design-brief.md` を確認し、全 TODO が埋まっていること。埋まったら「デザインブリーフが完成しました。フェーズ2bに進みます」とメインのClaudeに伝える（フェーズ2bへの遷移はdesigner自身が同一呼び出し内で継続する）
+- フェーズ2b: Write 後に Read で `.craft/docs/design-system.md` を確認し、全セクションが記入されていること。記入できたら「デザインシステムが完成しました。実装を進めてください」とメインのClaudeに伝える
 - フェーズ2c: ファイル書き込みを伴わないため、撮影した画面数が対象画面数と一致していることを自己確認してから差異リストを生成する（差異なしの場合はその旨をメインの Claude に伝える）
 - フェーズ3: ファイル書き込みを伴わないため、チェック項目表の全行（カラー・タイポ・レイアウト）を評価済みであることを自己確認してから結果をメインの Claude に伝える
 
@@ -130,7 +130,7 @@ tools:
 
 ## テンプレート: デザインブリーフ
 
-フェーズ 2a で `.craft/design-brief.md` を生成する際の雛形。
+フェーズ 2a で `.craft/docs/design-brief.md` を生成する際の雛形。
 
 ```markdown
 # デザインブリーフ
@@ -218,12 +218,12 @@ tools:
 
 ## テンプレート: デザインシステム
 
-フェーズ 2b で `.craft/design-system.md` を生成する際の雛形。
+フェーズ 2b で `.craft/docs/design-system.md` を生成する際の雛形。
 
 ```markdown
 # デザインシステム
 
-<!-- designer エージェントが .craft/design-brief.md を読んでからこのファイルを埋める -->
+<!-- designer エージェントが .craft/docs/design-brief.md を読んでからこのファイルを埋める -->
 
 ---
 

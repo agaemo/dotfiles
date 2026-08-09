@@ -1,9 +1,9 @@
 ---
 name: new-project
-description: 動的アプリ（API・DB・認証あり）のセットアップ手順。/craft から動的アプリを選択したときに実行される。
+description: 動的アプリ（API・DB・認証あり）、およびTauri/Electron等のデスクトップアプリのセットアップ手順。/craft から動的アプリ・デスクトップアプリを選択したときに実行される。
 ---
 
-# new-project（動的アプリセットアップ）
+# new-project（動的アプリ・デスクトップアプリセットアップ）
 
 カレントディレクトリに Claude ハーネスを一式セットアップする。
 
@@ -155,7 +155,7 @@ REPORT: "完了しました"
 ### ステップ 3: 完了報告
 
 NOTE: 開発ランタイム（言語・ランタイムマネージャー・フロントエンドフレームワークのscaffold等）は
-  ここでは決めない。planner が `.craft/plan.md` の「開発ランタイム」節に決定内容を記録し、
+  ここでは決めない。planner が `.craft/docs/plan.md` の「開発ランタイム」節に決定内容を記録し、
   build フロー側（ステップ0.6）が実際にインストール・scaffoldを実行する。
   決定手順は {SKILL_DIR}/flows/new-project/recipes/planner-checklist.md の
   「開発ランタイムの選定方針」を参照（planner呼び出し前に自動的に参照される）。

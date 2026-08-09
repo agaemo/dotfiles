@@ -1,13 +1,13 @@
 ## テンプレート: 要求定義書
 
-STEP 6 で `.craft/01_requirements_doc.md` を生成する際の雛形。入力: `.craft/requirements.md`
+STEP 6 で `.craft/docs/01_requirements_doc.md` を生成する際の雛形。入力: `.craft/docs/requirements.md`
 
 ```markdown
 # 要求定義書
 
 > バージョン: 1.0
 > 作成日: YYYY-MM-DD
-> 元要件: .craft/requirements.md
+> 元要件: .craft/docs/requirements.md
 
 ---
 
@@ -76,14 +76,14 @@ STEP 6 で `.craft/01_requirements_doc.md` を生成する際の雛形。入力:
 
 ## テンプレート: 要件定義書
 
-STEP 6 で `.craft/02_specifications_doc.md` を生成する際の雛形。入力: `.craft/stories.md`
+STEP 6 で `.craft/docs/02_specifications_doc.md` を生成する際の雛形。入力: `.craft/docs/stories.md`
 
 ```markdown
 # 要件定義書
 
 > バージョン: 1.0
 > 作成日: YYYY-MM-DD
-> 元要件: .craft/stories.md
+> 元要件: .craft/docs/stories.md
 
 ---
 
@@ -160,14 +160,14 @@ STEP 6 で `.craft/02_specifications_doc.md` を生成する際の雛形。入�
 
 ## テンプレート: 基本設計書
 
-STEP 6 で `.craft/03_basic_design_doc.md` を生成する際の雛形。
-入力: `.craft/plan.md` の「基本設計」セクション（アーキテクチャ概要・技術スタック・ディレクトリ構成・
+STEP 6 で `.craft/docs/03_basic_design_doc.md` を生成する際の雛形。
+入力: `.craft/docs/plan.md` の「基本設計」セクション（アーキテクチャ概要・技術スタック・ディレクトリ構成・
 認証設計・DBスキーマ・API設計・画面遷移図・セキュリティ設計を転記するのみ。design.md 等の
-元資料を直接参照し直さないこと）+ `.craft/design-system.md` があれば
+元資料を直接参照し直さないこと）+ `.craft/docs/design-system.md` があれば
 
 NOTE: `plan.md` の「基本設計」で該当項目が省略されている場合（DB・認証・フロントエンドなし等）、
 対応するセクションはそのまま省略すること。空欄の表を出力しない。
-NOTE: セクション8（デザインシステム概要）は `.craft/design-system.md` が存在しない場合（フロントエンド
+NOTE: セクション8（デザインシステム概要）は `.craft/docs/design-system.md` が存在しない場合（フロントエンド
 なしプロジェクト等）は省略する。セクション10（ADR）は `docs/adr/` に1件も存在しない場合は省略する。
 
 ```markdown
@@ -175,7 +175,7 @@ NOTE: セクション8（デザインシステム概要）は `.craft/design-sys
 
 > バージョン: 1.0
 > 作成日: YYYY-MM-DD
-> 元要件: .craft/plan.md
+> 元要件: .craft/docs/plan.md
 
 ---
 

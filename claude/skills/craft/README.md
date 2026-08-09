@@ -9,7 +9,7 @@
 
 ```mermaid
 flowchart TD
-    START([/craft 起動]) --> DETECT{.craft/plan.md\n存在する?}
+    START([/craft 起動]) --> DETECT{.craft/docs/plan.md\n存在する?}
     DETECT -->|Yes| SUGGEST["「実装を再開しますか？」と提案"]
     SUGGEST -->|再開する| RESUME["build フローへ委譲"]
     SUGGEST -->|しない| SCOPE
@@ -66,7 +66,7 @@ flowchart LR
 ## 開発ランタイムの管理
 
 ランタイム（Node.js / Bun / Python / Flutter 等）の選定・インストール・パッケージマネージャーの決定は、
-プロジェクトごとに `planner` が `.craft/plan.md` の「開発ランタイム」節に記録し、
+プロジェクトごとに `planner` が `.craft/docs/plan.md` の「開発ランタイム」節に記録し、
 `build` フロー側（ステップ0.6）が実際に構築する。ハーネステンプレート自体は特定の環境管理ツールを固定しない。
 
 - 決定手順: [flows/new-project/recipes/planner-checklist.md](flows/new-project/recipes/planner-checklist.md) の「開発ランタイムの選定方針」
@@ -117,10 +117,10 @@ craft テンプレートに置かれ、Claude が状況に応じて自律呼び�
 | エージェント | 生成物 | 役割 |
 |---|---|---|
 | `ideator` | — | アイデア探索・プロジェクト方向性の提案。intake の前段。 |
-| `intake` | `.craft/requirements.md` | 新機能・曖昧な依頼のヒアリングと要件定義。 |
-| `refiner` | `.craft/stories.md` | requirements.md をユーザーストーリーと受け入れ条件に分解。 |
-| `designer` | `.craft/design-brief.md`<br>`.craft/design-system.md` | UI/UX 設計・デザインブリーフ作成・Puppeteer での実画面レビュー。 |
-| `planner` | `.craft/plan.md` | 実装計画の立案。requirements.md / stories.md を読んでから動く。 |
+| `intake` | `.craft/docs/requirements.md` | 新機能・曖昧な依頼のヒアリングと要件定義。 |
+| `refiner` | `.craft/docs/stories.md` | requirements.md をユーザーストーリーと受け入れ条件に分解。 |
+| `designer` | `.craft/docs/design-brief.md`<br>`.craft/docs/design-system.md` | UI/UX 設計・デザインブリーフ作成・Puppeteer での実画面レビュー。 |
+| `planner` | `.craft/docs/plan.md` | 実装計画の立案。requirements.md / stories.md を読んでから動く。 |
 
 ### 完了チェック（STEP 9 / 自動・順次）
 
@@ -174,7 +174,7 @@ Claude Code のスキルとしては認識されず、メインの SKILL.md か�
 | `new-project` | Webアプリ（Node.js系）のセットアップ手順（ハーネス構築〜設計フェーズ）。実装フェーズは `build` に委譲する。 | [README](flows/new-project/README.md) |
 | `new-static` | 静的サイト（LP・PoC）のセットアップ手順。ヒアリング・デザインブリーフ・初期plan.md生成までを担当し、実装フェーズは `build` に委譲する。 | [README](flows/new-static/README.md) |
 | `new-app` | クロスプラットフォームアプリ（Flutter・React Native・Expo等）のセットアップ手順（ハーネス構築〜設計フェーズ）。Firebase 未取得時のモック実装分岐・`riverpod_generator` + `hive_generator` 競合の注記を含む。実装フェーズは `build` に委譲する。 | （README未作成） |
-| `build` | `.craft/plan.md` に基づいて実装を進める共通エンジン。new-project・new-static・new-app の設計フェーズ完了後、または別セッションでの再開時に呼ばれる。開発ランタイムの構築（plan.mdの「開発ランタイム」節から）・Makefile準備を最初に行い、フィーチャートラック設計の有無でフェーズ1〜3またはシンプルループを選び、レビューチェーン・CLAUDE.md生成までを担当する。 | [README](flows/build/README.md) |
+| `build` | `.craft/docs/plan.md` に基づいて実装を進める共通エンジン。new-project・new-static・new-app の設計フェーズ完了後、または別セッションでの再開時に呼ばれる。開発ランタイムの構築（plan.mdの「開発ランタイム」節から）・Makefile準備を最初に行い、フィーチャートラック設計の有無でフェーズ1〜3またはシンプルループを選び、レビューチェーン・CLAUDE.md生成までを担当する。 | [README](flows/build/README.md) |
 | `consult` | 既存システムへの課題相談、または新規構築だが対応レシピがない技術の相談（SIer的に型にはまらない依頼を受け持つ）。移行・リファクタ・現状維持／自前構築・近いカテゴリで妥協・対応しないを整理し、実行まで進める。テスト・品質・QA、DBマイグレーション、リリース計画、IaC、健全性評価、LP公開は相談内容から判定して各専用フローに委譲する。 | [README](flows/consult/README.md) |
 | `db-migration` | DBスキーマ変更（テーブル追加・カラム変更）の安全な実行手順。`consult`から委譲される。 | （README未作成） |
 | `iac` | Terraform/OpenTofu によるインフラ管理の導入・設計・運用手順。`consult`から委譲される。 | （README未作成） |
