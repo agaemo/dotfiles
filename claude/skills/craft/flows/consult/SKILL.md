@@ -216,17 +216,23 @@ IF ユーザーが移行・リファクタ、または自前で構築を選択:
     → 修正要望があれば計画を更新して再提示する
   PROHIBITED: 承認前に実行フェーズへ進むこと
 
-  ASK USER:
-    実行にあたって以下を確認します。
-    1. GitHub issue を作成しますか？（変更の背景・経緯を記録）
-    2. 完了後に PR を作成しますか？
-    ※ サンプル・学習目的など「ローカル作業のみ」の場合は両方不要で構いません。
+  IF git remote がない（ローカルのみリポジトリ）:
+    REPORT: 「GitHubリポジトリが未設定のため、issue/PR作成はスキップします」
+    CREATE_ISSUE = false
+    CREATE_PR    = false
+    LOCAL_ONLY   = true
+  ELSE:
+    ASK USER:
+      実行にあたって以下を確認します。
+      1. GitHub issue を作成しますか？（変更の背景・経緯を記録）
+      2. 完了後に PR を作成しますか？
+      ※ サンプル・学習目的など「ローカル作業のみ」の場合は両方不要で構いません。
 
-  WAIT_FOR: ユーザーの回答
+    WAIT_FOR: ユーザーの回答
 
-  CREATE_ISSUE = ユーザーが issue 作成を希望した場合
-  CREATE_PR    = ユーザーが PR 作成を希望した場合
-  LOCAL_ONLY   = ユーザーが issue も PR も不要と回答した場合
+    CREATE_ISSUE = ユーザーが issue 作成を希望した場合
+    CREATE_PR    = ユーザーが PR 作成を希望した場合
+    LOCAL_ONLY   = ユーザーが issue も PR も不要と回答した場合
 
   # fix ファイルを作成して .craft/docs/plan.md に追記する（issue/PR の有無にかかわらず常に実施）
   IF .craft/docs/ ディレクトリが存在する:

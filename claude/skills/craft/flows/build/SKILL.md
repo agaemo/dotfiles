@@ -414,6 +414,8 @@ IF NOT EXISTS(CLAUDE.md) OR （EXISTS するが プロジェクト名・目的�
     - プロジェクト名・目的（1〜2文）
     - スタック（実際に使う言語・フレームワーク・主要ライブラリ）
     - 開発コマンド（`make dev`/`make test`/`make build`等。.craft/docs/plan.md の「開発コマンド」セクション参照）
+      起動・動作確認の依頼では、runスキル（内蔵の`/run`、および`.claude/skills/run-*`）ではなく
+      上記コマンドを直接使うよう明記する
     - IF HAS_REVIEW_CHAIN: アーキテクチャ（採用パターン名・ディレクトリ構造のポイント・レイヤー間の依存の向き）
     - プロジェクト固有の制約（DBエンジン・実行環境の制限など）
     - .craft/docs/plan.md を参照するよう一言書く
