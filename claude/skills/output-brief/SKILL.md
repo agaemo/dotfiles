@@ -12,19 +12,23 @@ description: >
 # output-brief
 
 ```
-SKILL_DIR     = このSKILL.mdが存在するディレクトリの絶対パス
-RESEARCH_FILE = /tmp/output-brief-research.md  （調査結果の一時ファイル。使用後に削除する）
+SKILL_DIR      = このSKILL.mdが存在するディレクトリの絶対パス
+SCRATCH_DIR    = 実行時のシステムプロンプトに記載されたスクラッチディレクトリ（案内が無い環境では /tmp）
+RESEARCH_FILE  = {SCRATCH_DIR}/output-brief-research.md  （調査結果の一時ファイル）
+OUTPUT_DIR_CANDIDATES = ./output/output-brief/ / ./docs/output-brief/ / ./tmp/output-brief/
+  （最終成果物の保存先候補。いずれもカレントディレクトリ配下の相対パスで、ユーザーがGUIから直接開ける。`SCRATCH_DIR` のような絶対パスのスクラッチ領域は最終成果物の保存先にしない）
 ```
+
+IMPORTANT: `RESEARCH_FILE` はステップ1〜3で使う内部調査メモであり、ステップ4で生成する最終成果物とは別物。処理を中断・終了する場合（後述の中断パスを含む）は必ず `Bash` で `rm -f "$RESEARCH_FILE"` を実行してから終える。
 
 ## 発動判断
 
 以下のいずれかに該当する場合のみブリーフィングを行う。**全て指定済みなら即出力する（ステップ1〜3をスキップしてステップ4へ進む）。**
 
-- 保存先（ファイル保存 / チャット表示 / Artifact公開）が未指定
-- 出力形式（HTML / Markdown / CSV …）が未指定
-- HTML でレイアウト・カラーが未指定
-- コンテンツ内容・構成が不明
-- データ・素材が無い、または不十分・曖昧で調査が必要
+- 保存先（ファイル保存 / チャット表示 / Artifact公開）が未指定 → ステップ1で確認
+- 出力形式（HTML / Markdown / CSV …）が未指定、またはコンテンツ内容・構成が不明 → ステップ1で確認
+- データ・素材が無い、または不十分・曖昧で調査が必要 → ステップ1で確認
+- HTML でレイアウト・カラーが未指定 → ステップ2で確認
 
 ## フロー
 
@@ -45,11 +49,23 @@ WAIT_FOR: ユーザーの返信（番号・選択肢のテキストいずれで�
 
 ### 1. データ確認
 
-指示から以下3点を把握する。**全て読み取れる場合はステップ2へ直行する。不明な点があれば番号リスト形式で1回にまとめて確認する:**
+指示から以下3点を把握する（発動判断でステップ1対象とした項目に対応）。**全て読み取れる場合はステップ2へ直行する。不明な点があれば番号リスト形式で1回にまとめて確認する:**
 
 - 何を作るか（ファイル種別・内容）
 - データ・素材はあるか（URL・ファイルパス・テキスト）
-- 保存先の指定はあるか（ファイルとして保存 / チャット表示 / Artifactとして公開）。ファイル保存の場合は保存先パス（ファイル名含む）も確認する
+- 保存先の指定はあるか（ファイルとして保存 / チャット表示 / Artifactとして公開）。
+  ファイル保存で保存先パスが未指定の場合は、こちらから提案する。ユーザーに自由入力を求めるだけにしない:
+  1. ファイル名を内容から1つ提案する（内容を表す2〜4語 + 出力形式に応じた拡張子。例: `sales-summary-2026-08-21.html`）
+  2. `OUTPUT_DIR_CANDIDATES` の各ディレクトリと提案ファイル名を組み合わせ、番号リストで提示する:
+     ```
+     保存先:
+     [1]: ./output/output-brief/<提案ファイル名>（推奨）
+     [2]: ./docs/output-brief/<提案ファイル名>
+     [3]: ./tmp/output-brief/<提案ファイル名>（一時的な確認用途）
+     その他: 自由に記入してください（パスを指定、チャット表示のみも可）
+     ```
+     Artifact公開が選べる形式の場合は選択肢に追加する（「発動判断」内の注記の通り）。
+  3. ユーザー指定のファイル名・パスがあれば1・2を省略しそのまま使う
   - Artifact公開はHTML/Markdown出力のみ選べる（CSV/JSONでは提示しない）。ステップ1で保存先の回答を得ている場合（チャット表示・ファイル保存いずれであっても）、ステップ2で保存先を再度確認しない。**唯一の例外**: ステップ1の時点で出力形式が未確定でArtifactを選択肢に含められなかった場合、ステップ2でHTML/Markdownへの確定を確認した直後に、Artifact公開を選択肢として追加提示する。
 
 **調査が必要な場合**
@@ -147,15 +163,16 @@ WAIT_FOR: ユーザーの承認（「OK」「はい」「進めて」等）を�
      （macOS: `open <path>` / Linux: `xdg-open <path>` / Windows: `start <path>`）
 - チャット表示の場合: コードブロックで出力する
 - Artifact公開の場合:
-  0. **PROHIBITED: 外部CDNへの依存（Mermaid.js等の`<script src="https://...">`、Google Fonts等の外部`<link rel="stylesheet">`、fetch/XHR）を含めること。**
+  0. **IMPORTANT: `Artifact` ツールを呼び出す前に、必ず `artifact-design` スキルを読み込むこと。** HTML・Markdownいずれもこのスキルの設計指針でファイルを書いてから発行する（Artifactツールの必須手順）。
+  1. **PROHIBITED: 外部CDNへの依存（Mermaid.js等の`<script src="https://...">`、Google Fonts等の外部`<link rel="stylesheet">`、fetch/XHR）を含めること。**
      ArtifactはCSPで外部ホストへの通信をブロックする。外部scriptの読み込み失敗は他のスクリプト初期化まで巻き添えで止める場合があり（Mermaid図を含める場合の対応は `references/html-and-diagrams.md` 参照）、外部stylesheetもCSP違反としてブロックされる（fallbackはするが、コンソールにエラーが残る）。
      `assets/samples/` のテンプレートにある `<link rel="preconnect">` / Google Fonts の `<link>` タグは削除し、`font-family` は `system-ui` 以降のフォールバックのみで運用する。
      既知の制約: `slide` レイアウトの全画面表示ボタンは、Artifact環境（iframe）ではブラウザのPermissions PolicyによりFullscreen APIが使えず動作しない。テンプレートは `document.fullscreenEnabled` を見て自動的にボタンを非表示にする作りになっているため追加対応は不要。
-  1. Artifactは既定で非公開（自分のみ閲覧可）だが、claude.ai上にホストされる旨を伝えて確認する
+  2. Artifactは既定で非公開（自分のみ閲覧可）だが、claude.ai上にホストされる旨を伝えて確認する
      WAIT_FOR: ユーザーの承認
      **PROHIBITED: 承認なしにArtifactツールを実行すること**
-  2. `Artifact` ツールで発行する（`file_path` に生成したHTML/Markdownファイルのパス、`description` に内容を要約した1文、`favicon` に内容に合う絵文字1〜2個を指定）
-  3. 発行されたURLを報告する
-  4. 同じ内容の更新を求められた場合は、同じ `file_path` で再度 `Artifact` を呼び出す（同一URLに再デプロイされる）
+  3. `Artifact` ツールで発行する（`file_path` に生成したHTML/Markdownファイルのパス、`description` に内容を要約した1文、`favicon` に内容に合う絵文字1〜2個を指定）
+  4. 発行されたURLを報告する
+  5. 同じ内容の更新を求められた場合は、同じ `file_path` で再度 `Artifact` を呼び出す（同一URLに再デプロイされる）
 - 保存に失敗した場合: エラーを報告し、別のパスをユーザーに確認する
 - `RESEARCH_FILE` が存在する場合: `Bash` で `rm -f "$RESEARCH_FILE"` を実行して一時ファイルを削除する
