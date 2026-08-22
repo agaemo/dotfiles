@@ -187,11 +187,30 @@ IF ユーザーが「今は対応しない」「相談だけ」を選択:
 
 IF ユーザーが移行・リファクタ、または自前で構築を選択:
 
+  # 環境構築（ランタイム・パッケージマネージャーのインストール等）を伴う計画の場合、
+  # new-project と同じ選定方針を PLAN 作成前に適用する（mise 優先の原則を徹底するため）
+  IF 相談対象 == "新規構築（対応レシピなし）" AND 計画に環境構築を含む:
+    READ {SKILL_DIR}/flows/new-project/recipes/planner-checklist.md
+    IF READ FAILED:
+      NOTE: 読めない場合でも以下の原則に従うこと — 環境管理ツールはデフォルトを mise とし、
+            未知の言語・ツールはまず mise registry で対応可否を確認してから個別インストールを
+            検討する
+    APPLY: 「開発ランタイムの選定方針」に従い、環境管理ツール・言語バージョン・
+      セットアップコマンド・検証コマンドを確定する
+      IMPORTANT: 公式ドキュメントが特定のツール（例: pixi）を推奨していても、
+      まず mise 管理下に置けないか（例: `mise registry | grep <言語>`）を確認すること。
+      mise で対応できない場合のみ個別ツールの直接インストールを検討し、その理由を
+      PLAN の該当フェーズに明記する。Web検索で見つけた「公式推奨手順」をそのまま
+      採用する前に、必ずこの確認を経ること。
+
   PLAN:
     作業をフェーズに分割する。各フェーズは以下の条件を満たすこと：
       - 独立してテスト・検証できる単位
       - ロールバック手順が明確
       - 前のフェーズが成功しないと次に進まない
+    IF 環境構築を伴う場合:
+      該当フェーズに、上記で確定した「環境管理ツール」「セットアップコマンド」「検証コマンド」を
+      明記すること（new-project の plan.md「開発ランタイム」節と同等の粒度で書く）
 
     計画フォーマット：
       ## 実行計画
@@ -215,6 +234,32 @@ IF ユーザーが移行・リファクタ、または自前で構築を選択:
   GATE: 計画の承認を得る
     → 修正要望があれば計画を更新して再提示する
   PROHIBITED: 承認前に実行フェーズへ進むこと
+
+  # 承認された計画を .craft/docs/plan.md に保存する（実行前の計画として必ず残す。
+  # 後述の fix ファイルとは役割が異なる: plan.md は実行前の設計、fix ファイルは実行後の変更記録）
+  IF .craft/docs/plan.md が存在しない:
+    WRITE .craft/docs/plan.md:
+      ## 相談内容
+      [相談対象・要望を1〜2文]
+
+      ## 開発ランタイム（環境構築を伴う場合のみ。上記で確定した内容をそのまま転記）
+      **環境管理ツール:** ...
+      **セットアップコマンド:** ...
+      **検証コマンド:** ...
+
+      [PLAN で作成した「## 実行計画」以下をそのまま続けて記載]
+  ELSE:
+    .craft/docs/plan.md の末尾に「## 追加計画（{YYYY-MM-DD}）」として、上記と同じ内容を追記する
+  ASSERT EXISTS(.craft/docs/plan.md)
+
+  # git リポジトリが無ければ初期化する（以降の git 操作の前提のため）
+  IF .git が存在しない:
+    RUN: git init -b main
+    SET NEW_REPO = true
+    NOTE: 新規作成したリポジトリのため、後述のブランチ作成では consult 用のブランチ分離を行わず
+          main のまま進める
+  ELSE:
+    SET NEW_REPO = false
 
   IF git remote がない（ローカルのみリポジトリ）:
     REPORT: 「GitHubリポジトリが未設定のため、issue/PR作成はスキップします」
@@ -262,23 +307,35 @@ IF ユーザーが移行・リファクタ、または自前で構築を選択:
   ELSE:
     ISSUE_NUMBER = なし
 
-  # ブランチは issue・PR の有無に関わらず常に作成する（変更の分離のため）
-  IF git remote がない（ローカルのみリポジトリ）:
+  # ブランチ作成。ただしリポジトリが新規（今回 git init した）、または
+  # 既存リポジトリでもコミットが1つも無い場合は、ブランチ分離を行わずそのまま進める
+  IF NEW_REPO == true:
+    SET DEFAULT_BRANCH = "main"
+    SET BRANCH = "main"
+  ELIF `git rev-parse HEAD` が失敗する（コミットが1つも無い）:
+    RUN: DEFAULT_BRANCH=$(git symbolic-ref HEAD | sed 's@^refs/heads/@@')
+    SET BRANCH = DEFAULT_BRANCH
+    NOTE: 初回コミット前のため、ブランチ分離は行わない
+  ELIF git remote がない（ローカルのみリポジトリ）:
     RUN: DEFAULT_BRANCH=$(git symbolic-ref HEAD | sed 's@^refs/heads/@@')
     NOTE: リモートなしのため pull はスキップ
+    BRANCH = consult/<slug>
+      例: consult/sqlite-to-mysql、consult/auth-refactor
+    RUN: git checkout -b {BRANCH}
   ELSE:
     RUN: DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
     RUN: git checkout ${DEFAULT_BRANCH} && git pull
     IF 失敗:
       REPORT: pull に失敗した旨を伝え、コンフリクトや認証問題がないか確認を促す
       STOP
+    BRANCH = consult/<slug>
+      例: consult/sqlite-to-mysql、consult/auth-refactor
+    RUN: git checkout -b {BRANCH}
   ENDIF
 
-  BRANCH = consult/<slug>
-    例: consult/sqlite-to-mysql、consult/auth-refactor
-  RUN: git checkout -b {BRANCH}
-  ASSERT: ブランチが作成されて切り替わっていること（`git branch --show-current` = {BRANCH}）
-  IF FAILED: REPORT "ブランチ作成に失敗しました。既存ブランチと競合している可能性があります。" → STOP
+  IF BRANCH != DEFAULT_BRANCH:
+    ASSERT: ブランチが作成されて切り替わっていること（`git branch --show-current` = {BRANCH}）
+    IF FAILED: REPORT "ブランチ作成に失敗しました。既存ブランチと競合している可能性があります。" → STOP
 
   FOREACH phase IN 計画:
     REPORT: 「フェーズ N を開始します」と通知
