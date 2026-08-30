@@ -27,10 +27,12 @@ IF カレントディレクトリが疑わしい（意図したプロジェク�
 ### ステップ 1: フロントエンドの確認
 
 ```
-ASK USER: "フロントエンドUI（画面）はありますか？（あり / なし）"
-WAIT_FOR: ユーザーの回答
-
-SET HAS_FRONTEND = (回答が "あり" の場合 true、"なし" の場合 false)
+IF 呼び出し元（scope・consult等）からフロントエンドUIの有無が既知の情報として渡されている:
+  SET HAS_FRONTEND = 既知の値（再度質問しない）
+ELSE:
+  ASK USER: "フロントエンドUI（画面）はありますか？（あり / なし）"
+  WAIT_FOR: ユーザーの回答
+  SET HAS_FRONTEND = (回答が "あり" の場合 true、"なし" の場合 false)
 ```
 
 ---
