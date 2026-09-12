@@ -22,6 +22,11 @@ plan.md 本文を書く前に、後から変更すると計画全体の再生成
 - DB ドライバ / ORM（例: better-sqlite3 + Drizzle / Prisma / 生SQL）
 - 認証ライブラリ・認証方式（例: 自前JWT実装 / Auth.js / 他のIdP連携）
 - UIコンポーネントライブラリ（採用する場合）
+- **実行環境構成（Docker利用時）**: Dockerベースイメージ（例: `node:24-slim` / `postgres:18-alpine`
+  等の具体的なタグ）、コンテナ構成（サービス数・各サービスの役割・ボリューム・ネットワーク）。
+  ベースイメージのメジャーバージョンはDBイメージのデータディレクトリ形式・OS依存パッケージの
+  有無等、後から変えるとコストが高い決定を伴うため、他のライブラリ選定と同様に候補提示して
+  確認する。承認ゲートが1つ増えることを理由に省略しない
 
 確認手順:
 1. 各カテゴリについて推奨案 + 代替案を1〜2行の理由付きで提示する（plan.md執筆前の軽量な提示でよい）
@@ -29,6 +34,9 @@ plan.md 本文を書く前に、後から変更すると計画全体の再生成
    （詳細は agents/planner.md の「ライブラリ・フレームワーク選定ルール」参照）
 2. ユーザーが推奨と異なる選択をした場合、その選択を前提にしてから planner を呼び出す
    （= plan.md は最初から確定済みの技術選定で1回で書く。書き直しを前提にしない）
+3. 実行環境構成（Docker利用時）は、確定後に `.craft/docs/plan.md` の「開発ランタイム」節へ
+   コンテナ構成図（mermaid。サービス間の関係・ポート・ボリュームを図示）として記録すること
+   （下記「開発ランタイムの選定方針」のplan.mdへの転記手順を参照）
 
 ## 認証機能を含む場合の Makefile 追加ターゲット
 
@@ -55,7 +63,12 @@ IMPORTANT: plan.md の「開発ランタイム」節に書く内容を、plan.md
 1. **環境管理ツールの決定**
    - 既存リポジトリに `devbox.json` / `shell.nix` / `docker-compose.yml` がある場合はそれに従う
      （新規プロジェクトでは通常該当しない。既存システムへの機能追加時に該当する）
-   - ユーザーがDockerでの完結を希望する場合はそれに従う
+   - ユーザーがDockerでの完結を希望する場合はそれに従う。
+     IMPORTANT: 「Dockerで完結」が指示された場合、開発時の型補完・CLI実行の利便性を理由に
+     ホストへ言語ランタイムを併設する妥協案（mise併用等）を確認なしで提案しないこと。
+     全コマンド（scaffold・パッケージ追加・DB操作等）をコンテナ経由（`docker compose run`/
+     `exec`）で実行する構成を既定とし、ホスト側にも置きたい場合はユーザーから明示的に
+     求められたときのみ検討する
    - IMPORTANT: ユーザーが「環境を汚さない」等の分離要件を述べているが、具体的な
      ツール（mise/Docker/devbox等）を明示していない場合は、確認せずmiseへ倒さない。
      ASK USER: 環境分離の方法を確認する
@@ -74,12 +87,21 @@ IMPORTANT: plan.md の「開発ランタイム」節に書く内容を、plan.md
    （公式ドキュメント確認等）だけに頼らず、確定させる直前に必ず `researcher` エージェント
    （`{SKILL_DIR}/agents/researcher.md`）を呼び出して現状を調べさせること。
 
-   - 対象: 言語・ランタイム、および（HAS_FRONTEND == true の場合）採用予定フレームワーク
+   - 対象: 言語・ランタイム、（HAS_FRONTEND == true の場合）採用予定フレームワーク、
+     **および一緒に使う主要な周辺ツール（DBエンジンのDockerイメージ・ORM・パッケージ
+     マネージャーの主要バージョン等、後述「主要ライブラリの選定方針」で候補提示する対象）。**
+     IMPORTANT: フレームワーク本体だけを調べて満足しないこと。フレームワークと組み合わせて
+     使うORM・DBイメージ・ビルドツールは、それぞれ独立にメジャーバージョンの仕様変更
+     （設定ファイル形式・出力先・配布方法等）を起こしうる。実際に「Next.js/Node.jsは
+     差分確認済みだが、一緒に使うPrisma・PostgreSQLイメージ・pnpmの仕様変更が未調査だった」
+     という事例が発生している。対象を1つに絞らず、技術スタック表に載る主要コンポーネント
+     全てを対象にする
    - モードの判定:
      - 専用recipeがある技術（Bun / Python(uv) / Node.js / Flutter / React Native、
        および下記ステップ3の表にあるフレームワーク）→ **差分確認モード**。該当recipe
        ファイルの内容を読み、researcherへの指示に含めて渡す
-     - それ以外（Go・Rust・Java 等の言語、表に無いフレームワーク）→ **フル調査モード**
+     - それ以外（Go・Rust・Java 等の言語、表に無いフレームワーク、DBイメージ・ORM等の
+       周辺ツール）→ **フル調査モード**
    - Agent ツールでresearcherを起動し、完了報告（`.craft/docs/tech-research.md` への保存）
      を受け取ってから次に進む
    - IF READ FAILED（researcher.mdが見つからない）:
@@ -106,7 +128,10 @@ IMPORTANT: plan.md の「開発ランタイム」節に書く内容を、plan.md
         パッケージマネージャーは `"latest"` で構わない）
      3. インストール・検証コマンドを確定する（例: `mise exec -- go version`）
 
-4. **フレームワーク・アプリのscaffold決定**（HAS_FRONTEND == true の場合。new-app 由来の Flutter・React Native も含む）
+4. **フレームワーク・アプリのscaffold決定**（何らかのアプリケーションフレームワークを採用する場合に実施する。
+   フロントエンドフレームワーク（HAS_FRONTEND == true）に限らない — UIなしのバックエンドAPI専用
+   プロジェクトでもExpress・Fastify・Hono等のフレームワーク選定は後から変更コストが高いため対象に含める。
+   new-app 由来の Flutter・React Native も含む）
 
    `.craft/docs/tech-research.md` に記載のscaffold手順・破壊的変更を優先し、下表の記載と食い違う場合は
    tech-research.md（＝現時点の調査結果）を採用する。
@@ -121,7 +146,7 @@ IMPORTANT: plan.md の「開発ランタイム」節に書く内容を、plan.md
    | React Native (CLI) | ユーザーがCLI構成を明示的に希望した場合のみ選ぶ。同じ `.mise.toml` 作成後、`pnpm dlx @react-native-community/cli init <アプリ名> --directory . && pnpm install` |
    | Tauri（Rust製デスクトップアプリ） | `{SKILL_DIR}/flows/new-project/recipes/tauri-init.md` を読み、scaffoldコマンド・マージ時の`.gitignore`衝突対策・`panic="abort"`の扱いを確認する |
 
-   Webアプリの場合、会話の文脈から Next.js / Vite + React / Hono / Express 等を推定する。判断できない場合はユーザーに確認する。
+   会話の文脈から Next.js / Vite + React / Hono / Express 等を推定する（UI有無を問わない）。判断できない場合はユーザーに確認する。
    リアルタイム通信（WebSocket・チャット・通知）が要件にある場合は
    `{SKILL_DIR}/flows/new-project/recipes/socketio.md` を読み、実装ステップに組み込む
 
@@ -132,5 +157,9 @@ IMPORTANT: plan.md の「開発ランタイム」節に書く内容を、plan.md
      一度に実行する一続きの初期化コマンド列として記載すること）
    - STACK識別子（英小文字・言語名のみ。例: node / flutter / rust / go。「Node.js」等の表記は不可）も明記する。
      既存の特別扱い値（static・flutter・node）と衝突しないよう注意する
+   - Dockerを使う場合、「開発ランタイム」節に**コンテナ構成図**（mermaid flowchart）を追加する。
+     各サービス（app・db等）をノードにし、利用者からのアクセス経路・サービス間の依存
+     （`depends_on`）・主要なボリュームマウントを矢印で示す。空欄・省略は禁止（該当しない
+     場合＝Docker不使用の場合のみこの図自体を省略する）
 
 > **設計判断の記録:** 確認した内容は `.craft/docs/plan.md` の「設計判断」セクションに記録すること。
