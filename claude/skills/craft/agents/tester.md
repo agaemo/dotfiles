@@ -39,6 +39,7 @@ tools:
 2. **異常系** — 不正な入力・存在しないIDなどで正しいエラーが返るか
 3. **境界値** — 最小・最大・空・null などの端値
 4. **副作用** — DB 書き込み・外部API呼び出し・イベント発火が正しく起きるか
+5. **並行呼び出し（状態遷移関数のみ）** — 対象がDBの状態を読んでから書き込む関数（承認・予約確定・在庫引き当て等）の場合、同一リソースに対する2つの呼び出しを`Promise.all`等で同時実行し、片方だけが成功する（TOCTOU競合が起きない）ことを検証する。「後から追加すればよい」ではなく、対象が状態遷移関数と判断した時点でTDDモードの最初の実装前に含めること
 
 `.craft/docs/requirements.md` の受け入れ条件に対応するテストを優先する。
 
@@ -69,7 +70,8 @@ Bash でテストを実行し、全件 green を確認する。失敗した場�
 |------|-----------|---------|
 | サーバーレスエッジ関数（Vercel Edge, Cloudflare Workers 等） | ランタイムが Node.js と異なり、標準 API の一部が未実装 | Miniflare / wrangler dev 等のローカルエミュレーターで統合テスト |
 | WebSocket・Socket.IO のリアルタイムイベント | イベントループの非同期性・接続状態の再現が困難 | `socket.io-client` + テスト用サーバーを起動する統合テスト |
-| Next.js の Server Components / Server Actions | RSC のレンダリングパイプラインを再現できない | `next build` + `playwright` / `cypress` でE2Eテスト |
+| Next.js の Server Components（RSCのレンダリング自体） | RSC のレンダリングパイプラインを再現できない | `next build` + `playwright` / `cypress` でE2Eテスト |
+| Next.js の Server Actions（`auth()`等リクエストコンテキスト依存APIを呼ぶ関数） | **これは「テスト困難な領域」ではない。** Server Actionはただの非同期関数であり、直接importして呼び出せる。`auth()`が依存する`next/headers`はモック可能 | `vi.mock("@/auth", () => ({ auth: vi.fn() }))` 等でセッション取得をモックし、テストごとに任意のセッション（ユーザー・管理者・null）を注入して呼び出す。`redirect()`の成功パスは、throwされる例外（`digest`が`NEXT_REDIRECT`で始まる）と副作用（DB状態の変化）で検証する |
 | ブラウザ固有 API（IndexedDB・Service Worker・Geolocation） | jsdom では未実装または挙動が異なる | Playwright + 実ブラウザで E2E テスト |
 | DB マイグレーション（スキーマ変更の適用） | 本番DBへの副作用を伴う | テスト用インメモリDB（better-sqlite3 の `:memory:`）で統合テスト |
 | 外部 API（Stripe・SendGrid 等） | 実APIへの呼び出しはテストで行わない | `msw`（Mock Service Worker）または vitest の `vi.mock` でモック |
