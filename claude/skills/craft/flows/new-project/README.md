@@ -10,8 +10,9 @@ flowchart TD
     S0["new-project STEP 1: フロントエンドの確認\n（あり/なし → HAS_FRONTEND）"]
     S0 --> SETUP
 
-    SETUP["ハーネスセットアップ\n（サブエージェント）\n.gitignore / .mcp.json / hooks/ / settings.json"]
-    SETUP --> S1
+    SETUP["ハーネスセットアップ\n（サブエージェント）\ngit init / .gitignore / .mcp.json"]
+    SETUP --> SETUP2["hooks・settings.json 書き出し\n（メインClaude自身。self-modification誤検知回避のため分離）"]
+    SETUP2 --> S1
 
     subgraph DESIGN["エージェントチェーン（agent-chain.md、承認ゲートあり）"]
         S1["STEP 1: intake\n→ .craft/docs/requirements.md"]

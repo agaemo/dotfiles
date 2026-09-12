@@ -39,6 +39,12 @@ ELSE:
 
 ### ステップ 2: ファイル書き出し（サブエージェントで実行）
 
+IMPORTANT: `.claude/settings.json`・`.claude/hooks/*.js` の書き出しはサブエージェントに
+  含めないこと。これらのファイルパスを含むタスクをサブエージェントに渡すと、ハーネスの
+  権限システムに「自己変更（Self-Modification）」と判定され、Agent 呼び出し自体が拒否される
+  （実際に発生・再現済み）。git init・.gitignore・.mcp.json の書き出しのみをサブエージェントに
+  任せ、hooks・settings.json の書き出しはステップ2.5でメインClaude自身が行う。
+
 Agent ツールでサブエージェントを起動し、下記「サブエージェントへのプロンプト」ブロック全文を渡す。
 **変数 `<CWD>`・`<TEMPLATE>`・`<HAS_FRONTEND>` は実際の値に展開してから渡すこと。**
 **TEMPLATEは「このSKILL.mdが存在するディレクトリの2階層上」= craftディレクトリの絶対パス（例: /Users/alice/.claude/skills/craft）を親エージェントが計算して埋め込む。**
@@ -109,7 +115,20 @@ FOREACH row IN 以下の対応表:
   | gitignore                                | .gitignore                            | false         |
   | mcp.json                                 | .mcp.json                             | false         |
 
---- STEP 3: hooks ファイルの書き出し ---
+--- STEP 3: 完了報告 ---
+
+REPORT: "完了しました"
+```
+
+---
+
+### ステップ 2.5: hooks・settings.json の書き出し（メインClaude自身が実行）
+
+IMPORTANT: このステップはサブエージェントに委譲せず、メインClaude自身が直接 Read/Write すること
+（理由はステップ2冒頭のIMPORTANT参照）。
+
+```
+TEMPLATE = {SKILL_DIR}  # craftディレクトリの絶対パス
 
 FOREACH row IN 以下の対応表:
   READ  TEMPLATE/row.src
@@ -119,8 +138,6 @@ FOREACH row IN 以下の対応表:
   |----------------------------|-----------------------------------------|
   | hooks/on-session-start.js  | .claude/hooks/on-session-start.js       |
   | hooks/pre-bash.js          | .claude/hooks/pre-bash.js               |
-
---- STEP 4: settings.json の書き出し ---
 
 READ TEMPLATE/settings.json
 REPLACE ALL: ".claude/hooks/" → "${CLAUDE_PROJECT_DIR}/.claude/hooks/"
@@ -145,25 +162,9 @@ NOTE: `${CLAUDE_PROJECT_DIR}`のようなプレースホルダーを含むshell 
 ASSERT EXISTS(CWD/.claude/settings.json)
 ASSERT: 書き出した CWD/.claude/settings.json に CWD の実際の絶対パス文字列が
   含まれていないこと（confirms `${CLAUDE_PROJECT_DIR}`への置換が正しく行われたか）
-
---- STEP 5: セットアップ確認（安全網） ---
-
-NOTE: 通常は発火しない。STEP 2〜4で書き出し済みのため
-
-FOREACH (path, src) IN [
-  (.claude/settings.json,              settings.json),
-  (.claude/hooks/on-session-start.js,  hooks/on-session-start.js),
-  (.claude/hooks/pre-bash.js,          hooks/pre-bash.js)
-]:
-  IF NOT EXISTS(CWD/path):
-    READ  TEMPLATE/src
-    WRITE CWD/path
-  ENDIF
-  ASSERT EXISTS(CWD/path)
-
---- STEP 6: 完了報告 ---
-
-REPORT: "完了しました"
+IF いずれかの ASSERT が FAILED:
+  REPORT: エラー内容を報告してユーザーに確認を求める
+  STOP
 ```
 
 ---

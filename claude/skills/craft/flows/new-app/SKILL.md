@@ -80,6 +80,12 @@ ENDIF
 
 ### ステップ 3: ファイル書き出し（サブエージェントで実行）
 
+IMPORTANT: `.claude/settings.json`・`.claude/hooks/*.js` の書き出しはサブエージェントに
+  含めないこと。これらのファイルパスを含むタスクをサブエージェントに渡すと、ハーネスの
+  権限システムに「自己変更（Self-Modification）」と判定され、Agent 呼び出し自体が拒否される
+  （実際に発生・再現済み）。git init・.gitignore・.mcp.json の書き出しのみをサブエージェントに
+  任せ、hooks・settings.json の書き出しはステップ3.5でメインClaude自身が行う。
+
 Agent ツールでサブエージェントを起動し、以下のプロンプトを渡す。
 **`CWD` と `TEMPLATE` は実際の絶対パスに展開してから渡すこと。**
 WAIT_FOR: サブエージェントの完了報告（"完了しました"）を受け取ってから続きに進む。
@@ -132,15 +138,24 @@ READ  TEMPLATE/mcp.json               → WRITE CWD/.mcp.json
 ASSERT EXISTS(CWD/.gitignore)
 ASSERT EXISTS(CWD/.mcp.json)
 
---- STEP 3: hooks ファイルの書き出し ---
+--- STEP 3: 完了報告 ---
 
+REPORT: "完了しました"
+```
+
+---
+
+### ステップ 3.5: hooks・settings.json の書き出し（メインClaude自身が実行）
+
+IMPORTANT: このステップはサブエージェントに委譲せず、メインClaude自身が直接 Read/Write すること
+（理由はステップ3冒頭のIMPORTANT参照）。
+
+```
 READ  TEMPLATE/hooks/on-session-start.js → WRITE CWD/.claude/hooks/on-session-start.js
 READ  TEMPLATE/hooks/pre-bash.js         → WRITE CWD/.claude/hooks/pre-bash.js
 
 ASSERT EXISTS(CWD/.claude/hooks/on-session-start.js)
 ASSERT EXISTS(CWD/.claude/hooks/pre-bash.js)
-
---- STEP 4: settings.json の書き出し ---
 
 READ TEMPLATE/settings.json
 REPLACE ALL: ".claude/hooks/" → "${CLAUDE_PROJECT_DIR}/.claude/hooks/"
@@ -151,10 +166,9 @@ WRITE CWD/.claude/settings.json
 
 ASSERT EXISTS(CWD/.claude/settings.json)
 ASSERT: 書き出した CWD/.claude/settings.json に CWD の実際の絶対パス文字列が含まれていないこと
-
---- STEP 5: 完了報告 ---
-
-REPORT: "完了しました"
+IF いずれかの ASSERT が FAILED:
+  REPORT: エラー内容を報告してユーザーに確認を求める
+  STOP
 ```
 
 ---

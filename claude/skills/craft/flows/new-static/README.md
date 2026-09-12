@@ -15,13 +15,15 @@ flowchart TD
         S2P --> GATE{承認}
     end
 
-    GATE -->|承認| S3
+    GATE -->|承認| S25["STEP 2.5:\nresearcher呼び出し（差分確認）\n→ .craft/docs/tech-research.md"]
+    S25 --> S3
 
     subgraph SETUP["セットアップ（サブエージェント）"]
-        S3["STEP 3:\nmise → Astro プロジェクト作成\n→ ファイル書き出し\n→ settings.json\n→ git init\n→ pnpm build 確認"]
+        S3["STEP 3:\nmise → Astro プロジェクト作成\n→ ファイル書き出し（.gitignore/.mcp.json）\n→ git init\n→ pnpm build 確認"]
     end
 
-    S3 --> S35["STEP 3.5:\nデザインブリーフのセクション構成から\n.craft/docs/plan.md を未着手状態で生成"]
+    S3 --> S34["STEP 3.4（メインClaude）:\nhooks・settings.json の書き出し"]
+    S34 --> S35["STEP 3.5:\nデザインブリーフのセクション構成から\n.craft/docs/plan.md を未着手状態で生成"]
     S35 --> S4["STEP 4: build フローへ委譲\nSTACK=static, HAS_REVIEW_CHAIN=false"]
     S4 --> END([完了])
 ```

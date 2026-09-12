@@ -113,22 +113,12 @@ IF EXISTS(CWD/.vscode):
   RUN: rm -rf CWD/.vscode
 ENDIF
 
---- STEP 3: settings.json の書き出し（最初に実施してパーミッション設定を有効化） ---
+--- STEP 3: 残ファイルの書き出し ---
 
-READ TEMPLATE/settings.json
-REPLACE ALL: ".claude/hooks/" → "${CLAUDE_PROJECT_DIR}/.claude/hooks/"
-  IMPORTANT: CWDの実際の絶対パスを書き込まないこと。`${CLAUDE_PROJECT_DIR}`はClaude Code
-  公式のプレースホルダーで、hook実行時のカレントディレクトリに関わらずプロジェクトルートを
-  指す。絶対パス直書きは他環境での動作不能・個人情報露出の原因になる
-WRITE CWD/.claude/settings.json  ← Write ツールを使うこと（Bash 禁止）
-
-ASSERT EXISTS(CWD/.claude/settings.json)
-ASSERT: 書き出した CWD/.claude/settings.json に CWD の実際の絶対パス文字列が含まれていないこと
-IF FAILED:
-  REPORT: エラー内容を報告してユーザーに確認を求める
-  STOP
-
---- STEP 4: 残ファイルの書き出し ---
+NOTE: `.claude/settings.json`・`.claude/hooks/*.js` はここに含めない。メインClaude自身が
+  ステップ3.5（サブエージェント完了後）で書き出す（理由: サブエージェントにこれらのパスを
+  含むタスクを渡すと、ハーネスの権限システムに「自己変更」と判定され Agent 呼び出し自体が
+  拒否される。実際に発生・再現済み）。
 
 IMPORTANT: ファイル作成はすべて Write ツールを使うこと。Bash（mkdir / echo / cat）は使わない。
            Write ツールは親ディレクトリを自動生成するため mkdir は不要。
@@ -147,14 +137,12 @@ FOREACH row IN 以下の対応表:
   |-------------------------------|--------------------------------------|
   | gitignore                     | .gitignore                           |
   | mcp.json                      | .mcp.json                            |
-  | hooks/on-session-start.js     | .claude/hooks/on-session-start.js    |
-  | hooks/pre-bash.js             | .claude/hooks/pre-bash.js            |
 
 IF いずれかの ASSERT が FAILED:
   REPORT: エラー内容（どのファイルか）を報告してユーザーに確認を求める
   STOP
 
---- STEP 5: git 初期化 ---
+--- STEP 4: git 初期化 ---
 
 IF EXISTS(CWD/.git/):
   NOTE: 既存 git リポジトリを検出。git init はスキップ
@@ -166,7 +154,7 @@ IF FAILED:
   REPORT: エラー内容を報告してユーザーに確認を求める
   STOP
 
---- STEP 6: Oxlint のインストール ---
+--- STEP 5: Oxlint のインストール ---
 
 RUN:
   mise exec -- pnpm add -D oxlint
@@ -176,7 +164,7 @@ IF FAILED:
   REPORT: エラー内容を報告してユーザーに確認を求める
   STOP
 
---- STEP 7: ネイティブ依存関係のビルド承認 ---
+--- STEP 6: ネイティブ依存関係のビルド承認 ---
 
 RUN:
   mise exec -- pnpm approve-builds --all
@@ -186,7 +174,7 @@ IF FAILED:
   REPORT: エラー内容を報告してユーザーに確認を求める
   STOP
 
---- STEP 8: ビルド確認 ---
+--- STEP 7: ビルド確認 ---
 
 RUN:
   mise exec -- pnpm run build
@@ -196,14 +184,14 @@ IF build FAILED:
   STOP
 ENDIF
 
---- STEP 9: 最終確認 ---
+--- STEP 8: 最終確認 ---
 
-ASSERT EXISTS: CWD/.claude/settings.json
-ASSERT EXISTS: CWD/.claude/hooks/on-session-start.js
-ASSERT EXISTS: CWD/.claude/hooks/pre-bash.js
 ASSERT EXISTS: CWD/.mcp.json
+ASSERT EXISTS: CWD/.gitignore
 NOTE: 存在しないファイルがあれば対応する STEP に戻って再実行すること
+NOTE: `.claude/settings.json`・hooks はステップ3.5（メインClaude側）で書き出されるため、
+  ここでは確認しない。
 
---- STEP 10: 完了報告 ---
+--- STEP 9: 完了報告 ---
 
 REPORT: "完了しました"

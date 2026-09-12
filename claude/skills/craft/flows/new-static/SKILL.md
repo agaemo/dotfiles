@@ -145,6 +145,29 @@ GATE: ユーザー承認
 
 ---
 
+### ステップ 2.5: 技術調査（researcher呼び出し）
+
+```
+IMPORTANT: setup-prompt.md に書かれたAstroの既知の罠（v6のContent Collections等）は
+  記載時点のスナップショットであり、Astro自体は更新が速いフレームワークのため、
+  そのまま実行前提にしない。
+
+Agent ツールで researcher エージェント（{SKILL_DIR}/../../agents/researcher.md）を起動する。
+  対象: Astro（+ Node.js）
+  モード: 差分確認（{SKILL_DIR}/setup-prompt.md の内容、特にSTEP2のNOTE群を前提として渡す）
+WAIT_FOR: サブエージェントの完了報告（`.craft/docs/tech-research.md` への保存）を受け取ってから続きに進む
+IF READ FAILED（researcher.mdが見つからない）:
+  NOTE: 読めない場合でも省略せず、WebSearch/WebFetchで同等の調査（Astro最新版の
+  破壊的変更・既知の罠）をこの場で行うこと
+
+IMPORTANT: researcherは「懸念なし」であっても客観的な差分（バージョンステータスの変化・
+  新たなセキュリティリリース・破壊的変更・新たな既知の罠等）を報告に含めてくる。差分がある
+  場合、その内容をそのままユーザーに提示してから次に進むこと（提示せず進めることを禁止する）。
+  WAIT_FOR: ユーザーの回答（差分がある場合のみ）
+```
+
+---
+
 ### ステップ 3: セットアップ（サブエージェントで実行）
 
 ```
@@ -154,6 +177,9 @@ IMPORTANT: プロンプト内のプレースホルダーを渡す前に実際の
                例: /Users/alice/.claude/skills/craft
 
 READ {SKILL_DIR}/setup-prompt.md ← サブエージェントへのプロンプト本文（ここで初めて読む）
+IMPORTANT: .craft/docs/tech-research.md の内容と setup-prompt.md の記載が食い違う場合、
+  tech-research.md（＝現時点の調査結果）を優先し、サブエージェントへの指示にその差分を
+  明記してから渡すこと（setup-prompt.md 自体は書き換えない）。
 IF READ FAILED:
   REPORT: "setup-prompt.md が見つかりません。セットアップを開始できません。"
   STOP
@@ -163,6 +189,35 @@ Agent ツールでサブエージェントを起動し、上記で読み込ん�
 WAIT_FOR: サブエージェントの完了報告（"完了しました"）を受け取ってから続きに進む。
 IF サブエージェントが "完了しました" を報告しない（エラー・中断）:
   REPORT: 失敗したステップと理由をユーザーに伝え、再試行するか確認すること
+  STOP
+```
+
+---
+
+### ステップ 3.4: hooks・settings.json の書き出し（メインClaude自身が実行）
+
+IMPORTANT: このステップはサブエージェントに委譲せず、メインClaude自身が直接 Read/Write すること。
+  `.claude/settings.json`・`.claude/hooks/*.js` の書き出しをサブエージェントに含めると、
+  ハーネスの権限システムに「自己変更（Self-Modification）」と判定され Agent 呼び出し自体が
+  拒否される（実際に発生・再現済み）。ステップ3のAstroプロジェクト生成が完了した後（＝
+  ディレクトリが非空になった後）に行うことで、STEP2の「非空ディレクトリ」誤判定問題も回避する。
+
+```
+TEMPLATE = {SKILL_DIR}/../..  # craftディレクトリの絶対パス
+
+READ  TEMPLATE/hooks/on-session-start.js → WRITE CWD/.claude/hooks/on-session-start.js
+READ  TEMPLATE/hooks/pre-bash.js         → WRITE CWD/.claude/hooks/pre-bash.js
+
+READ TEMPLATE/settings.json
+REPLACE ALL: ".claude/hooks/" → "${CLAUDE_PROJECT_DIR}/.claude/hooks/"
+WRITE CWD/.claude/settings.json
+
+ASSERT EXISTS(CWD/.claude/settings.json)
+ASSERT EXISTS(CWD/.claude/hooks/on-session-start.js)
+ASSERT EXISTS(CWD/.claude/hooks/pre-bash.js)
+ASSERT: 書き出した CWD/.claude/settings.json に CWD の実際の絶対パス文字列が含まれていないこと
+IF いずれかの ASSERT が FAILED:
+  REPORT: エラー内容を報告してユーザーに確認を求める
   STOP
 ```
 

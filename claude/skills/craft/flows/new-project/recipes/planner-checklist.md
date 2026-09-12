@@ -68,18 +68,48 @@ IMPORTANT: plan.md の「開発ランタイム」節に書く内容を、plan.md
      大半の言語をカバーし、内部でその言語の標準ツール（rustup等）を使って導入する。
      「miseで対応できるか」を必ず最初に確認してから、対応できない場合のみ個別ツールを検討する
 
-2. **言語・ランタイムのバージョン決定**
+2. **技術調査（researcher呼び出し、必須）**
+
+   IMPORTANT: バージョン・scaffold手順は時間とともに変わる。recipeやIMPORTANTの一般原則
+   （公式ドキュメント確認等）だけに頼らず、確定させる直前に必ず `researcher` エージェント
+   （`{SKILL_DIR}/agents/researcher.md`）を呼び出して現状を調べさせること。
+
+   - 対象: 言語・ランタイム、および（HAS_FRONTEND == true の場合）採用予定フレームワーク
+   - モードの判定:
+     - 専用recipeがある技術（Bun / Python(uv) / Node.js / Flutter / React Native、
+       および下記ステップ3の表にあるフレームワーク）→ **差分確認モード**。該当recipe
+       ファイルの内容を読み、researcherへの指示に含めて渡す
+     - それ以外（Go・Rust・Java 等の言語、表に無いフレームワーク）→ **フル調査モード**
+   - Agent ツールでresearcherを起動し、完了報告（`.craft/docs/tech-research.md` への保存）
+     を受け取ってから次に進む
+   - IF READ FAILED（researcher.mdが見つからない）:
+     NOTE: 読めない場合でも省略せず、WebSearch/WebFetchで同等の調査（quickstart・
+     破壊的変更・既知の罠・メンテナンス状況）をこの場で行うこと
+   - IMPORTANT: researcherは「懸念なし」であっても客観的な差分（バージョンステータスの
+     変化・新たなセキュリティリリース・破壊的変更・新たな既知の罠等）を報告に含めてくる。
+     「懸念」という評価語の有無で判断せず、recipe記載時点からの差分そのものがあるかどうかで
+     判断すること（フル調査モードでは常に該当ありとして扱う）。
+   - 差分がある場合、その内容をそのままユーザーに提示してから次のステップへ進む
+     （代替への変更を提案するかはユーザー次第。提示せず進めることを禁止する）
+     WAIT_FOR: ユーザーの回答（差分がある場合のみ。recipe内容と完全に一致し差分皆無の場合は提示不要）
+
+3. **言語・ランタイムのバージョン決定**
+   - `.craft/docs/tech-research.md`（ステップ2で得た調査結果）の推奨構成を踏まえて確定する
    - 既知の組み合わせ（Bun / Python(uv) / Node.js / Flutter / React Native）は
      `{SKILL_DIR}/flows/new-project/recipes/runtime-*.md`（Node.js系）・
-     `{SKILL_DIR}/flows/new-app/flutter-notes.md`（Flutter）の該当テンプレートに従う
+     `{SKILL_DIR}/flows/new-app/flutter-notes.md`（Flutter）の該当テンプレートをベースに、
+     tech-research.md の差分確認結果（変更点があれば）を反映する
    - それ以外の言語（Go・Rust・Java 等）は以下の手順で決定する:
-     1. 選定したマネージャーのレジストリで対応バージョンを確認する
-        （例: `mise registry | grep -i <言語>` または公式ドキュメント）
+     1. tech-research.md の推奨バージョンを起点に、選定したマネージャーのレジストリで
+        対応可否を確認する（例: `mise registry | grep -i <言語>`）
      2. ランタイムは固定バージョンを指定する（`"latest"` はビルド再現性がなく禁止。
         パッケージマネージャーは `"latest"` で構わない）
      3. インストール・検証コマンドを確定する（例: `mise exec -- go version`）
 
-3. **フレームワーク・アプリのscaffold決定**（HAS_FRONTEND == true の場合。new-app 由来の Flutter・React Native も含む）
+4. **フレームワーク・アプリのscaffold決定**（HAS_FRONTEND == true の場合。new-app 由来の Flutter・React Native も含む）
+
+   `.craft/docs/tech-research.md` に記載のscaffold手順・破壊的変更を優先し、下表の記載と食い違う場合は
+   tech-research.md（＝現時点の調査結果）を採用する。
 
    | フレームワーク | scaffold手順 |
    |---|---|
@@ -95,9 +125,9 @@ IMPORTANT: plan.md の「開発ランタイム」節に書く内容を、plan.md
    リアルタイム通信（WebSocket・チャット・通知）が要件にある場合は
    `{SKILL_DIR}/flows/new-project/recipes/socketio.md` を読み、実装ステップに組み込む
 
-4. **plan.md への転記**
-   - 1・2で確定した内容 → 「開発ランタイム」節の「環境管理ツール」「セットアップコマンド」「検証コマンド」
-   - 3で確認したscaffoldコマンド → 同じく「開発ランタイム」節の「セットアップコマンド」に追記する
+5. **plan.md への転記**
+   - 1・3で確定した内容 → 「開発ランタイム」節の「環境管理ツール」「セットアップコマンド」「検証コマンド」
+   - 4で確認したscaffoldコマンド → 同じく「開発ランタイム」節の「セットアップコマンド」に追記する
      （ランタイムのインストールとフレームワークのscaffoldは、buildフローが同じタイミングで
      一度に実行する一続きの初期化コマンド列として記載すること）
    - STACK識別子（英小文字・言語名のみ。例: node / flutter / rust / go。「Node.js」等の表記は不可）も明記する。
