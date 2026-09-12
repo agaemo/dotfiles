@@ -29,6 +29,24 @@ IaC 作業を始める前に、以下を確認してユーザーの回答を待�
 
 ---
 
+## ステップ0.5: 構成図の作成・確認
+
+IF `.craft/docs/plan.md` の「インフラ構成」節に既にシステム構成図がある（`planner` 経由で
+呼ばれた場合）:
+  それをそのまま使う。作り直さない。
+ELSE（iac単独で呼ばれた場合。構成図が無い）:
+  ステップ0のヒアリング結果から、mermaid flowchart でシステム構成図を作成する。
+  利用者→フロントエンド配信→認証→API/実行基盤→データストアのデータフローを矢印で表し、
+  各ノードにサービス名と役割（1行）を添える。既存インフラがある場合は「既存」「新規」を
+  色分けで区別する。
+  PRESENT: 構成図をユーザーに提示する
+  GATE: ユーザー承認
+    IF 否定された: 該当箇所を修正して再提示する
+  PROHIBITED: 承認前にステップ1へ進むこと
+ENDIF
+
+---
+
 ## ツール選定の目安
 
 | ツール | 向いているケース |
@@ -80,9 +98,35 @@ infra/
 
 ---
 
+## ステップ1.5: 技術調査（researcher呼び出し、必須）
+
+IMPORTANT: Terraform provider のバージョン・認証方式・推奨されるState管理方法は変化が速い。
+IaCは「設定を間違えると本番インフラが壊れる」領域のため、古い情報のまま進めるリスクが特に高い。
+
+Agent ツールで researcher エージェント（`{SKILL_DIR}/agents/researcher.md`。SKILL_DIR は
+craftディレクトリの絶対パス）を起動する。
+- 対象: ステップ0で確定したクラウドプロバイダーの Terraform provider（`hashicorp/aws` /
+  `hashicorp/google` / `azurerm` 等）
+- モード: フル調査（iacには専用recipeが無いため常にフル調査）
+- 調査観点: providerの最新バージョン・直近の破壊的変更・認証方式の変更（IAM Role/
+  Workload Identity連携等）・推奨されるState管理方法・既知の罠
+WAIT_FOR: サブエージェントの完了報告（`.craft/docs/tech-research.md` への保存）を受け取ってから続きに進む
+IF READ FAILED（researcher.mdが見つからない）:
+  NOTE: 読めない場合でも省略せず、WebSearch/WebFetchで同等の調査をこの場で行うこと
+
+IMPORTANT: researcherは客観的な事実（バージョンステータス変化・新たな認証方式等）を
+  「懸念なし」の一言でまとめて省略しない。差分がある場合、その内容をユーザーに提示してから
+  次のステップへ進むこと。
+  WAIT_FOR: ユーザーの回答（差分がある場合のみ）
+
+---
+
 ## ステップ2: State の設定（リモートバックエンド）
 
 State はインフラの現状を記録するファイル。**絶対に git にコミットしない**（シークレットが含まれる）。
+
+ステップ0で確定したクラウドプロバイダー、および `.craft/docs/tech-research.md`
+（ステップ1.5の調査結果）に従い、以下の該当する例をベースに確定する。
 
 ### AWS（S3 + DynamoDB）の場合
 
@@ -103,9 +147,31 @@ terraform {
 bootstrap 用の別ディレクトリ（`infra/bootstrap/`）で先に作る。
 **「バックエンドリソースをどうするか」を確認してから進むこと。**
 
+### GCP（GCS）の場合
+
+```hcl
+# versions.tf
+terraform {
+  backend "gcs" {
+    bucket = "<your-state-bucket>"
+    prefix = "infra/<env>"
+  }
+}
+```
+
+GCSバックエンドはオブジェクトの世代管理でState変更履歴を保持し、Terraform自体が
+ロック機構を持つため、AWSのDynamoDBに相当する別リソースは不要（GCSバケット1つで足りる）。
+バックエンド用のGCSバケットはコンソールまたは `gcloud storage buckets create` で先に作る。
+**「バックエンドバケットをどうするか」を確認してから進むこと。**
+
 ---
 
 ## ステップ3: Provider 設定
+
+ステップ0で確定したクラウドプロバイダーに応じて選ぶ。バージョンは
+`.craft/docs/tech-research.md`（ステップ1.5の調査結果）の推奨値を使う（下記は例）。
+
+### AWS の場合
 
 ```hcl
 # versions.tf
@@ -125,11 +191,36 @@ provider "aws" {
 }
 ```
 
+### GCP の場合
+
+```hcl
+# versions.tf
+terraform {
+  required_version = ">= 1.6"
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 6.0"  # マイナーバージョンまで固定する
+    }
+  }
+}
+
+provider "google" {
+  project = var.gcp_project_id
+  region  = var.gcp_region
+  # サービスアカウントキーをここに書かない。ローカルは Application Default
+  # Credentials（`gcloud auth application-default login`）、CI/CDは
+  # Workload Identity連携を使う（長期キーの発行・保管を避ける）。
+}
+```
+
 ---
 
 ## ステップ4: 変数・シークレット管理のルール
 
-- **シークレット（DBパスワード・APIキー）は `terraform.tfvars` に書かず、AWS Secrets Manager / SSM Parameter Store から参照すること**
+- **シークレット（DBパスワード・APIキー）は `terraform.tfvars` に書かず、シークレット管理サービスから参照すること**
+  - AWS: Secrets Manager / SSM Parameter Store
+  - GCP: Secret Manager
 - `terraform.tfvars` は `.gitignore` に必ず追加する
 - `variables.tf` に `sensitive = true` をつけてログへの出力を防ぐ
 
@@ -139,10 +230,21 @@ variable "db_password" {
   type      = string
   sensitive = true  # plan/apply の出力に値が表示されなくなる
 }
+```
 
-# Secrets Manager からの参照例
+### AWS: Secrets Manager からの参照例
+
+```hcl
 data "aws_secretsmanager_secret_version" "db" {
   secret_id = "prod/myapp/db"
+}
+```
+
+### GCP: Secret Manager からの参照例
+
+```hcl
+data "google_secret_manager_secret_version" "db" {
+  secret = "prod-myapp-db-password"
 }
 ```
 
