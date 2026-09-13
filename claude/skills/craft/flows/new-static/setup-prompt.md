@@ -58,22 +58,35 @@ IF FAILED:
 
 --- STEP 2: Astro プロジェクト作成 ---
 
-NOTE: この時点で CWD/.craft/docs/design-brief.md が既に存在する（ステップ1で作成済み）。
-  `pnpm create astro@latest .` はディレクトリが非空だと判定すると、意図しない別名の
-  サブディレクトリ（例: ランダムな2単語の名前）にプロジェクトを生成してしまう既知の問題がある。
-  これを避けるため、実行前に .craft/ を一時退避し、実行後に戻す。
+NOTE: この時点で CWD/.craft/docs/design-brief.md と CWD/.mise.toml が既に存在する
+  （ステップ1で作成済み）。`pnpm create astro@latest .` はディレクトリが非空だと判定すると、
+  意図しない別名のサブディレクトリ（例: ランダムな2単語の名前）にプロジェクトを生成して
+  しまう既知の問題がある。これを避けるため、実行前に .craft/ と .mise.toml の両方を
+  一時退避し、実行後に戻す（.craft/ だけを退避しても .mise.toml が残っていれば
+  非空判定を回避できず同じ問題が再発する。実際に発生した事例あり）。
 
-IF NOT EXISTS(CWD/.craft):
+  IMPORTANT: .mise.toml を退避すると `mise exec -- <command>` はCWDに設定ファイルが
+  無いためバージョンを解決できず失敗する。退避中のscaffoldコマンドに限り、
+  `mise exec node@lts pnpm@latest -- <command>` のようにバージョンを明示指定し、
+  .mise.toml の存在に依存しない形で実行すること。
+
+IF NOT EXISTS(CWD/.craft) AND NOT EXISTS(CWD/.mise.toml):
   SKIP（退避不要。非空ディレクトリ問題も発生しない）
 ELSE:
-  RUN（3行を1回のBashツール呼び出しで `&&` 連結して実行すること。分割実行すると
-       `$$`（シェルPID）が呼び出しごとに変わり退避先を見失う。CWDのbasenameベースの
-       固定名を使うことで、この呼び出し中に何が起きても一意なパスを保つ）:
-    mv CWD/.craft /tmp/craft-setup-tmp-<CWDのbasename> && \
-    mise exec -- pnpm create astro@latest . --template minimal --no-git --yes && \
-    mv /tmp/craft-setup-tmp-<CWDのbasename> CWD/.craft
+  RUN（1回のBashツール呼び出しで実行すること。分割実行すると `$$`（シェルPID）が
+       呼び出しごとに変わり退避先を見失う。CWDのbasenameベースの固定名を使うことで、
+       この呼び出し中に何が起きても一意なパスを保つ。
+       退避対象（.craft/・.mise.toml）が存在しない場合、その mv は失敗するが
+       `|| true` で無視し、後続の `&&` 判定（scaffoldコマンドの成否）に影響させない
+       ようにする）:
+    ( mv CWD/.craft /tmp/craft-setup-tmp-<CWDのbasename> 2>/dev/null || true ) ; \
+    ( mv CWD/.mise.toml /tmp/mise-setup-tmp-<CWDのbasename> 2>/dev/null || true ) ; \
+    mise exec node@lts pnpm@latest -- pnpm create astro@latest . --template minimal --no-git --yes && \
+    ( mv /tmp/craft-setup-tmp-<CWDのbasename> CWD/.craft 2>/dev/null || true ) ; \
+    ( mv /tmp/mise-setup-tmp-<CWDのbasename> CWD/.mise.toml 2>/dev/null || true )
 
   ASSERT: CWD/.craft/docs/design-brief.md が存在すること（退避・復元が正しく行われたか）
+  ASSERT: CWD/.mise.toml が存在すること（退避・復元が正しく行われたか）
   ASSERT: package.json が CWD 直下に存在すること（サブディレクトリに生成されていないか）
   IF いずれかの ASSERT が FAILED:
     REPORT: "Astroのプロジェクト作成でディレクトリがずれた可能性があります。
