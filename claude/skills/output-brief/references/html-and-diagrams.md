@@ -70,21 +70,26 @@ GCP（512×512 viewBox、透明背景+複数色。2025年のアイコン刷新�
 | Cloud Run | `cloud-run.svg` |
 | GKE | `gke.svg` |
 | BigQuery | `bigquery.svg` |
+| Cloud SQL | `cloud-sql.svg` |
+| Cloud Spanner | `cloud-spanner.svg` |
+| AlloyDB | `alloydb.svg` |
+
+**IMPORTANT: 「コアプロダクト」は公式PDF（`google-cloud-product-icons.pdf`、Google Cloud公式サイトで配布）内で `*` 表記されたサービスで、専用のユニークアイコンを持つ。カテゴリアイコンで代用してよいのは、そのサービスがコアプロダクト一覧に含まれない場合のみ。同梱にない `*` 付きサービスが必要な場合は、カテゴリアイコンで済ませず後述の「同梱にないアイコンの取得」で `Unique Icons/` 配下から専用アイコンを探す。**
 
 | カテゴリ（複数サービス共有） | 該当サービス例 | ファイル |
 |---|---|---|
 | Networking | Cloud Load Balancing, Cloud CDN, Cloud VPN 等 | `networking.svg` |
-| Databases | Cloud SQL, Firestore, Memorystore, Spanner 等 | `databases.svg` |
+| Databases | Firestore, Memorystore, Bigtable, Datastore 等（Cloud SQL/Spanner/AlloyDBはコアプロダクトのため上表を使う） | `databases.svg` |
 | Serverless Computing | Cloud Functions, App Engine 等 | `serverless-computing.svg` |
 | Containers | GKE以外のコンテナ関連サービス | `containers.svg` |
 | Security Identity | Cloud IAM, Secret Manager 等 | `security-identity.svg` |
 | Storage | Filestore, Persistent Disk 等 | `storage.svg` |
 | Integration Services | Pub/Sub, Workflows 等 | `integration-services.svg` |
-| DevOps | Cloud Build, Cloud Deploy 等 | `devops.svg` |
+| DevOps | Artifact Registry, Cloud Build, Cloud Deploy, Container Registry 等 | `devops.svg` |
 | Management Tools | Cloud Monitoring, Cloud Logging 等 | `management-tools.svg` |
 | AI/Machine Learning | Vertex AI以外のAI/ML関連サービス | `ai-machine-learning.svg` |
 
-同一カテゴリを複数サービスに使う図（例: Cloud SQLとFirestoreを両方使う図）では、同じアイコンが重複してもラベルテキストで区別する。区別が重要な図では後述の「同梱にないアイコンの取得」でコアプロダクト相当がないか確認する。
+同一カテゴリを複数サービスに使う図（例: FirestoreとMemorystoreを両方使う図）では、同じアイコンが重複してもラベルテキストで区別する。
 
 **同梱にないアイコンの取得**（`SCRATCH_DIR` にダウンロードし、同一セッション内は再取得しない）:
 
@@ -109,6 +114,17 @@ GCPアイコンSVGは `<style>` 内で `.st0`〜`.st4` 等の汎用クラス名�
 sed -i '' -E "s/\.st([0-9])/.<ユニークな接頭辞>-st\1/g; s/class=\"st([0-9])\"/class=\"<ユニークな接頭辞>-st\1\"/g" "<対象SVGファイル>"
 ```
 AWSアイコンはクラス名を使わないため、この対策は不要。
+
+**ノードへのアイコン配置（上下余白のバランス）**
+ノード枠（高さ80pxを想定）内にアイコン+ラベルを配置する際、上下の余白が均等になるよう座標を計算する（目安、ノード上端を0とした相対座標）:
+- アイコン（40×40）: y=8〜48
+- ラベル（1行、サービス名のみ）: baseline y=70
+- 上余白8px・下余白8px（`80 - 70`にテキストのディセンダー分を加味した近似値）
+
+サブラベルの行を追加する場合は、追加した行数分ノード高さを広げてから余白を再計算する（安易に既存の80px内へ詰め込むと下寄りになりやすい）。配置後は他のviz-diagram同様、必ずスクリーンショットで上下余白の対称性を確認する。
+
+**ノード内のラベルはサービス名のみにする**
+GCPは2025年のアイコン刷新で「コアプロダクト（サービス固有アイコン）」と「カテゴリ（複数サービスで共有するアイコン）」が混在する。ノードごとに「コンテナアプリ」のような説明文をサブラベルとして付けると、他ノードの公式カテゴリ名（Networking・Databases等）と表記の粒度が揃わず、かつ非公式な呼称を作り出してしまう。ノード内はサービス名のみとし、コア/カテゴリの区別や補足が必要な場合は図の下（`figcaption`）に注記としてまとめる。
 
 ## HTML の場合
 
