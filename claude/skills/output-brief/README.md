@@ -164,6 +164,12 @@
 
 ---
 
+#### AWS/GCPアーキテクチャ構成図
+
+AWS/GCPのサービス構成図が必要な場合、公式アイコン（AWS 18種・GCP 15種を`assets/aws-icons/` `assets/gcp-icons/`に同梱、同梱外は実行時に公式サイトから取得）を**改変せず**viz-diagramのノードに組み込む。汎用のviz-diagramノードより実サービスとして正確に伝わる。改変禁止・単体配布禁止などの制約と実装詳細は[`references/html-and-diagrams.md`](references/html-and-diagrams.md)を参照。
+
+---
+
 ### Markdown
 
 番号リストで以下を確認する。

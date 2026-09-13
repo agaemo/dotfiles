@@ -36,6 +36,80 @@ ELSE:
   - **quadrantChart の文字エンコーディング**: title・axis・quadrant・ポイント名に日本語等のUnicode文字を使う場合はダブルクォートで囲む（`"テキスト"`）。囲まないと `Syntax error in text` になる（flowchart 等の他の図種では不要）。
   - **HTML でのキャプション**: 図の読み方や補足を添える場合は `<div class="mermaid">` の直後に `<span class="mermaid-caption">補足テキスト</span>` を置く。CSS は全テーマに組み込み済み。
 
+### AWS/GCPアーキテクチャ構成図
+
+AWS/GCPのサービス構成図・アーキテクチャ図が必要な場合、viz-diagram（矢印・ノード枠・ラベルの手描きSVG）のノードの中に、AWS/GCP公式アイコンを**改変せずそのまま**配置する方式を使う（汎用のviz-diagramノードより実サービスとして正確に伝わる）。
+
+**IMPORTANT: ライセンス制約（AWS/GCPとも公式に詳細な利用規約文書は存在しないが、以下を守れば「アーキテクチャ図作成用に提供している」という両社の提供意図の範囲内に収まる）**
+- **PROHIBITED: アイコンの改変**（色・比率・パスの変更。ノードサイズに合わせた `scale()` 変換のみ許可）
+- **PROHIBITED: アイコンを単体で抽出・再配布可能な形で提供すること**（常にアーキテクチャ図の一部として埋め込む。アイコンファイル単体をユーザーに渡す用途では使わない）
+- アーキテクチャ図の文脈でのみ使用する（サービスと無関係な装飾用途に使わない）
+
+**同梱アイコン**（`$SKILL_DIR/assets/aws-icons/` `$SKILL_DIR/assets/gcp-icons/`。`Read` して `<g id="art">...</g>` 部分を viz-diagram のノード内に `<g transform="translate(x,y) scale(s)">` で埋め込む）:
+
+AWS（80×80 viewBox、サービスカテゴリ色の正方形背景+白アイコン。背景ごと配置すればよい）:
+
+| サービス | ファイル | サービス | ファイル |
+|---|---|---|---|
+| EC2 | `ec2.svg` | Route 53 | `route53.svg` |
+| Auto Scaling | `auto-scaling.svg` | SQS | `sqs.svg` |
+| Lambda | `lambda.svg` | SNS | `sns.svg` |
+| RDS | `rds.svg` | ECS | `ecs.svg` |
+| DynamoDB | `dynamodb.svg` | EKS | `eks.svg` |
+| ElastiCache | `elasticache.svg` | IAM | `iam.svg` |
+| VPC | `vpc.svg` | CloudWatch | `cloudwatch.svg` |
+| ALB (Elastic Load Balancing) | `alb.svg` | S3 | `s3.svg` |
+| CloudFront | `cloudfront.svg` | API Gateway | `api-gateway.svg` |
+
+GCP（512×512 viewBox、透明背景+複数色。2025年のアイコン刷新で個別サービスアイコンは主要コアプロダクトのみに整理され、それ以外は同一カテゴリ内で1つのアイコンを共有する）:
+
+| コアプロダクト（サービス固有） | ファイル |
+|---|---|
+| Compute Engine | `compute-engine.svg` |
+| Cloud Storage | `cloud-storage.svg` |
+| Cloud Run | `cloud-run.svg` |
+| GKE | `gke.svg` |
+| BigQuery | `bigquery.svg` |
+
+| カテゴリ（複数サービス共有） | 該当サービス例 | ファイル |
+|---|---|---|
+| Networking | Cloud Load Balancing, Cloud CDN, Cloud VPN 等 | `networking.svg` |
+| Databases | Cloud SQL, Firestore, Memorystore, Spanner 等 | `databases.svg` |
+| Serverless Computing | Cloud Functions, App Engine 等 | `serverless-computing.svg` |
+| Containers | GKE以外のコンテナ関連サービス | `containers.svg` |
+| Security Identity | Cloud IAM, Secret Manager 等 | `security-identity.svg` |
+| Storage | Filestore, Persistent Disk 等 | `storage.svg` |
+| Integration Services | Pub/Sub, Workflows 等 | `integration-services.svg` |
+| DevOps | Cloud Build, Cloud Deploy 等 | `devops.svg` |
+| Management Tools | Cloud Monitoring, Cloud Logging 等 | `management-tools.svg` |
+| AI/Machine Learning | Vertex AI以外のAI/ML関連サービス | `ai-machine-learning.svg` |
+
+同一カテゴリを複数サービスに使う図（例: Cloud SQLとFirestoreを両方使う図）では、同じアイコンが重複してもラベルテキストで区別する。区別が重要な図では後述の「同梱にないアイコンの取得」でコアプロダクト相当がないか確認する。
+
+**同梱にないアイコンの取得**（`SCRATCH_DIR` にダウンロードし、同一セッション内は再取得しない）:
+
+AWS:
+```bash
+ZIP_URL=$(curl -sL "https://aws.amazon.com/architecture/icons/" | grep -oE 'https://d1\.awsstatic\.com[^"]*Icon-package[^"]*\.zip' | head -1)
+curl -sL "$ZIP_URL" -o "$SCRATCH_DIR/aws-icons.zip"
+unzip -l "$SCRATCH_DIR/aws-icons.zip" | grep -i "<検索したいサービス名>_64.svg"
+unzip -o -j "$SCRATCH_DIR/aws-icons.zip" "<上記で見つかったパス>" -d "$SCRATCH_DIR/aws-icons/"
+```
+
+GCP:
+```bash
+curl -sL "https://services.google.com/fh/files/misc/core-products-icons.zip" -o "$SCRATCH_DIR/gcp-core.zip"
+curl -sL "https://services.google.com/fh/files/misc/category-icons.zip" -o "$SCRATCH_DIR/gcp-category.zip"
+unzip -l "$SCRATCH_DIR/gcp-core.zip" "$SCRATCH_DIR/gcp-category.zip" | grep -i "<検索したいサービス名>"
+```
+
+**IMPORTANT: GCPアイコンのクラス名衝突**
+GCPアイコンSVGは `<style>` 内で `.st0`〜`.st4` 等の汎用クラス名を使っており、複数アイコンを同一HTML文書に埋め込むとクラス名が衝突し、意図しない色が適用される。同梱アイコン（`assets/gcp-icons/`）はファイル名由来のprefixで既にユニーク化済み（例: `.compute-engine-st1`）なのでそのまま使えるが、都度ダウンロードしたアイコンを使う場合は埋め込み前に同様のprefix化を行う:
+```bash
+sed -i '' -E "s/\.st([0-9])/.<ユニークな接頭辞>-st\1/g; s/class=\"st([0-9])\"/class=\"<ユニークな接頭辞>-st\1\"/g" "<対象SVGファイル>"
+```
+AWSアイコンはクラス名を使わないため、この対策は不要。
+
 ## HTML の場合
 
 レイアウト選択 → カラー選択の **2 段階** で行う。
