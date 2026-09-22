@@ -75,6 +75,10 @@ Container / コンテナ / Docker が含まれる場合に確認する。
 ワーカーノード側もKubernetes管理用のリソースが上乗せされる分、同じ処理をさせるにも
 Compose・サーバーレス単体運用よりVMコストがやや増える。
 
+補足：APのオートスケールとDBの自動化は別軸で考える。DBの可用性（落ちても自動復旧）は
+Cloud SQL / RDSのマルチAZ構成で対応でき、Kubernetesは不要。DBのスケール（負荷に応じた
+自動増減）まで欲しい場合のみ、Aurora Serverless v2 / Cloud Spanner等のサーバーレス系DBを検討する。
+
 段階1（Docker Compose止まり）と判断した場合、このIaCスキルでのTerraform管理対象は
 VM自体の作成程度に留まることが多い。段階2・3の場合は、それぞれ以降のステップで
 Cloud Run / ECS Fargateのリソース、またはKubernetesクラスタ（GKE/EKS/AKS）自体の構築や
