@@ -64,6 +64,10 @@ Container / コンテナ / Docker が含まれる場合に確認する。
 | 2 | サーバーレス（Cloud Run / ECS Fargate） | 運用の手間をかけたくない。マネージドに任せて台数管理から解放されたい規模 |
 | 3 | Kubernetes（GKE / EKS / AKS 等） | 複数チームが同じ基盤で複数サービスを運用する規模 |
 
+段階3を選んだ場合、`{SKILL_DIR}/guidelines/cloud-native-tools.md`（SKILL_DIRはcraft
+ディレクトリの絶対パス）を参照し、周辺ツール（Helm・ArgoCD・cert-manager・External Secrets等）
+の選定目安とする。段階1・2の場合は参照不要。
+
 次の段階へ進む目安（いずれかに強く当てはまる場合）：
 - サーバーが3台以上になり、手動デプロイが辛くなってきた
 - 落ちたら自動で復旧してほしい可用性要件がある

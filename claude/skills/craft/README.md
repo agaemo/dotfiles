@@ -203,6 +203,7 @@ Claude Code のスキルとしては認識されず、メインの SKILL.md か�
 | `api-design.md` | REST API 設計規約（命名・HTTP メソッド・エラーフォーマット・ページネーション）。 |
 | `observability.md` | ログ・トレーシング・ヘルスチェックの設計と実装指針。 |
 | `adr-template.md` | ADR（アーキテクチャ決定記録）のテンプレート。`planner` が該当判断時に読み込む。 |
+| `cloud-native-tools.md` | Kubernetes導入後の周辺ツールカタログ。`flows/iac` が段階3選択時に読み込む。 |
 
 ---
 
