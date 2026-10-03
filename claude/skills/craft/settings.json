@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/on-session-start.js"
+            "command": "sh .claude/hooks/on-session-start.sh"
           }
         ]
       }
@@ -39,7 +39,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/pre-bash.js"
+            "command": "sh .claude/hooks/pre-bash.sh"
           }
         ]
       }
