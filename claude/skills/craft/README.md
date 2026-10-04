@@ -10,13 +10,16 @@
 ```mermaid
 flowchart TD
     START([/craft 起動]) --> DETECT{.craft/docs/plan.md\n存在する?}
-    DETECT -->|Yes| SUGGEST["「実装を再開しますか？」と提案"]
-    SUGGEST -->|再開する| RESUME["build フローへ委譲"]
-    SUGGEST -->|しない| SCOPE
+    DETECT -->|Yes| CLASSIFY{依頼文の分類}
+    CLASSIFY -->|再開であることが明確| RESUME["build フローへ委譲"]
+    CLASSIFY -->|再開と無関係な\n具体的依頼| SCOPE
+    CLASSIFY -->|未指定・判断できない| ASK["「実装を再開しますか？」と確認"]
+    ASK -->|再開する| RESUME
+    ASK -->|しない| SCOPE
     DETECT -->|No| SCOPE
 
     SCOPE["scope フローへ委譲\n種別の推定・確認・振り分け"]
-    SCOPE --> ROUTED[static / project / app / consult\nのいずれかへ委譲]
+    SCOPE --> ROUTED["static / project / app / consult などへ委譲\n新規構築以外のシステム関連の依頼は consult"]
 
     ROUTED --> END_SC([完了])
     RESUME --> END_R([build フローが\nすべて実装して完了])
@@ -32,6 +35,7 @@ flowchart TD
 - [flows/new-project/README.md](flows/new-project/README.md) — 動的アプリセットアップ
 - [flows/consult/README.md](flows/consult/README.md) — 既存システムの相談・新規構築の相談
 - [flows/qa-consult/README.md](flows/qa-consult/README.md) — QA相談
+- [flows/investigate/README.md](flows/investigate/README.md) — 不具合・挙動などの調査
 
 ---
 
@@ -176,7 +180,7 @@ Claude Code のスキルとしては認識されず、メインの SKILL.md か�
 | `new-app` | クロスプラットフォームアプリ（Flutter・React Native・Expo等）のセットアップ手順（ハーネス構築〜設計フェーズ）。Firebase 未取得時のモック実装分岐・`riverpod_generator` + `hive_generator` 競合の注記を含む。実装フェーズは `build` に委譲する。 | （README未作成） |
 | `new-runtime` | 特定の言語・ランタイム自体の学習・検証用環境構築（サイト・アプリの制作が目的ではない軽量フロー）。ヒアリング→開発ランタイム確定（researcher呼び出し含む）→plan.md作成→`build`委譲。 | （README未作成） |
 | `build` | `.craft/docs/plan.md` に基づいて実装を進める共通エンジン。new-project・new-static・new-app の設計フェーズ完了後、または別セッションでの再開時に呼ばれる。開発ランタイムの構築（plan.mdの「開発ランタイム」節から）・Makefile準備を最初に行い、フィーチャートラック設計の有無でフェーズ1〜3またはシンプルループを選び、レビューチェーン・CLAUDE.md生成までを担当する。 | [README](flows/build/README.md) |
-| `consult` | 既存システムへの課題相談、または新規構築だが対応レシピがない技術の相談（SIer的に型にはまらない依頼を受け持つ）。移行・リファクタ・現状維持／自前構築・近いカテゴリで妥協・対応しないを整理し、実行まで進める。テスト・品質・QA、DBマイグレーション、リリース計画、IaC、健全性評価、LP公開は相談内容から判定して各専用フローに委譲する。 | [README](flows/consult/README.md) |
+| `consult` | 既存システムへの課題相談、または新規構築だが対応レシピがない技術の相談（SIer的に型にはまらない依頼を受け持つ）。移行・リファクタ・現状維持／自前構築・近いカテゴリで妥協・対応しないを整理し、実行まで進める。テスト・品質・QA、DBマイグレーション、リリース計画、IaC、健全性評価、LP公開、不具合・挙動の調査は相談内容から判定して各専用フローに委譲する。 | [README](flows/consult/README.md) |
 | `db-migration` | DBスキーマ変更（テーブル追加・カラム変更）の安全な実行手順。`consult`から委譲される。 | （README未作成） |
 | `iac` | Terraform/OpenTofu によるインフラ管理の導入・設計・運用手順。AWS/GCP/Azure対応、researcher呼び出しによるprovider最新情報の確認を含む。`scope`から直接（アプリ開発を伴わない場合）、または`consult`から委譲される。新規プロジェクトの本番クラウド公開は`planner`が「インフラ構成」を決定した後、実装完了後にこのフローでコード化する。 | [README](flows/iac/README.md) |
 | `qa` | 既存プロジェクトのQA基盤構築。テスト方針策定・フレームワーク導入・優先実装・CI組み込みまで一貫して進める。`agents/qa.md`（コードレビュー用エージェント）とは別物。`consult`から委譲される。 | （README未作成） |
@@ -184,6 +188,7 @@ Claude Code のスキルとしては認識されず、メインの SKILL.md か�
 | `scorer` | コードベースの健全性を 6 観点で定期評価。スコアと改善タスクの一覧を返す。`consult`から委譲される。 | （README未作成） |
 | `release-planner` | リリース戦略・デプロイ計画・ロールバック手順の策定。`consult`から委譲される。 | （README未作成） |
 | `lp-publish` | LP・静的サイトの本番公開準備（ホスティング・ドメイン・SEOファイル）をガイドする。`consult`から委譲される。 | （README未作成） |
+| `investigate` | 不具合・障害の原因、コード・仕様・影響範囲の理解、技術の実現可能性、性能問題など「何が起きているか」を調べ、根拠と確度を付けて報告する（修正は行わない）。種別ごとの手順は `flows/investigate/types/` に分離し、必要な種別だけ読み込む。調査後は、終了／直接修正／issue 化して `issue-triage`／`consult` の選択肢整理のいずれかへ引き渡す。`consult`から委譲される。 | [README](flows/investigate/README.md) |
 | `_TEMPLATE` | 新規フロー作成用のひな形。 | — |
 
 ---
