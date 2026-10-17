@@ -138,6 +138,7 @@ GCPは2025年のアイコン刷新で「コアプロダクト（サービス固�
 - `$SKILL_DIR/assets/previews/article-light.png`
 - `$SKILL_DIR/assets/previews/table-light.png`
 - `$SKILL_DIR/assets/previews/slide-light.png`
+- `$SKILL_DIR/assets/previews/editor-light.png`
 IF 画像が読み込めない場合は表示をスキップし、テキストでレイアウトの特徴を説明する。
 
 次に番号リストでレイアウトを選んでもらう:
@@ -146,6 +147,13 @@ IF 画像が読み込めない場合は表示をスキップし、テキスト�
 - `article` — 文書。見出し・本文・コード・引用など Markdown 的な構造向き
 - `table` — 表。複数項目を列で比較するデータ表向き
 - `slide` — プレゼン資料。1セクション1枚の枠付きカードを横スクロール（矢印キー可）で送るスライド形式。全画面表示トグル（Fキー / 右上ボタン）付き。提案・報告・ピッチ向き
+- `editor` — 対話型エディタ。ドラッグ分類・設定編集・値の調整など、操作した結果を Claude Code に貼り戻す使い捨て編集UI向き（SKILL.md ステップ1の用途が「操作して結果を戻す」のとき推奨）
+
+**`editor` レイアウトの必須ルール**
+- **IMPORTANT: 必ずエクスポートボタンを付ける**（`Copy as JSON` / `Copy as prompt` / `Copy diff` 等、内容に合うもの）。UI上の操作結果を Claude Code に貼り戻せる形にするのがこのレイアウトの目的であり、エクスポートの無い編集UIは作らない。
+- 1つのデータ専用の使い捨てUIとして作る（汎用ツール化しない）。外部通信（fetch/XHR・外部CDN）は使わず、状態はページ内のJSで完結させる。
+- クリップボード書き込みの失敗時は出力欄を選択状態にして手動コピーを促す（テンプレート実装済み）。
+- 骨格は `samples/editor-<color>.html` のボード（`.ed-board` / `.ed-col` / `.ed-card`）・ツールバー（`.ed-btn`）・出力欄（`.ed-out`）を流用し、列名・カード・エクスポート文面を内容に合わせて差し替える。分類以外の編集（フォーム・スライダー等）が要る場合は、同じツールバー・出力欄を残したまま中央の部品だけを差し替える。
 
 **ステップ 2-2: カラー選択**
 
@@ -168,7 +176,7 @@ IF 画像が読み込めない場合は表示をスキップし、テキスト�
 [6]: light — 白ベース。シンプル・クリーン
 ```
 
-全 30 種のサンプルは `$SKILL_DIR/assets/samples/<layout>-<color>.html` に保存されている。
+全 36 種のサンプルは `$SKILL_DIR/assets/samples/<layout>-<color>.html` に保存されている。
 `open "$SKILL_DIR/assets/samples/<layout>-<color>.html"` でブラウザから詳細確認できることをユーザーに伝える。
 
 **グラフィック要素（viz-* コンポーネント）**
@@ -188,8 +196,12 @@ IF 画像が読み込めない場合は表示をスキップし、テキスト�
 | 分岐フロー図・シーケンス図・状態遷移図・画面遷移図・クラス図・ER図・ユースケース図・アクティビティ図・コンポーネント図 | `.viz-diagram`（インラインSVG） | Mermaid代替（詳細は上記参照） |
 | 階層ツリー | `.viz-tree` | 組織図・カテゴリ階層 |
 | ガントチャート風 | `.viz-gantt` | 期間・スケジュール |
+| 注釈付きdiff | `.viz-diff` / `.viz-diff-line` / `.viz-diff-note` | コードレビュー・PR解説。行を `.add`/`.del`、ノートを `.crit`/`.warn`/`.good` で色分け（blocking / nit / ok） |
+| 比較グリッド | `.viz-compare` / `.viz-compare-card` | 複数案の並列比較。各カードに `.viz-compare-tradeoff` を必ず書く。推奨案は `.pick` |
+| タブ（CSSのみ） | `.viz-tabs` | 設定例・結果・注意点などの切り替え（最大4つ。`input` と `section.viz-tabs-panel` を同順で並べる） |
+| 目次 / TL;DR | `.viz-toc` / `.viz-tldr` | 長文の冒頭。結論を先に示しページ内リンクを置く。折りたたみは既存の `<details>` |
 
-具体的なマークアップは `$SKILL_DIR/assets/component-library.html` を `Read` して参照する（全19種のコード例が1ページにまとまっている。9〜19番は図解、詳細な対応表は上記参照）。CSS変数（--accent, --good/--warn/--crit 等）を通じて選択済みのカラーテーマに自動追従するため、コピーする際に色の指定は不要。無理に全種類を使う必要はなく、内容に合うものだけを選ぶ。
+具体的なマークアップは `$SKILL_DIR/assets/component-library.html` を `Read` して参照する（全24種のコード例が1ページにまとまっている。9〜19番は図解、20〜23番は注釈付きdiff・比較グリッド・タブ・目次/TL;DR、24番は editor 部品。詳細な対応表は上記参照）。CSS変数（--accent, --good/--warn/--crit 等）を通じて選択済みのカラーテーマに自動追従するため、コピーする際に色の指定は不要。無理に全種類を使う必要はなく、内容に合うものだけを選ぶ。
 
 **viz-diagram（複数ノードのインラインSVG手描き図）の検証**
 

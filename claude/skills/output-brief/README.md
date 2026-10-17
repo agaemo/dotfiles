@@ -19,6 +19,7 @@
 | HTMLでレイアウト・カラーが未指定 | 使う |
 | コンテンツ内容・構成が不明 | 使う |
 | データ・素材が無い、または不十分・曖昧 | 使う（調査してから出力） |
+| 用途（読む / 共有 / 操作して結果を戻す）が不明で、HTMLのレイアウト推奨に影響する | 使う（ステップ1で確認） |
 | 形式・保存先・内容が全て明示されている | **使わない（直接出力）** |
 
 ---
@@ -27,8 +28,8 @@
 
 ```
 データ確認（ステップ1）
-  ↓ 不明点があれば1回で質問
-  ↓ 素材が無い・不十分な場合は WebSearch/WebFetch で調査
+  ↓ 不明点（内容・素材・用途・形式）があれば1回で質問
+  ↓ 素材が無い・不十分な場合は WebSearch/WebFetch などで調査
 ブリーフィング（ステップ2）
   ↓ 調査した場合は要約を提示して内容を確認
   ↓ テキストの番号リストで選択肢を提示
@@ -51,6 +52,7 @@
 |--------|------|
 | 素材が指定されていない（「〜について調べて出力して」等） | `WebSearch` / `WebFetch` で調べる |
 | 素材はあるが情報が不足・曖昧 | 不足分を `WebSearch` / `WebFetch` で補う |
+| 素材がローカルや社内ツールにある | ユーザーが示した範囲内で、コードベース・git 履歴・MCP（Slack・Linear 等）・Claude in Chrome も使う。範囲外へ広げる場合は止めて確認 |
 | 調査範囲が広い・情報源が乏しい | 調査前に番号リストで対象・観点を確認 |
 
 調査結果はステップ2のブリーフィングで要約（出典・主要な事実）を提示し、内容が正しいか確認してから後続のフォーマット確認に進む。
@@ -72,6 +74,7 @@
 | 文書 | `article` | 本文・見出し・コード・引用 | Markdown 的な構造のドキュメント |
 | 表 | `table` | データ比較表 | 複数項目を列ごとに比較するコンテンツ |
 | プレゼン | `slide` | 1セクション1枚の枠付きカードを横スクロールで送るスライド（全画面表示トグル付き） | 提案・報告・ピッチ資料 |
+| 編集 | `editor` | ドラッグ分類・コピー用エクスポートボタン付きの使い捨て編集UI | 並べ替え・分類・設定編集など、操作結果を Claude Code に貼り戻すもの |
 
 #### カラーテーマ
 
@@ -136,6 +139,16 @@
 |-------|------|-------|
 | [![](assets/previews/slide-green.png)](assets/previews/slide-green.png) | [![](assets/previews/slide-dark.png)](assets/previews/slide-dark.png) | [![](assets/previews/slide-light.png)](assets/previews/slide-light.png) |
 
+##### editor
+
+| warm | cool | blue |
+|------|------|------|
+| [![](assets/previews/editor-warm.png)](assets/previews/editor-warm.png) | [![](assets/previews/editor-cool.png)](assets/previews/editor-cool.png) | [![](assets/previews/editor-blue.png)](assets/previews/editor-blue.png) |
+
+| green | dark | light |
+|-------|------|-------|
+| [![](assets/previews/editor-green.png)](assets/previews/editor-green.png) | [![](assets/previews/editor-dark.png)](assets/previews/editor-dark.png) | [![](assets/previews/editor-light.png)](assets/previews/editor-light.png) |
+
 ---
 
 #### グラフィック要素（viz-* コンポーネント）
@@ -157,8 +170,12 @@
 | クラス図・ER図・ユースケース図・アクティビティ図・コンポーネント図（インラインSVG） | UML系の図解 |
 | 階層ツリー | 組織図・カテゴリ階層 |
 | ガントチャート風 | 期間・スケジュール |
+| 注釈付きdiff | コードレビュー・PR解説（blocking / nit / ok の重大度別ノート） |
+| 比較グリッド | 複数案の並列比較（トレードオフ明記） |
+| タブ（CSSのみ） | 設定例・結果・注意点などの切り替え |
+| 目次 / TL;DR | 長文の冒頭で結論とページ内リンクを示す |
 
-クラス名は `viz-` 名前空間に統一されており、既存レイアウトのクラス（`.card` `.stat` `.badge` 等）と衝突しない。CSS変数（`--accent` `--good` `--warn` `--crit` 等）を通じて6色テーマすべてに自動追従する。コード例は [`assets/component-library.html`](assets/component-library.html) にまとまっている（全19種）。
+クラス名は `viz-` 名前空間に統一されており、既存レイアウトのクラス（`.card` `.stat` `.badge` 等）と衝突しない。CSS変数（`--accent` `--good` `--warn` `--crit` 等）を通じて6色テーマすべてに自動追従する。コード例は [`assets/component-library.html`](assets/component-library.html) にまとまっている（全24種）。
 
 分岐フロー・シーケンス図・階層ツリー・状態遷移図・ガントチャートは、Mermaidの代替としてもこのコンポーネント一式を優先する（外部CDN不要のためArtifact公開でも制約なく使える）。Mermaidはこれらでカバーできない図（クラス図・ER図等）が必要な場合や、Markdown出力の場合に限定して使う。
 
@@ -166,7 +183,7 @@
 
 #### AWS/GCPアーキテクチャ構成図
 
-AWS/GCPのサービス構成図が必要な場合、公式アイコン（AWS 18種・GCP 15種を`assets/aws-icons/` `assets/gcp-icons/`に同梱、同梱外は実行時に公式サイトから取得）を**改変せず**viz-diagramのノードに組み込む。汎用のviz-diagramノードより実サービスとして正確に伝わる。改変禁止・単体配布禁止などの制約と実装詳細は[`references/html-and-diagrams.md`](references/html-and-diagrams.md)を参照。
+AWS/GCPのサービス構成図が必要な場合、公式アイコン（AWS 18種・GCP 18種を`assets/aws-icons/` `assets/gcp-icons/`に同梱、同梱外は実行時に公式サイトから取得）を**改変せず**viz-diagramのノードに組み込む。汎用のviz-diagramノードより実サービスとして正確に伝わる。改変禁止・単体配布禁止などの制約と実装詳細は[`references/html-and-diagrams.md`](references/html-and-diagrams.md)を参照。
 
 ---
 
@@ -219,6 +236,9 @@ AWS/GCPのサービス構成図が必要な場合、公式アイコン（AWS 18�
 - **承認なしに出力しない** — `WAIT_FOR` → 承認 → `Write` の順序を守る
 - **修正は最大3ラウンド** — 収束しない場合は中断してユーザーに方向性を確認する
 - **出力後は存在確認** — ファイル保存後にパスの存在を確認してから報告する
+- **既存ファイルは確認なしに上書きしない** — 保存先に同名ファイルがあれば、上書きか別名かをユーザーに確認する。HTML を保存した後は「ブラウザで開くか」も確認する
+- **Artifact発行前に `artifact-design` スキルを読み込む** — HTML・Markdown とも、このスキルの設計指針でファイルを書いてから発行する。保存・状態の記憶などが必要なら `artifact-capabilities` も読み込む
+- **`editor` レイアウトはエクスポートボタン必須** — `Copy as JSON` / `Copy as prompt` などで操作結果を Claude Code に貼り戻せる形にする。Artifact の iframe ではクリップボード書き込みが拒否される場合があるため、失敗時は出力欄を選択状態にして手動コピーを促すフォールバックをテンプレートに備えている
 - **調査結果も出力前に要約確認する** — 調べた内容を出力に直結させず、ステップ2で正しさを確認してから先に進む
 - **Artifact公開はHTML/Markdownのみ** — CSV/JSONでは選択肢に出さない。既定で非公開だが、claude.ai上にホストされる旨を実行前に確認する
 - **グラフィック要素は外部ライブラリ不使用** — viz-*コンポーネント・図解ともCSS/HTML/インラインSVGのみで構成し、Mermaidやチャートライブラリ等の外部CDNに依存しない。Artifact公開時のCSP制約を受けずに使える

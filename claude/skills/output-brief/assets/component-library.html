@@ -98,6 +98,55 @@ figure.viz-diagram figcaption{font-size:12px;color:var(--text-muted);text-align:
 .viz-gantt-track{position:relative;background:var(--border);border-radius:6px;height:1.3rem}
 .viz-gantt-bar{position:absolute;top:0;height:100%;background:var(--accent);border-radius:6px}
 .viz-gantt-value{position:absolute;top:0;height:100%;display:flex;align-items:center;font-size:11px;color:var(--text-muted);white-space:nowrap}
+/* ==== viz-* 追加コンポーネント: 注釈付きdiff / 比較グリッド / タブ / 目次 ==== */
+.viz-diff{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;font-family:'SF Mono','Fira Code',monospace;font-size:12.5px;line-height:1.6}
+.viz-diff-line{display:grid;grid-template-columns:2.5rem 1fr;white-space:pre-wrap;word-break:break-all}
+.viz-diff-line>span:first-child{color:var(--text-muted);text-align:right;padding:0 .6rem 0 0;user-select:none}
+.viz-diff-line.add{background:var(--good-bg)}
+.viz-diff-line.del{background:var(--crit-bg)}
+.viz-diff-note{display:flex;gap:.6rem;align-items:flex-start;margin:.15rem 0 .15rem 2.5rem;padding:.5rem .75rem;border-left:3px solid var(--border);background:var(--accent-bg);font-family:inherit;font-size:12px;color:var(--text)}
+.viz-diff-note.crit{border-left-color:var(--crit);background:var(--crit-bg)}
+.viz-diff-note.warn{border-left-color:var(--warn);background:var(--warn-bg)}
+.viz-diff-note.good{border-left-color:var(--good);background:var(--good-bg)}
+.viz-compare{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.viz-compare-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:1.1rem 1.25rem}
+.viz-compare-card.pick{border-color:var(--accent);background:var(--accent-bg)}
+.viz-compare-title{font-weight:700;font-size:14px;margin-bottom:.4rem}
+.viz-compare-tradeoff{font-size:12px;color:var(--text-muted);margin-top:.75rem;padding-top:.6rem;border-top:1px dashed var(--border)}
+.viz-tabs{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.viz-tabs>input{position:absolute;opacity:0;pointer-events:none}
+.viz-tabs-bar{display:flex;gap:.25rem;padding:.4rem .5rem 0;border-bottom:1px solid var(--border);overflow-x:auto}
+.viz-tabs-bar label{font-size:13px;color:var(--text-muted);padding:.5rem .9rem;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.viz-tabs-panel{display:none;padding:1.1rem 1.25rem}
+.viz-tabs>input:nth-of-type(1):checked~.viz-tabs-bar label:nth-child(1),
+.viz-tabs>input:nth-of-type(2):checked~.viz-tabs-bar label:nth-child(2),
+.viz-tabs>input:nth-of-type(3):checked~.viz-tabs-bar label:nth-child(3),
+.viz-tabs>input:nth-of-type(4):checked~.viz-tabs-bar label:nth-child(4){color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.viz-tabs>input:nth-of-type(1):checked~section.viz-tabs-panel:nth-of-type(1),
+.viz-tabs>input:nth-of-type(2):checked~section.viz-tabs-panel:nth-of-type(2),
+.viz-tabs>input:nth-of-type(3):checked~section.viz-tabs-panel:nth-of-type(3),
+.viz-tabs>input:nth-of-type(4):checked~section.viz-tabs-panel:nth-of-type(4){display:block}
+.viz-toc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem}
+.viz-toc-title{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem}
+.viz-toc ol{margin:0;padding-left:1.25rem;font-size:13.5px}
+.viz-toc a{color:var(--accent);text-decoration:none}
+.viz-tldr{border-left:3px solid var(--accent);background:var(--accent-bg);padding:.8rem 1.1rem;border-radius:0 8px 8px 0;font-size:14px}
+.viz-tldr strong{display:block;font-size:11px;letter-spacing:.07em;color:var(--accent);margin-bottom:.2rem}
+/* ==== editor レイアウト（対話型エディタ）: 使い捨て編集UI + エクスポート ==== */
+.ed-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;align-items:start}
+.ed-col{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.75rem;min-height:140px}
+.ed-col.over{border-color:var(--accent);background:var(--accent-bg)}
+.ed-col-title{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text-muted);margin:.1rem .25rem .6rem;display:flex;justify-content:space-between}
+.ed-card{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.55rem .75rem;margin-bottom:.5rem;font-size:13px;cursor:grab;box-shadow:var(--shadow)}
+.ed-card.dragging{opacity:.4}
+.ed-toolbar{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin:1.25rem 0}
+.ed-btn{font:inherit;font-size:13px;font-weight:600;color:var(--bg);background:var(--accent);border:0;border-radius:8px;padding:.5rem 1rem;cursor:pointer}
+.ed-btn.sub{color:var(--accent);background:var(--accent-bg);border:1px solid var(--accent-border)}
+.ed-status{font-size:12.5px;color:var(--text-muted)}
+.ed-out{width:100%;min-height:7rem;font-family:'SF Mono','Fira Code',monospace;font-size:12.5px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.75rem;resize:vertical}
+body.ed{display:block}
+.ed-main{max-width:1000px;margin:0 auto;padding:3rem 2rem}
+@media(max-width:768px){.ed-main{padding:2rem 1.25rem}}
 </style>
 </head>
 <body>
@@ -570,6 +619,58 @@ figure.viz-diagram figcaption{font-size:12px;color:var(--text-muted);text-align:
 <figcaption>丸=提供インターフェース（ロリポップ）、弧=要求インターフェース（ソケット）</figcaption>
 </figure>
 </div>
+
+<h2>20. 注釈付きdiff（重大度別マージンノート）</h2>
+<p class="desc">コードレビュー・PR解説向け。行は <code>.add</code>/<code>.del</code> で色分け、ノートは <code>.crit</code>/<code>.warn</code>/<code>.good</code> で重大度を示す（blocking / nit / OK）。</p>
+<div class="demo">
+<div class="viz-diff">
+  <div class="viz-diff-line del"><span>12</span><span>-  const chunk = await reader.read();</span></div>
+  <div class="viz-diff-line add"><span>12</span><span>+  const chunk = await reader.read({ signal });</span></div>
+  <div class="viz-diff-note crit"><span class="viz-badge viz-badge-crit">blocking</span><span>signal が中断されたとき reader が解放されず、バックプレッシャーが詰まる。finally で releaseLock すること。</span></div>
+  <div class="viz-diff-line add"><span>13</span><span>+  if (!chunk.done) queue.push(chunk.value);</span></div>
+  <div class="viz-diff-note warn"><span class="viz-badge viz-badge-warn">nit</span><span>キュー長の上限チェックがない。上限は定数化を推奨。</span></div>
+  <div class="viz-diff-line"><span>14</span><span>   return queue;</span></div>
+  <div class="viz-diff-note good"><span class="viz-badge viz-badge-good">ok</span><span>戻り値の型は従来と同じで呼び出し側への影響なし。</span></div>
+</div>
+</div>
+
+<h2>21. 比較グリッド（複数案の並列表示）</h2>
+<p class="desc">探索フェーズで複数案を横並びにする。各カードに「何を犠牲にしているか」を必ず書く。推奨案は <code>.pick</code>。</p>
+<div class="demo">
+<div class="viz-compare">
+  <div class="viz-compare-card"><div class="viz-compare-title">A: 単一ページ</div>スクロールで完結。実装が最小。<div class="viz-compare-tradeoff">トレードオフ: 情報量が増えると探しにくい</div></div>
+  <div class="viz-compare-card pick"><div class="viz-compare-title">B: タブ分割（推奨）</div>用途別に切り替え。モバイルでも読みやすい。<div class="viz-compare-tradeoff">トレードオフ: 全体を一望できない</div></div>
+  <div class="viz-compare-card"><div class="viz-compare-title">C: スライド形式</div>1枚1論点で説明向き。<div class="viz-compare-tradeoff">トレードオフ: 参照・検索に不向き</div></div>
+</div>
+</div>
+
+<h2>22. タブ（CSSのみ・最大4つ）</h2>
+<p class="desc">JS不要のラジオボタン方式。<code>input</code> と <code>section.viz-tabs-panel</code> を同じ順序で並べる。同一ページに複数置く場合は <code>name</code> と <code>id</code> を重複させない。</p>
+<div class="demo" style="padding:0;border:0;box-shadow:none;background:none">
+<div class="viz-tabs">
+  <input type="radio" name="tabs-demo" id="tabs-demo-1" checked>
+  <input type="radio" name="tabs-demo" id="tabs-demo-2">
+  <input type="radio" name="tabs-demo" id="tabs-demo-3">
+  <div class="viz-tabs-bar">
+    <label for="tabs-demo-1">設定例</label>
+    <label for="tabs-demo-2">実行結果</label>
+    <label for="tabs-demo-3">注意点</label>
+  </div>
+  <section class="viz-tabs-panel">timeout: 30s / retries: 3</section>
+  <section class="viz-tabs-panel">200 OK（平均 120ms）</section>
+  <section class="viz-tabs-panel">retries を増やすと合計待ち時間が伸びる。</section>
+</div>
+</div>
+
+<h2>23. 目次 / TL;DR</h2>
+<p class="desc">長文の冒頭に置く。<code>.viz-tldr</code> で結論を先に示し、<code>.viz-toc</code> でページ内リンク（見出しに <code>id</code> を付ける）。折りたたみは既存の <code>&lt;details&gt;</code> を使う。</p>
+<div class="demo">
+<div class="viz-tldr"><strong>TL;DR</strong>レート制限はトークンバケット方式。上限超過時は 429 を返し、1秒ごとに補充される。</div>
+<div class="viz-toc" style="margin-top:1rem"><div class="viz-toc-title">目次</div><ol><li><a href="#">全体像</a></li><li><a href="#">主要コード</a></li><li><a href="#">注意点</a></li></ol></div>
+</div>
+
+<h2>24. 対話型エディタ部品（editor レイアウト）</h2>
+<p class="desc">ドラッグ分類ボード（<code>.ed-board</code>/<code>.ed-col</code>/<code>.ed-card</code>）、ツールバー（<code>.ed-btn</code>）、出力欄（<code>.ed-out</code>）。完成形は <code>samples/editor-*.html</code>。<strong>必ずエクスポートボタン（Copy as JSON / prompt / diff）を付ける。</strong></p>
 
 </body>
 </html>
