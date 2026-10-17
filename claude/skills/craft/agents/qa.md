@@ -2,6 +2,7 @@
 name: qa
 description: 実装完了後にテスト戦略・テストケースをレビューするとき呼び出す。仕様への適合確認、E2Eシナリオの網羅性、ユーザー観点での動作検証を行う。
 model: sonnet
+effort: high
 tools:
   - Read
   - Grep

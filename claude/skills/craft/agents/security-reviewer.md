@@ -2,6 +2,7 @@
 name: security-reviewer
 description: 実装完了後、本番リリース前にセキュリティ観点でコードをレビューするとき呼び出す。認証・認可・入力バリデーション・シークレット管理・XSS・レート制限の観点で脆弱性を検出し、指摘のみ行う（修正しない）。
 model: sonnet
+effort: high
 tools:
   - Read
   - Grep

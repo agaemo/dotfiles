@@ -4,6 +4,9 @@ name: my-agent
 description: "[いつ使うか]ときに使う。[何をするか]。"
 # model は opus（複雑・計画系）/ sonnet（標準）/ haiku（軽量・高速）から選ぶ
 model: sonnet
+# effort（推論の深さ）は検証・レビュー系なら high。省略するとセッションの設定に従う。
+# craft のエージェントは Agent ツール（general-purpose）で起動するため、呼び出し側が effort パラメータにこの値を渡す
+# effort: high
 tools:
   - Read
   - Grep

@@ -248,6 +248,19 @@ IF CREATE_PR == false:
   REPORT: 変更内容のサマリーを表示して完了とする（ISSUE_NUMBER != なし の場合は作成した issue へのリンクも含める）
   STOP
 
+# PR 作成の直前に、承認時から状態が動いていないかを再確認する
+IF BRANCH != DEFAULT_BRANCH:
+  RUN: git status --short && git branch --show-current
+  ASSERT: 現在のブランチが {BRANCH} であること。違う場合は REPORT して STOP
+  IF 意図しない未コミットの変更がある:
+    REPORT: 変更の一覧
+    WAIT_FOR: ユーザーの判断（コミットする / 破棄する / そのまま進める）
+  IF git remote がある:
+    RUN: git fetch && git rev-list --count HEAD..origin/{DEFAULT_BRANCH}
+    IF 結果が 0 より大きい（{DEFAULT_BRANCH} が進んでいる）:
+      REPORT: 進んでいるコミット数
+      WAIT_FOR: ユーザーの判断（rebase してから作成 / このまま作成）
+
 READ {SKILL_DIR}/flows/consult/pr-template.md  ← PR本文フォーマットを確認してから作成する
 
 CREATE PR:

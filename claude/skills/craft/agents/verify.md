@@ -2,6 +2,7 @@
 name: verify
 description: 実装完了後、依頼内容・要件定義と実際の実装を照合するとき呼び出す。要件の抜け・ズレ・スコープ外の混入を検出し、ユーザーに確認を促す。
 model: haiku
+effort: high
 tools:
   - Read
   - Grep

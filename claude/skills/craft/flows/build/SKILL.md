@@ -51,6 +51,9 @@ REPORT TO USER: 完了状況
   - 完了済みのステップ（対応するコード・ファイルが存在するか確認）
   - 未着手のステップ
   - 外部依存で未接続のもの（Firebase・外部API・認証基盤等）
+  - git の状態（再開時のみ。git リポジトリでなければ省略）: `git status --short` で未コミットの変更を、
+    `git log --oneline -10` で plan.md の作成以降のコミットを確認し、別セッションや他者の変更で
+    plan.md と食い違う可能性のある箇所があれば挙げる
 
 IF plan.md に「技術調査の結果」等、外部システムの仕様（API・イベント名・機能の存在有無等）に
    ついてplanner（WebSearch）が断定した記述があり、かつその前提が基本設計の中核を占める
@@ -229,6 +232,8 @@ IF テスト環境が未セットアップ:
   NOTE: tester は `subagent_type` として登録されていない。Agent ツールで general-purpose を起動し、
     プロンプトで `{SKILL_DIR}/agents/tester.md` を Read して定義に従うよう指示する
     （または定義の全文を貼る）。同じ tester を使い続ける場合は SendMessage で再開してよい。
+    Agent ツールの effort パラメータには、`agents/tester.md` の frontmatter の `effort`（high）を指定する
+    （general-purpose として起動するため、frontmatter の値は自動では適用されない）。
   IMPORTANT: tester（およびすべてのサブエージェント）の自己申告を信用しない。
     Red（失敗）・Green（成功）・テスト件数は、必ずメインが自分で `make test` / `make e2e` を実行して実測する
     （自己申告の件数が実測とずれた例がある。Red の確認を省略して実装に進まないこと）。
@@ -277,6 +282,9 @@ IF READ FAILED:
   REPORT: "phase2-prompt.md が見つかりません。フェーズ2を開始できません。"
   STOP
 （テンプレート内の [TRACK_NAME]・[ABSOLUTE_PATH] 等を実際の値に展開してから渡すこと）
+各トラックの Agent 起動では、effort パラメータに medium を指定する。
+  実装は中程度の推論で素早く出し、検証・レビュー系（ステップ1・5）は high で詰める分担にするため
+  （検証とエッジケースの確認には高い effort が効き、実装そのものには過剰になりやすい）。
 
 WAIT_FOR: 全トラックエージェントの完了報告を受け取ってから続きに進む
 
@@ -441,6 +449,10 @@ NOTE: レビュー系エージェントへの依頼には、次の2点を必ず�
     テストの有無・通過を主張する指摘は、コードを読むだけでなく実行して確かめさせる。
   - 実行しなかった項目・確認できなかった項目は、断定せず「未確認」と書かせる
     （E2E を実行せずに「検証するテストが無い」と誤って指摘した例がある）。
+
+NOTE: Agent ツールの effort パラメータには、呼び出すエージェントファイル（agents/<name>.md）の
+  frontmatter の `effort`（verify・qa・code-reviewer・security-reviewer・adversarial-reviewer は high）を指定する。
+  general-purpose として起動するため、frontmatter の値は自動では適用されない。
 
 NOTE: adversarial-reviewer（トラックCのみ）は他エージェントの承認結果に関わらず独立して判定するため、
       先行エージェントが全て承認済みでも省略しないこと。

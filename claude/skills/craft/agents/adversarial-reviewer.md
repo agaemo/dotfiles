@@ -2,6 +2,7 @@
 name: adversarial-reviewer
 description: 実装完了後、本番リリース前に「この変更を今出荷してよいか」を懐疑的な立場から検証するとき呼び出す。設計判断・前提・トレードオフを疑い、コスト高・危険・検知困難な失敗を能動的に探す。指摘のみ行う（修正しない）。
 model: sonnet
+effort: high
 tools:
   - Read
   - Grep
