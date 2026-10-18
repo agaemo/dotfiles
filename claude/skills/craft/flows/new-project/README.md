@@ -41,7 +41,7 @@ flowchart TD
     END -.->|本番クラウド公開する場合| IAC["iac フローへ\n（plan.mdの「インフラ構成」節をTerraform/OpenTofu化）"]
 ```
 
-※ 確認用ページは `.craft/review/` にまとめ、入口は `index.html`(左メニュー+iframe。メニューは `scripts/review_index.py` で更新)。手順は [preview-generation.md](preview-generation.md)。
+※ 確認用ページは `.craft/review/` にまとめ、入口は `index.html`(左メニュー+iframe。メニューは `scripts/review_index.py` で更新)。承認ゲートは 01 要件定義・02 ストーリー・03 画面モック(UI なしは利用イメージ)・04 デザイン・05 実装計画・06 統合設計書の固定スロットで、番号・ファイル名は変えない(補助資料は自由)。手順は [preview-generation.md](preview-generation.md)。
 
 ※ N はフロントエンドあり4・なし3（デザインフェーズがスキップされるため）。STEP番号はagent-chain.mdの実際の番号に合わせている。
 

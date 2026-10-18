@@ -37,6 +37,8 @@
   nav a[aria-current="page"] { background: var(--select); color: var(--select-text); border-left-color: var(--accent); font-weight: 700; }
   nav a[aria-current="page"] small { color: var(--select-text); font-weight: 400; }
   nav a:focus-visible, .tool:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  nav .off { display: block; padding: 6px 8px; border-left: 3px solid transparent; color: var(--text-sub); opacity: .65; }
+  nav .off small { display: block; font-size: 11px; line-height: 1.4; }
   .tools { margin: 18px 6px 0; }
   .tool { font: 500 11px var(--font-body); color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; cursor: pointer; text-decoration: none; }
   main { min-width: 0; height: 100%; }
@@ -57,9 +59,10 @@
 <main><iframe id="view" title="本文"></iframe></main>
 <script>
   (function () {
-    /* PROJECT と PAGES は scripts/review_index.py(init / set / remove)で更新する。手で書き換えない。
-       PAGES の各行: { id, file(index.html からの相対パス), group, title, note }
-       group: "gate"(承認ゲート。メニューで 1. 2. と自動採番)/ "extra"(補助資料) */
+    /* PROJECT と PAGES は scripts/review_index.py(init / set / skip / extra / remove)で更新する。手で書き換えない。
+       PAGES の各行: { id, file(index.html からの相対パス), group, title, note, status }
+       group: "gate"(承認ゲート。6つの固定スロットで、番号はファイル名の番号)/ "extra"(補助資料。自由)
+       status: "ready"(ページあり)/ "skip"(対象外。note に理由)/ "pending"(未作成) */
     var PROJECT = "{{PROJECT_NAME}}";
     var PAGES = [
     ];
@@ -69,7 +72,13 @@
     var menu = document.getElementById("menu");
     document.getElementById("brand").textContent = PROJECT;
 
-    /** 見出しとリンク一覧を group ごとに組み立てる(承認ゲートだけ番号を付ける) */
+    /** 承認ゲートの番号は、ファイル名の番号(gates/03-mock.html なら 3)。無ければ並びの順 */
+    function slotNo(p, i) {
+      var m = /\/(\d+)-/.exec(p.file);
+      return m ? parseInt(m[1], 10) : i + 1;
+    }
+
+    /** 見出しとメニューを group ごとに組み立てる。ready だけリンクにし、skip・pending は灰色で理由を添える */
     function build() {
       [["gate", "承認ゲート"], ["extra", "補助資料"]].forEach(function (g) {
         var pages = PAGES.filter(function (p) { return p.group === g[0]; });
@@ -77,12 +86,21 @@
         var h = document.createElement("h2"); h.textContent = g[1];
         var ul = document.createElement("ul");
         pages.forEach(function (p, i) {
-          var li = document.createElement("li"), a = document.createElement("a");
-          a.href = p.file; a.dataset.id = p.id;
-          a.appendChild(document.createTextNode((g[0] === "gate" ? (i + 1) + ". " : "") + p.title));
-          if (p.note) { var sm = document.createElement("small"); sm.textContent = p.note; a.appendChild(sm); }
-          a.addEventListener("click", function (ev) { ev.preventDefault(); location.hash = p.id; });
-          li.appendChild(a); ul.appendChild(li);
+          var li = document.createElement("li");
+          var label = (g[0] === "gate" ? slotNo(p, i) + ". " : "") + p.title;
+          var note = p.status === "skip" ? "対象外: " + p.note : p.status === "pending" ? "未作成" : p.note;
+          var el;
+          if (p.status === "ready" || !p.status) {
+            el = document.createElement("a");
+            el.href = p.file; el.dataset.id = p.id;
+            el.addEventListener("click", function (ev) { ev.preventDefault(); location.hash = p.id; });
+          } else {
+            el = document.createElement("span");
+            el.className = "off"; el.setAttribute("aria-disabled", "true");
+          }
+          el.appendChild(document.createTextNode(label));
+          if (note) { var sm = document.createElement("small"); sm.textContent = note; el.appendChild(sm); }
+          li.appendChild(el); ul.appendChild(li);
         });
         menu.append(h, ul);
       });

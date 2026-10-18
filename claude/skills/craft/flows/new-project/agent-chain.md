@@ -24,10 +24,13 @@ description: new-project セットアップ完了後の設計フェーズ・エ�
 ```
 
 NOTE: 各 GATE で承認を求める前に以下の形式で進捗を必ず表示すること（N はフロントあり4・なし3）:
-  ── 承認 [N/N]: <文書名> ──────────────────────
-  ✅ STEP 1: requirements.md（承認済み）
-  👉 STEP 2: stories.md（承認待ち）
-  ⬜ STEP 3: デザイン（未着手）
+  ── 承認 [N/N]: <ページ名> ──────────────────────
+  ✅ 01 要件定義（承認済み）
+  👉 02 ユーザーストーリー（承認待ち）
+  ⬜ 03・04 画面モック・デザインシステム（未着手）
+  ⬜ 05 実装計画（未着手）
+  NOTE: 項目の番号と名前は、確認用ページのメニュー（承認ゲートの6スロット。preview-generation.md の表）と同じものを使う。
+        06 統合設計書は承認を求めないため、この進捗には載せない（N にも数えない）。
   ──────────────────────────────────────────
   NOTE: HAS_FRONTEND == false の場合は「STEP 3: デザイン」の行を省き、Nは3に読み替える
 
@@ -41,7 +44,9 @@ NOTE: 各 GATE で承認を求める前に以下の形式で進捗を必ず表�
     ASSERT/失敗時の代替導線が定義されている）
   その後、各STEPに書かれた固有の内容でHTMLを作成し、指定の出力先に保存する。
   保存のたびに、preview-generation.md の「index.html の生成と更新」に従って
-  .craft/review/index.html のメニューを更新し、ユーザーには index.html を開いて提示する。
+  .craft/review/index.html のメニュー（review_index.py の set / skip / extra）を更新し、
+  ユーザーには index.html を開いて提示する。ファイル名と番号は、同ファイルの固定スロットの表に従う（変えない）。
+  初回（STEP 1 の保存時）に index.html を init し、HAS_FRONTEND == false なら design を「UI なし」で skip にする。
 
 ```
 STEP 1: intake
@@ -135,11 +140,12 @@ IF HAS_FRONTEND == true:
        出力先: .craft/review/gates/03-mock.html
 
     GATE: 承認進捗を表示してからユーザーに提示し、承認を得ること（03-mock.html と 04-design.html を
-          提示する。wireframe.html は補助資料として index.html のメニューに載せる）
+          提示する。wireframe.html は補助資料として `review_index.py extra` でメニューに載せる）
     PROHIBITED: デザイン承認前にコンポーネントを1行も書くこと
     NOTE: デザインによってAPIの形・DBフィールドが変わる場合があるため、planner より前に確定させること
 ELSE:
   STEP 3 をスキップし STEP 4 へ進む（design-brief.md・design-system.md・design.md は生成しない）
+  確認用ページでは、04 を「UI なし」で対象外にし、03 は「利用イメージ」にする（STEP 4 の後に作る。下記）
 ENDIF
 
 STEP 4: planner ← 基本設計を含む場合、このGATEが実質的な基本設計承認になる（DBスキーマ・API設計・セキュリティ設計を含む）
@@ -187,7 +193,16 @@ STEP 4: planner ← 基本設計を含む場合、このGATEが実質的な基�
     - 治療は実務資料（plan相当）: 図解による理解のしやすさを優先し、誇張した装飾は避ける
     出力先: .craft/review/gates/05-plan.html
 
-  GATE: 承認進捗を表示してからユーザーに計画を提示し、承認を得ること
+    IF HAS_FRONTEND == false:
+      利用イメージ（03）を作る: plan.md の API・CLI の設計から、実際に使う様子を HTML にまとめる。
+        - API: エンドポイントごとのリクエストとレスポンスの例（`curl` の実行例を含む。正常系とエラーの両方）
+        - CLI: 主要なコマンドと、その出力例
+        - 画像でなく HTML/CSS（ターミナル風の等幅表示）で作る。ダミーデータは実在の情報にしない
+      出力先: .craft/review/gates/03-mock.html（`review_index.py set` のとき、タイトルに「利用イメージ」を指定する）
+      ワイヤーフレームは作らない
+    ENDIF
+
+  GATE: 承認進捗を表示してからユーザーに計画を提示し、承認を得ること（UI なしの場合は、03 利用イメージも一緒に提示する）
     この承認は、統合設計書の自動生成と実装の開始（STEP 6・7）に進む合意を兼ねる。提示時にその旨を一言添えること
     NOTE: DB・API・認証を伴う場合、ここでDBスキーマ・API設計・セキュリティ設計が確定する。
           以降のSTEP6は、この内容を文書として整形するのみで新たな設計判断は行わない。
@@ -244,9 +259,9 @@ STEP 6: 統合設計書生成 ← 承認ゲートなし（自動生成と確認�
   ただし、読みやすく確認できるよう、3文書を1枚にまとめた確認用ページを出す（承認は求めない）:
     python3 -I {SKILL_DIR}/flows/new-project/scripts/md2html.py .craft/review/gates/06-spec.html 統合設計書 \
       .craft/docs/01_requirements_doc.md .craft/docs/02_specifications_doc.md .craft/docs/03_basic_design_doc.md
-    その後、preview-generation.md の「index.html の生成と更新」に従い、メニューの6番目に載せる
-    （id: spec / group: gate / 補足: 「要求・要件・基本設計(確認のみ。承認は不要)」）。
-  生成後に、3文書の場所（.craft/docs/）と、確認用ページ（.craft/review/index.html の 6番）を一言知らせて、STEP 7 へ進む。
+    その後、`review_index.py set .craft/review/index.html spec "要求・要件・基本設計(確認のみ。承認は不要)"` で、
+    メニューの 06 を「ページあり」にする。
+  生成後に、3文書の場所（.craft/docs/）と、確認用ページ（.craft/review/index.html の 06）を一言知らせて、STEP 7 へ進む。
   PROHIBITED: 生成物への承認ゲートの要求（確認用ページを出すことは禁止しない。矛盾の報告と確認は除く。下記 NOTE に従う）
   NOTE: 文書の内容に矛盾が見つかった場合は、承認済みの元ドキュメントを自分で書き換えず、矛盾の内容と修正案を
         ユーザーに報告して確認を得る。確認後に、該当する元ドキュメント（requirements.md 等）を修正してから再生成する

@@ -131,7 +131,9 @@ UNTIL ALL(score >= 4)
   .craft/docs/design-brief.md の内容から、カラーパレット（実際のスウォッチ）・
   タイポグラフィの印象・ブランドアーキタイプ・FEEL/ANTI-FEELワード・ページ構成を
   1枚にまとめる（保存後、preview-generation.md の「index.html の生成と更新」に従って
-  .craft/review/index.html のメニューを更新し、index.html を開いて提示する）
+  `review_index.py` で `.craft/review/index.html` を作り、`set` で 04 をページありにする。
+  このフローが出すのはデザインだけなので、01・02・03・05・06 は `skip`（理由: 静的サイトはデザインブリーフのみ）にする。
+  保存後に index.html を開いて提示する）
     - artifact-design skillの既定方針（ライト/ダーク両テーマ対応）は維持したまま、
       ヒアリングで確認した明暗の方針を初期表示（:root のデフォルト値）に反映する
   出力先: .craft/review/gates/04-design.html

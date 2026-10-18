@@ -26,37 +26,46 @@ Artifact は外部ホストへのリクエストが厳格にブロックされ�
 ## 出力先の構成（.craft/review/）
 
 確認用ページは `.craft/review/` にまとめ、入口を `index.html`（左メニュー＋iframe）の1つにする。
+承認ゲートは**6つの固定スロット**で、番号・ファイル名・タイトルは変えない（成果物として揃えるため）。補助資料は自由に追加・削除できる。
+
+| 番号 | id | ファイル | タイトル | 元の文書 | 出す条件 |
+|---|---|---|---|---|---|
+| 01 | requirements | `gates/01-requirements.html` | 要件定義 | `requirements.md` | 常に |
+| 02 | stories | `gates/02-stories.html` | ユーザーストーリー | `stories.md` | 常に |
+| 03 | mock | `gates/03-mock.html` | 画面モック | `design.md`・`design-system.md` | UI あり。UI なしは「利用イメージ」（下記） |
+| 04 | design | `gates/04-design.html` | デザインシステム | `design-brief.md`・`design-system.md` | UI あり。UI なしは対象外 |
+| 05 | plan | `gates/05-plan.html` | 実装計画 | `plan.md`（基本設計・テスト・リスクを含む） | 常に |
+| 06 | spec | `gates/06-spec.html` | 統合設計書 | `01_`〜`03_` の3文書 | 常に（承認は求めない。確認のみ） |
 
 ```
 .craft/review/
-  index.html            入口。雛形から作り、メニューは PAGES 配列で定義する
-  gates/                承認ゲートの資料。メニューの順に番号を付ける
-    01-requirements.html  02-stories.html  03-mock.html  04-design.html  05-plan.html  06-spec.html（統合設計書）
-  extras/               補助資料（承認ゲートではないもの）
-    wireframe.html  icon.html など
+  index.html       入口。メニューは scripts/review_index.py で更新する
+  gates/           上の6スロット
+  extras/          補助資料（自由。ファイル名は <名前>.html）
 ```
 
-- 番号は枠として固定する。その案件で作らないページは欠番のままにし、PAGES 配列からも消す（例: HAS_FRONTEND == false なら 03・04 は無い）。
-- 承認ゲートでない資料（ワイヤー、アイコン案など）は `extras/` に置き、PAGES では `group: "extra"` にする。
-- 06-spec.html（統合設計書）はメニューの承認ゲート欄に載せるが、承認は求めない（確認のみ。補足にそう書く）。作り方は agent-chain.md の STEP 6。
+- メニューには6スロットを常に並べ、状態を3つで示す: ページあり（リンク）/ 対象外（灰色。理由つき）/ 未作成（灰色）。欠番にして番号を詰めない。メニューの番号は、ファイル名の番号と同じ。
+- UI なしの案件: 04 は「対象外（UI なし）」、03 は **「利用イメージ」** にする（タイトルを置き換える）。API なら、リクエストとレスポンスの例（`curl` の実行例を含む）、CLI なら、コマンドと出力例を、HTML にまとめる。内容は plan.md の API・CLI の設計から作り、05 の承認ゲートで一緒に提示する（planner の後に作る）。ワイヤーフレームは作らない。
+- 補助資料の例（推奨）: `wireframe`（UI あり）、`tech`（技術調査。`tech-research.md`）、`icon`（アイコン案）、`adr`（設計判断の記録）。増減は自由で、承認の対象ではない。
 - `.craft/review/` 以外（旧 `.craft/previews/` 等）には出力しない。
 
 ## index.html の生成と更新
 
 メニュー（`index.html` の `PROJECT`・`PAGES`）は、手で書き換えず、更新スクリプトで操作する。
-`{SCRIPT}` = `python3 -I {SKILL_DIR}/flows/new-project/scripts/review_index.py`
+`{SCRIPT}` = `python3 -I {SKILL_DIR}/flows/new-project/scripts/review_index.py`、`{INDEX}` = `.craft/review/index.html`
 
-1. 初回: `{SCRIPT} init .craft/review/index.html <プロジェクト名>`（雛形をコピーする。既にあれば何もしない）。
-2. ページを保存するたびに: `{SCRIPT} set .craft/review/index.html <id> <file> <gate|extra> <タイトル> [補足]`
-   （`<file>` は `index.html` からの相対パス。ファイルが無いと失敗する。同じ id は置き換わる。
-   並びは、承認ゲートと補助資料をそれぞれファイル名の順にそろえる）。
-   作らないことにしたページは `{SCRIPT} remove .craft/review/index.html <id>`、確認は `{SCRIPT} list .craft/review/index.html`。
-   id の例: requirements / stories / mock / design / plan / spec / wireframe / icon。
-3. 各ページには戻りリンクを入れる。`<body>` の直後に `<p id="back-nav"><a href="../index.html">&larr; 一覧へ</a></p>`、`</body>` の直前に
+1. 初回: `{SCRIPT} init {INDEX} <プロジェクト名>`（雛形をコピーし、6スロットを「未作成」で作る。既にあれば何もしない）。
+2. ページを保存するたびに: `{SCRIPT} set {INDEX} <スロットid> [補足 [タイトル]]`
+   （タイトルは、UI なしの `mock` を「利用イメージ」にするときだけ指定する。ファイルが無いと失敗する）。
+3. 対象外のスロット: `{SCRIPT} skip {INDEX} <スロットid> <理由>`（例: `skip {INDEX} design "UI なし"`）。
+   UI なしの案件では、承認ゲートの最初（STEP 1 の保存時）に `design` を対象外にしておく。
+4. 補助資料: `{SCRIPT} extra {INDEX} <id> extras/<名前>.html <タイトル> [補足]`、消すときは `{SCRIPT} remove {INDEX} <id>`。
+   現在の状態は `{SCRIPT} list {INDEX}`。
+5. 各ページには戻りリンクを入れる。`<body>` の直後に `<p id="back-nav"><a href="../index.html">&larr; 一覧へ</a></p>`、`</body>` の直前に
    `<script>if(window.top!==window){var b=document.getElementById("back-nav");if(b)b.hidden=true;}</script>`
    を置く（iframe の中では隠れ、単体で開いたときだけ出る）。Markdown 変換スクリプトの出力には入っている。
-4. ユーザーへは `.craft/review/index.html` を開いて提示する（`#mock` のように hash で該当ページを指定できる）。
-5. テーマ切替は各ページ内のボタンで行う（`file://` では iframe の中身を外から変えられない）。
+6. ユーザーへは `.craft/review/index.html` を開いて提示する（`#mock` のように hash で該当ページを指定できる）。
+7. テーマ切替は各ページ内のボタンで行う（`file://` では iframe の中身を外から変えられない）。
 
 ## 画面モックの作り方
 
