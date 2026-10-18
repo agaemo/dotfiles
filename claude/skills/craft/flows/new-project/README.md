@@ -21,8 +21,8 @@ flowchart TD
         S2 -->|承認 2/N| S3_CHECK
 
         S3_CHECK{HAS_FRONTEND?}
-        S3_CHECK -->|Yes| S3["STEP 3: designer\n→ .craft/docs/design-brief.md\n→ .craft/docs/design-system.md"]
-        S3 --> S3P["プレビュー生成\n→ .craft/previews/design-preview.html（ローカル）"]
+        S3_CHECK -->|Yes| S3["STEP 3: designer\n→ .craft/docs/design-brief.md\n→ .craft/docs/design-system.md\n→ .craft/docs/design.md"]
+        S3 --> S3P["プレビュー生成\n→ .craft/previews/design-preview.html・wireframe-preview.html（ローカル）"]
         S3P -->|承認 3/N| S4
         S3_CHECK -->|No| S4
 
@@ -41,7 +41,7 @@ flowchart TD
     END -.->|本番クラウド公開する場合| IAC["iac フローへ\n（plan.mdの「インフラ構成」節をTerraform/OpenTofu化）"]
 ```
 
-※ N はフロントエンドあり5・なし4（デザインフェーズがスキップされるため）。STEP番号はagent-chain.mdの実際の番号に合わせている。
+※ N はフロントエンドあり4・なし3（デザインフェーズがスキップされるため）。STEP番号はagent-chain.mdの実際の番号に合わせている。
 
 実装フェーズの詳細は [flows/build/README.md](../build/README.md) を参照。
 本番クラウド公開のインフラ構築は [flows/iac/README.md](../iac/README.md) を参照。
