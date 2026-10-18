@@ -130,14 +130,15 @@ UNTIL ALL(score >= 4)
   ASSERT/失敗時の代替導線が定義されている）
   .craft/docs/design-brief.md の内容から、カラーパレット（実際のスウォッチ）・
   タイポグラフィの印象・ブランドアーキタイプ・FEEL/ANTI-FEELワード・ページ構成を
-  1枚にまとめる
+  1枚にまとめる（保存後、preview-generation.md の「index.html の生成と更新」に従って
+  .craft/review/index.html のメニューを更新し、index.html を開いて提示する）
     - artifact-design skillの既定方針（ライト/ダーク両テーマ対応）は維持したまま、
       ヒアリングで確認した明暗の方針を初期表示（:root のデフォルト値）に反映する
-  出力先: .craft/previews/design-preview.html
+  出力先: .craft/review/gates/04-design.html
 
 GATE: ユーザー承認
   SHOW USER:
-    "デザインブリーフが完成しました（プレビュー: .craft/previews/design-preview.html）。この方針で実装を進めますか？"
+    "デザインブリーフが完成しました（プレビュー: .craft/review/gates/04-design.html）。この方針で実装を進めますか？"
   WAIT_FOR: ユーザーが明示的に承認する
   PROHIBITED: 承認を受け取る前にステップ3へ進むこと
   IF NOT CONFIRMED: STOP

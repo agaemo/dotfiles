@@ -107,7 +107,10 @@ def main(argv: list) -> int:
         '<!doctype html><html lang="ja"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width, initial-scale=1">'
         f"<title>{html.escape(title)}</title><style>{CSS}</style></head><body>"
-        f"<nav>{nav_html}</nav><main>{'<hr>'.join(body)}</main></body></html>"
+        f'<nav><a id="back-nav" href="../index.html">&larr; 一覧へ</a>{nav_html}</nav>'
+        f"<main>{'<hr>'.join(body)}</main>"
+        '<script>if(window.top!==window){var b=document.getElementById("back-nav");if(b)b.hidden=true;}</script>'
+        "</body></html>"
     )
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(doc, encoding="utf-8")

@@ -22,12 +22,12 @@ flowchart TD
 
         S3_CHECK{HAS_FRONTEND?}
         S3_CHECK -->|Yes| S3["STEP 3: designer\n→ .craft/docs/design-brief.md\n→ .craft/docs/design-system.md\n→ .craft/docs/design.md"]
-        S3 --> S3P["プレビュー生成\n→ .craft/previews/design-preview.html・wireframe-preview.html（ローカル）"]
+        S3 --> S3P["プレビュー生成\n→ .craft/review/gates/03-mock.html・04-design.html、extras/wireframe.html（ローカル）"]
         S3P -->|承認 3/N| S4
         S3_CHECK -->|No| S4
 
         S4["STEP 4: planner\n→ .craft/docs/plan.md\n（開発ランタイム決定 + 基本設計 + クリティカルパス + 並列トラック定義\n+ 本番クラウド公開を伴う場合はインフラ構成決定・researcher呼び出し）"]
-        S4 --> S4P["プレビュー生成\n→ .craft/previews/plan-preview.html（ローカル）"]
+        S4 --> S4P["プレビュー生成\n→ .craft/review/gates/05-plan.html（ローカル）"]
         S4P -->|承認 4/N| S45
         S45["STEP 5: 理解度チェック\n（5項目すべて ≥4 になるまでループ）"]
         S45 --> S5

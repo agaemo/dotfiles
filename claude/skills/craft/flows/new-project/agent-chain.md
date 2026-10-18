@@ -40,6 +40,8 @@ NOTE: 各 GATE で承認を求める前に以下の形式で進捗を必ず表�
     未読の場合のみ。セッションが変わった場合は再度READする。共通ルール・CDN方針・
     ASSERT/失敗時の代替導線が定義されている）
   その後、各STEPに書かれた固有の内容でHTMLを作成し、指定の出力先に保存する。
+  保存のたびに、preview-generation.md の「index.html の生成と更新」に従って
+  .craft/review/index.html のメニューを更新し、ユーザーには index.html を開いて提示する。
 
 ```
 STEP 1: intake
@@ -50,7 +52,7 @@ STEP 1: intake
     .craft/docs/requirements.md の内容から確認用HTMLを作成する
       - プロジェクト概要・必須機能・スコープ外・完成の基準を中心に、読みやすい見出し階層で提示する
       - 治療は実務資料（memo相当）: 誇張した装飾は避ける
-    出力先: .craft/previews/requirements-preview.html
+    出力先: .craft/review/gates/01-requirements.html
 
   GATE: 承認進捗を表示してからユーザーに内容を提示し、承認を得ること
   PROHIBITED: 承認前に次ステップへ進むこと
@@ -68,7 +70,7 @@ STEP 2: refiner
     .craft/docs/stories.md の内容から確認用HTMLを作成する
       - US一覧をカード形式で提示し、受け入れ条件・サイズ・依存を見やすく整理する
       - 「未解決の疑問」セクションは回答済み(x)/未回答を視覚的に区別する
-    出力先: .craft/previews/stories-preview.html
+    出力先: .craft/review/gates/02-stories.html
 
   GATE: 承認進捗を表示してからユーザーに内容を提示し、承認を得ること
   PROHIBITED: 承認前に次ステップへ進むこと
@@ -112,7 +114,7 @@ IF HAS_FRONTEND == true:
        design-system.md のトークン（実際の色・タイポ）を使ったラフなレイアウトHTMLを作成する。
        IMPORTANT: 高精細なモックアップではなく、レイアウトの骨格（ヘッダー・ナビ・主要コンポーネントの
        配置）が伝わる粒度でよい。作り込みすぎない（1画面あたり実装時間5分以内を目安にする）
-       出力先: .craft/previews/wireframe-preview.html
+       出力先: .craft/review/extras/wireframe.html
 
     d. プレビュー生成（共通ルール参照）:
        .craft/docs/design-brief.md・.craft/docs/design-system.md の内容から、
@@ -122,10 +124,18 @@ IF HAS_FRONTEND == true:
            設置すること（例: `<html data-theme="light">` をJSでトグルする）。
            「両テーマに対応」と文書だけに書いて実物を見せない状態を禁止する
          - 治療は実務資料（memo/plan相当）: 誇張したヒーロー等は避け、パレット・タイポの実物大提示を主目的にする
-       出力先: .craft/previews/design-preview.html
+       出力先: .craft/review/gates/04-design.html
 
-    GATE: 承認進捗を表示してからユーザーに提示し、承認を得ること（design-preview.html と
-          wireframe-preview.html の両方を提示する）
+    c3. 画面モック生成（省略禁止）:
+       preview-generation.md の「画面モックの作り方」に従い、主要画面を操作できる実寸モックにする。
+       アプリの種類（Web ページ型 / ウィンドウ型）に合う骨組みを、preview-generation.md の
+       「画面モックの作り方」から選んで .craft/review/gates/03-mock.html にコピーし、
+       design-system.md の実トークン・design.md の主要画面・ダミーデータで置き換える。
+       画面の見た目を画像で貼らない（HTML/CSSで組む）
+       出力先: .craft/review/gates/03-mock.html
+
+    GATE: 承認進捗を表示してからユーザーに提示し、承認を得ること（03-mock.html と 04-design.html を
+          提示する。wireframe.html は補助資料として index.html のメニューに載せる）
     PROHIBITED: デザイン承認前にコンポーネントを1行も書くこと
     NOTE: デザインによってAPIの形・DBフィールドが変わる場合があるため、planner より前に確定させること
 ELSE:
@@ -175,7 +185,7 @@ STEP 4: planner ← 基本設計を含む場合、このGATEが実質的な基�
     ENDIF
 
     - 治療は実務資料（plan相当）: 図解による理解のしやすさを優先し、誇張した装飾は避ける
-    出力先: .craft/previews/plan-preview.html
+    出力先: .craft/review/gates/05-plan.html
 
   GATE: 承認進捗を表示してからユーザーに計画を提示し、承認を得ること
     この承認は、統合設計書の自動生成と実装の開始（STEP 6・7）に進む合意を兼ねる。提示時にその旨を一言添えること

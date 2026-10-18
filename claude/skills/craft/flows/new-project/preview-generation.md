@@ -1,6 +1,6 @@
 # プレビュー生成（共通ルール）
 
-craft の new-project・new-app フロー（agent-chain.md）・new-static フローの各GATE（design-brief・plan.md。統合設計書は承認ゲートなし）で、承認前にローカルHTMLでプレビューを生成する際の共通手順。メインClaudeが行う。呼び出し元のSTEPからは、このファイルをプレビュー生成チェーン中に未読の場合のみ読み込み（セッションが変わった場合は再度READする）、対象ファイル・図解内容の差分のみを実行すること。
+craft の new-project・new-app フロー（agent-chain.md）・new-static フローの各GATE（design-brief・plan.md。統合設計書は承認ゲートなし）で、承認前にローカルHTMLで確認用ページを生成する際の共通手順。メインClaudeが行う。呼び出し元のSTEPからは、このファイルをプレビュー生成チェーン中に未読の場合のみ読み込み（セッションが変わった場合は再度READする）、対象ファイル・図解内容の差分のみを実行すること。
 
 ## Artifact を使わない理由
 
@@ -23,6 +23,53 @@ Artifact は外部ホストへのリクエストが厳格にブロックされ�
 「ライト/ダーク両テーマに対応」等、対象文書が複数の見た目パターンを持つ場合、
 プレビューHTML側に実際に切り替えられるUIを必ず設置すること（記述のみで済ませない）。
 
+## 出力先の構成（.craft/review/）
+
+確認用ページは `.craft/review/` にまとめ、入口を `index.html`（左メニュー＋iframe）の1つにする。
+
+```
+.craft/review/
+  index.html            入口。雛形から作り、メニューは PAGES 配列で定義する
+  gates/                承認ゲートの資料。メニューの順に番号を付ける
+    01-requirements.html  02-stories.html  03-mock.html  04-design.html  05-plan.html
+  extras/               補助資料（承認ゲートではないもの）
+    wireframe.html  icon.html など
+```
+
+- 番号は枠として固定する。その案件で作らないページは欠番のままにし、PAGES 配列からも消す（例: HAS_FRONTEND == false なら 03・04 は無い）。
+- 承認ゲートでない資料（ワイヤー、アイコン案など）は `extras/` に置き、PAGES では `group: "extra"` にする。
+- 統合設計書（STEP 6）はプレビューを作らない（承認ゲートなしの方針）ため、`review/` には載せない。
+- `.craft/review/` 以外（旧 `.craft/previews/` 等）には出力しない。
+
+## index.html の生成と更新
+
+メニュー（`index.html` の `PROJECT`・`PAGES`）は、手で書き換えず、更新スクリプトで操作する。
+`{SCRIPT}` = `python3 -I {SKILL_DIR}/flows/new-project/scripts/review_index.py`
+
+1. 初回: `{SCRIPT} init .craft/review/index.html <プロジェクト名>`（雛形をコピーする。既にあれば何もしない）。
+2. ページを保存するたびに: `{SCRIPT} set .craft/review/index.html <id> <file> <gate|extra> <タイトル> [補足]`
+   （`<file>` は `index.html` からの相対パス。ファイルが無いと失敗する。同じ id は置き換わる。
+   並びは、承認ゲートと補助資料をそれぞれファイル名の順にそろえる）。
+   作らないことにしたページは `{SCRIPT} remove .craft/review/index.html <id>`、確認は `{SCRIPT} list .craft/review/index.html`。
+   id の例: requirements / stories / mock / design / plan / wireframe / icon。
+3. 各ページには戻りリンクを入れる。`<body>` の直後に `<p id="back-nav"><a href="../index.html">&larr; 一覧へ</a></p>`、`</body>` の直前に
+   `<script>if(window.top!==window){var b=document.getElementById("back-nav");if(b)b.hidden=true;}</script>`
+   を置く（iframe の中では隠れ、単体で開いたときだけ出る）。Markdown 変換スクリプトの出力には入っている。
+4. ユーザーへは `.craft/review/index.html` を開いて提示する（`#mock` のように hash で該当ページを指定できる）。
+5. テーマ切替は各ページ内のボタンで行う（`file://` では iframe の中身を外から変えられない）。
+
+## 画面モックの作り方
+
+UI のある案件では、承認ゲートに操作できる画面モック（`gates/03-mock.html`）を出す。
+
+- 画面は画像（PNG・スクリーンショット・貼り付けた図）にしない。HTML/CSS で実寸に近い大きさで組み、ダミーデータを入れる。
+- 骨組みは種類で選び、`.craft/review/gates/03-mock.html` にコピーして置き換える。色・書体・寸法は `design-system.md` の実トークンを使う。
+  - Web ページ型（ブラウザで開く Web アプリ・サイト）: `{SKILL_DIR}/flows/new-project/templates/review/mock-skeleton-web.html`（追加フォーム・検索・一覧・削除ダイアログ・空状態）
+  - ウィンドウ型（デスクトップアプリ・常駐ツール）: `{SKILL_DIR}/flows/new-project/templates/review/mock-skeleton.html`（小型ウィンドウ、キー操作、設定の折りたたみ）
+  - どちらも合わない画面は、骨組みのテーマ切替・戻りリンク・確認ダイアログの型だけ借りて、画面を HTML/CSS で組む。
+- 動かすのは、その画面の主要な操作だけでよい（一覧の選択、検索の絞り込み、開閉、確認ダイアログなど。キー操作が中心のアプリはキーボードも）。全画面・全操作は作り込まない。
+- ダミーデータは実在の情報にしない。ページの冒頭に「表示している内容はサンプル」と書く。
+
 ## Markdown からの変換スクリプト
 
 Markdown 主体の文書（要件定義・ストーリー・plan.md 等）は、毎回HTMLを手で書かず、同梱のスクリプトで変換する。
@@ -40,6 +87,7 @@ python3 -I {SKILL_DIR}/flows/new-project/scripts/md2html.py <出力パス> <タ�
 
 呼び出し元STEPが示す「出力先: <パス>」の値を、以下の `<出力パス>` として使う。
 対象ファイルが複数の場合も、呼び出し元の指示に従い単一のHTMLにまとめる。
+保存後は「index.html の生成と更新」を行う。
 
 ```
 Skill ツールで artifact-design を読み込んでから作成する

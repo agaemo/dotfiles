@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{PROJECT_NAME}} 確認用</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
+<style>
+  /* Layout: 左に固定メニュー(承認ゲート、補助資料)、右に iframe。スマホ幅ではメニューが上に畳まれる */
+  :root {
+    --bg: #F4F3EF; --surface: #FFFFFF; --line: #CFCDC6; --text: #1B1F24; --text-sub: #5A646E;
+    --select: #DCE6F6; --select-text: #2A4572; --accent: #C23A22;
+    --font-display: "Shippori Mincho", "Hiragino Mincho ProN", serif;
+    --font-body: "Noto Sans JP", "Hiragino Sans", "Yu Gothic UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171C; --surface: #1C2128; --line: #3A444F; --text: #E8EAEC; --text-sub: #9AA4AE;
+      --select: #24385A; --select-text: #B8CDEE; --accent: #EE6A50; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171C; --surface: #1C2128; --line: #3A444F; --text: #E8EAEC; --text-sub: #9AA4AE;
+    --select: #24385A; --select-text: #B8CDEE; --accent: #EE6A50; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 13px/1.6 var(--font-body); display: grid; grid-template-columns: 240px minmax(0, 1fr); }
+  nav { border-right: 1px solid var(--line); padding: 20px 12px; overflow-y: auto; background: var(--surface); }
+  .brand { font: 700 18px/1.3 var(--font-display); margin: 0 6px 2px; }
+  .sub { color: var(--text-sub); font-size: 11px; margin: 0 6px 16px; }
+  h2 { font: 700 11px var(--font-body); letter-spacing: .08em; color: var(--text-sub); margin: 18px 6px 6px; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  nav a { display: block; padding: 6px 8px; border-radius: 4px; color: inherit; text-decoration: none; border-left: 3px solid transparent; }
+  nav a small { display: block; font-size: 11px; color: var(--text-sub); line-height: 1.4; }
+  nav a:hover { background: var(--bg); }
+  nav a[aria-current="page"] { background: var(--select); color: var(--select-text); border-left-color: var(--accent); font-weight: 700; }
+  nav a[aria-current="page"] small { color: var(--select-text); font-weight: 400; }
+  nav a:focus-visible, .tool:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .tools { margin: 18px 6px 0; }
+  .tool { font: 500 11px var(--font-body); color: var(--text); background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; cursor: pointer; text-decoration: none; }
+  main { min-width: 0; height: 100%; }
+  iframe { width: 100%; height: 100%; border: 0; display: block; background: var(--bg); }
+  @media (max-width: 720px) {
+    body { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); }
+    nav { border-right: 0; border-bottom: 1px solid var(--line); max-height: 40vh; }
+  }
+</style>
+</head>
+<body>
+<nav aria-label="メニュー">
+  <p class="brand" id="brand"></p>
+  <p class="sub">承認ゲートの確認用</p>
+  <div id="menu"></div>
+  <div class="tools"><a class="tool" id="newtab" href="#" target="_blank" rel="noopener">別タブで開く</a></div>
+</nav>
+<main><iframe id="view" title="本文"></iframe></main>
+<script>
+  (function () {
+    /* PROJECT と PAGES は scripts/review_index.py(init / set / remove)で更新する。手で書き換えない。
+       PAGES の各行: { id, file(index.html からの相対パス), group, title, note }
+       group: "gate"(承認ゲート。メニューで 1. 2. と自動採番)/ "extra"(補助資料) */
+    var PROJECT = "{{PROJECT_NAME}}";
+    var PAGES = [
+    ];
+
+    var view = document.getElementById("view");
+    var newtab = document.getElementById("newtab");
+    var menu = document.getElementById("menu");
+    document.getElementById("brand").textContent = PROJECT;
+
+    /** 見出しとリンク一覧を group ごとに組み立てる(承認ゲートだけ番号を付ける) */
+    function build() {
+      [["gate", "承認ゲート"], ["extra", "補助資料"]].forEach(function (g) {
+        var pages = PAGES.filter(function (p) { return p.group === g[0]; });
+        if (!pages.length) return;
+        var h = document.createElement("h2"); h.textContent = g[1];
+        var ul = document.createElement("ul");
+        pages.forEach(function (p, i) {
+          var li = document.createElement("li"), a = document.createElement("a");
+          a.href = p.file; a.dataset.id = p.id;
+          a.appendChild(document.createTextNode((g[0] === "gate" ? (i + 1) + ". " : "") + p.title));
+          if (p.note) { var sm = document.createElement("small"); sm.textContent = p.note; a.appendChild(sm); }
+          a.addEventListener("click", function (ev) { ev.preventDefault(); location.hash = p.id; });
+          li.appendChild(a); ul.appendChild(li);
+        });
+        menu.append(h, ul);
+      });
+    }
+
+    /** hash のページ ID を開く。未知の ID や空のときは先頭のページにする */
+    function show(id) {
+      var links = Array.prototype.slice.call(menu.querySelectorAll("a[data-id]"));
+      var cur = links.filter(function (a) { return a.dataset.id === id; })[0] || links[0];
+      if (!cur) return;
+      links.forEach(function (a) {
+        if (a === cur) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+      });
+      var href = cur.getAttribute("href");
+      if (view.getAttribute("src") !== href) view.setAttribute("src", href);
+      newtab.setAttribute("href", href);
+      document.title = PROJECT + " 確認用";
+    }
+
+    window.addEventListener("hashchange", function () { show(location.hash.slice(1)); });
+    build();
+    show(location.hash.slice(1));
+  })();
+</script>
+</body>
+</html>
