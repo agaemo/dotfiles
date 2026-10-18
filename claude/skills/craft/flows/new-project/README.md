@@ -15,9 +15,9 @@ flowchart TD
     SETUP2 --> S1
 
     subgraph DESIGN["エージェントチェーン（agent-chain.md、承認ゲートあり）"]
-        S1["STEP 1: intake\n→ .craft/docs/requirements.md"]
+        S1["STEP 1: intake\n→ .craft/docs/requirements.md\n→ プレビュー: .craft/review/gates/01-requirements.html"]
         S1 -->|承認 1/N| S2
-        S2["STEP 2: refiner\n→ .craft/docs/stories.md"]
+        S2["STEP 2: refiner\n→ .craft/docs/stories.md\n→ プレビュー: .craft/review/gates/02-stories.html"]
         S2 -->|承認 2/N| S3_CHECK
 
         S3_CHECK{HAS_FRONTEND?}
@@ -40,6 +40,8 @@ flowchart TD
     S6 --> END([完了])
     END -.->|本番クラウド公開する場合| IAC["iac フローへ\n（plan.mdの「インフラ構成」節をTerraform/OpenTofu化）"]
 ```
+
+※ 確認用ページは `.craft/review/` にまとめ、入口は `index.html`(左メニュー+iframe。メニューは `scripts/review_index.py` で更新)。手順は [preview-generation.md](preview-generation.md)。
 
 ※ N はフロントエンドあり4・なし3（デザインフェーズがスキップされるため）。STEP番号はagent-chain.mdの実際の番号に合わせている。
 
