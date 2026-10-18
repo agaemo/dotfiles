@@ -100,7 +100,10 @@ WAIT_FOR: ユーザーの回答（判断がつかない場合のみ）
 1. **クラウドプロバイダーの選定**（ユーザー確認必須。後から変更コストが極めて高い）
    - AWS / GCP / Azure / その他。ユーザーが既存の利用実績・組織のポリシーを持つ場合はそれに従う
 2. **researcher呼び出し（必須）**
-   - Agent ツールで researcher エージェント（`agents/researcher.md`）を起動する
+   - Agent ツールが使える場合は、researcher エージェント（`agents/researcher.md`）を起動する
+   - Agent ツールが使えない場合（planner 自身がサブエージェントとして起動されている場合）は、
+     WebSearch で同等の調査（quickstart・破壊的変更・既知の罠・メンテナンス状況）を行い、
+     結果を `.craft/docs/tech-research.md` に追記する
    - 対象: 選定したクラウドプロバイダーの主要マネージドサービス（認証基盤・API層・データストア等、
      要件から必要と判断されるもの）
    - モード: フル調査
