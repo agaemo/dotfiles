@@ -1,8 +1,10 @@
-<!-- 雛形(Web ページ型): 追加フォーム・検索・一覧・削除の確認ダイアログ・空状態・テーマ切替を、実際に操作できる。
-     {{PROJECT_NAME}} と「サンプル」「項目 A/B/ラベル」の文言、色のトークン(:root)、検証規則(valid の行)を、その案件の
-     design-system.md・design.md・stories.md の内容に置き換える。画面が複数ある案件は、主要な1〜2画面だけを作る。
-     デスクトップアプリのウィンドウ型は mock-skeleton.html を使う。 -->
 <!doctype html>
+<!-- 雛形(Web ページ型・2画面): 一覧(S1)と詳細(S2)を、ハッシュ(#book-ID)で切り替える。
+     S1: 追加フォーム・検索・一覧(行の中で状態を変更)・空状態。S2: 戻る・状態・明細(子の項目)の追加と削除・項目の削除ダイアログ。
+     {{PROJECT_NAME}} と「サンプル」「項目」「補足」「明細」「未着手/進行中/完了」の文言、色のトークン(:root)、検証規則を、
+     その案件の design-system.md・design.md・stories.md の内容に置き換える。
+     画面が1つなら、詳細(id="s2")と、その JS(route・renderDetail・メモ関連)を消す。画面が3つ以上なら、主要な2画面だけを作る。
+     デスクトップアプリのウィンドウ型は mock-skeleton.html を使う。 -->
 <html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{{PROJECT_NAME}} 画面モック</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
 <style>
@@ -46,59 +48,103 @@
   .dlg { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px 20px; max-width:360px; box-shadow:0 12px 28px rgba(60,40,10,.22); }
   .dlg p { margin:0 0 14px; } .acts { display:flex; justify-content:flex-end; gap:8px; }
   @media (max-width:640px) { form { grid-template-columns:1fr; } .bm { grid-template-columns:4px 1fr; } .bm .btn { grid-column:2; justify-self:start; } }
+
+  .bm i { background:var(--accent); } .stat { font:500 12px var(--font-body); border:1px solid var(--line); background:var(--tag); color:var(--text); border-radius:999px; padding:2px 8px; }
+  .row2 { display:flex; gap:10px; align-items:center; flex-wrap:wrap; } .bm .t a { color:var(--text); text-decoration:none; } .bm .t a:hover { color:var(--accent); }
+  .detail h2 { margin:0 0 4px; } .link { background:none; border:0; color:var(--accent); font:14px var(--font-body); cursor:pointer; padding:0; }
+  textarea { font:15px var(--font-body); color:var(--text); background:var(--bg); border:1px solid var(--line); border-radius:4px; padding:6px 10px; width:100%; min-height:72px; }
+  .note-item { background:var(--surface); border:1px solid var(--line); border-radius:8px; padding:10px 14px; display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+  .note-item p { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; } [hidden] { display:none !important; }
 </style></head>
 <body>
 <p class="back" id="back-nav"><a href="../index.html">&larr; 一覧へ</a></p>
 <div class="wrap">
 <div class="bar"><div><h1>{{PROJECT_NAME}}</h1><p class="note">実寸のモックです。表示している内容はサンプルで、実際のデータではありません(再読み込みで元に戻ります)。</p></div><button class="toggle" id="theme-toggle" type="button">ダーク / ライト</button></div>
+
+<section id="s1">
 <form id="add" novalidate>
-  <div class="f full"><label for="url">項目 A(必須)</label><input id="url" type="text" placeholder="例: sample-1"><span class="err" id="url-err" role="alert"></span></div>
-  <div class="f"><label for="ttl">項目 B(任意)</label><input id="ttl" type="text"><span class="err" id="ttl-err" role="alert"></span></div>
-  <div class="f"><label for="tag">ラベル(任意、カンマ区切り)</label><input id="tag" type="text"></div>
+  <div class="f"><label for="ttl">項目名(必須)</label><input id="ttl" type="text"><span class="err" id="ttl-err" role="alert"></span></div>
+  <div class="f"><label for="sub">補足(任意)</label><input id="sub" type="text"></div>
   <div class="f full"><button class="btn primary" type="submit" style="align-self:flex-start">追加</button></div>
 </form>
-<div class="search"><label for="q" class="note">検索(項目 A・B・ラベル)</label><input id="q" type="text" autocomplete="off"></div>
+<div class="search"><label for="q" class="note">検索(項目名・補足)</label><input id="q" type="text" subocomplete="off"></div>
 <ul id="list"></ul>
+</section>
+
+<section id="s2" class="detail" hidden>
+  <p><button class="link" id="back" type="button">&larr; 一覧へ</button></p>
+  <h2 id="d-title" style="font:700 26px/1.3 var(--font-display)"></h2>
+  <p class="note" id="d-meta"></p>
+  <div class="row2"><label for="d-stat" class="note">状態</label><select id="d-stat"></select><button class="btn danger" id="d-del" type="button">項目を削除</button></div>
+  <h2 style="font:700 18px/1.4 var(--font-display);margin-top:24px">明細</h2>
+  <div class="f"><label for="memo">明細を書く(2000 文字まで)</label><textarea id="memo"></textarea><span class="err" id="memo-err" role="alert"></span></div>
+  <p><button class="btn primary" id="memo-add" type="button">明細を追加</button></p>
+  <ul id="notes"></ul>
+</section>
+
 <div class="scrim" id="scrim" hidden><div class="dlg" role="alertdialog" aria-labelledby="dlg-msg"><p id="dlg-msg"></p><div class="acts"><button class="btn" id="cancel" type="button">キャンセル</button><button class="btn primary" id="ok" type="button">削除する</button></div></div></div>
 </div>
 <script>
 (function(){
-  var items=[
-    {t:"サンプル項目 1",u:"sample-1",g:["ラベル X","ラベル Y"],at:"2026-01-03 09:30"},
-    {t:"サンプル項目 2",u:"sample-2",g:["ラベル X"],at:"2026-01-02 18:05"},
-    {t:"sample-3",u:"sample-3",g:[],at:"2026-01-01 07:42"}];
-  var $=function(i){return document.getElementById(i)},list=$("list"),pending=null;
+  var STATES=["未着手","進行中","完了"];
+  var books=[
+    {id:1,t:"サンプル項目 A",a:"補足 A",s:1,at:"2026-10-18 21:30",n:[{b:"サンプルの明細 1",at:"2026-10-18 22:10"},{b:"サンプルの明細 2",at:"2026-10-17 20:05"}]},
+    {id:2,t:"サンプル項目 B",a:"補足 B",s:0,at:"2026-10-15 09:12",n:[]},
+    {id:3,t:"サンプル項目 C",a:"",s:2,at:"2026-10-01 18:40",n:[{b:"サンプルの明細 3",at:"2026-10-02 08:00"}]}];
+  var nextId=4,cur=null,pending=null,$=function(i){return document.getElementById(i)};
   function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
-  /** 検索語で絞り込んで一覧を描き直す。0件のときは状況に応じた空状態を出す */
-  function render(){
-    var w=$("q").value.trim().toLowerCase();list.textContent="";
-    var shown=items.filter(function(b){return !w||(b.t+" "+b.u+" "+b.g.join(" ")).toLowerCase().indexOf(w)>=0});
-    if(!shown.length){var li=el("li","empty",items.length?"一致する項目がありません":"まだ登録がありません。上のフォームから追加してください");list.appendChild(li);return}
+  function fill(sel){sel.textContent="";STATES.forEach(function(x,i){var o=el("option",null,x);o.value=i;sel.appendChild(o)})}
+  /** 検索語で絞り込み、一覧を描き直す。0件は状況に応じた空状態を出す */
+  function renderList(){
+    var w=$("q").value.trim().toLowerCase(),list=$("list");list.textContent="";
+    var shown=books.filter(function(b){return !w||(b.t+" "+b.a).toLowerCase().indexOf(w)>=0});
+    if(!shown.length){list.appendChild(el("li","empty",books.length?"一致する項目がありません":"まだ登録がありません。上のフォームから追加してください"));return}
     shown.forEach(function(b){
       var li=el("li","bm");li.appendChild(el("i"));
-      var d=el("div");d.appendChild(el("div","t",b.t));d.appendChild(el("small",null,b.u));
-      var m=el("div","m",b.at+"　");b.g.forEach(function(x){m.appendChild(el("span","tag",x))});d.appendChild(m);li.appendChild(d);
-      var del=el("button","btn danger","削除");del.type="button";del.addEventListener("click",function(){pending=b;$("dlg-msg").textContent="「"+b.t+"」を削除します。元に戻せません。";$("scrim").hidden=false;$("cancel").focus()});
-      li.appendChild(del);list.appendChild(li)});
+      var d=el("div"),t=el("div","t"),a=el("a",null,b.t);a.href="#book-"+b.id;t.appendChild(a);d.appendChild(t);
+      d.appendChild(el("small",null,(b.a||"補足なし")+" ・ "+b.at));li.appendChild(d);
+      var sel=el("select");fill(sel);sel.value=b.s;sel.setAttribute("aria-label",b.t+" の状態");sel.addEventListener("change",function(){b.s=+sel.value});li.appendChild(sel);
+      list.appendChild(li)});
+  }
+  function renderDetail(){
+    var b=cur;$("d-title").textContent=b.t;$("d-meta").textContent=(b.a||"補足なし")+" ・ 作成 "+b.at;$("d-stat").value=b.s;
+    var ul=$("notes");ul.textContent="";
+    if(!b.n.length)ul.appendChild(el("li","empty","まだ明細がありません"));
+    b.n.forEach(function(m){var li=el("li","note-item"),d=el("div");d.appendChild(el("p",null,m.b));d.appendChild(el("small",null,m.at));li.appendChild(d);
+      var x=el("button","btn danger","削除");x.type="button";x.addEventListener("click",function(){b.n=b.n.filter(function(y){return y!==m});renderDetail()});li.appendChild(x);ul.appendChild(li)});
+  }
+  /** hash(#book-ID)で一覧と詳細を切り替える。一覧に戻っても検索語は保つ */
+  function route(){
+    var m=/^#book-(\d+)$/.exec(location.hash),b=m&&books.filter(function(x){return x.id===+m[1]})[0];
+    $("s1").hidden=!!b;$("s2").hidden=!b;
+    if(b){cur=b;renderDetail();window.scrollTo(0,0)}else renderList();
   }
   function err(id,inp,msg){$(id).textContent=msg;$(inp).classList.toggle("bad",!!msg)}
   $("add").addEventListener("submit",function(ev){
-    ev.preventDefault();var u=$("url").value.trim(),t=$("ttl").value.trim(),ok=true;err("url-err","url","");err("ttl-err","ttl","");
-    var valid=u.length>0; /* 実際の検証規則に置き換える */
-    if(!valid){err("url-err","url","項目 A を入力してください");ok=false}
-    else if(items.some(function(b){return b.u===u})){err("url-err","url","登録済みです");ok=false}
-    if(t.length>200){err("ttl-err","ttl","項目 B は 200 文字までです");ok=false}
+    ev.preventDefault();var t=$("ttl").value.trim(),a=$("sub").value.trim(),ok=true;err("ttl-err","ttl","");
+    if(!t){err("ttl-err","ttl","項目名を入力してください");ok=false}
+    else if(t.length>200){err("ttl-err","ttl","項目名は 200 文字までです");ok=false}
+    else if(books.some(function(b){return b.t===t&&b.a===a})){err("ttl-err","ttl","登録済みです");ok=false}
     if(!ok)return;
-    items.unshift({t:t||u,u:u,g:$("tag").value.split(",").map(function(x){return x.trim()}).filter(Boolean),at:"2026-01-04 10:00"});
-    $("add").reset();render();
+    books.unshift({id:nextId++,t:t,a:a,s:0,at:"2026-10-19 10:00",n:[]});$("add").reset();renderList();
   });
-  $("q").addEventListener("input",render);
+  $("q").addEventListener("input",renderList);
+  $("back").addEventListener("click",function(){location.hash=""});
+  $("d-stat").addEventListener("change",function(){cur.s=+$("d-stat").value});
+  $("memo-add").addEventListener("click",function(){
+    var v=$("memo").value.trim();err("memo-err","memo","");
+    if(!v){err("memo-err","memo","明細を入力してください");return}
+    if(v.length>2000){err("memo-err","memo","明細は 2000 文字までです");return}
+    cur.n.unshift({b:v,at:"2026-10-19 10:05"});$("memo").value="";renderDetail();
+  });
+  function ask(b){pending=b;$("dlg-msg").textContent="「"+b.t+"」を削除します。明細も一緒に消え、元に戻せません。";$("scrim").hidden=false;$("cancel").focus()}
   function close(){$("scrim").hidden=true;pending=null}
+  $("d-del").addEventListener("click",function(){ask(cur)});
   $("cancel").addEventListener("click",close);
-  $("ok").addEventListener("click",function(){items=items.filter(function(b){return b!==pending});close();render()});
+  $("ok").addEventListener("click",function(){books=books.filter(function(b){return b!==pending});close();location.hash="";renderList()});
   $("scrim").addEventListener("keydown",function(ev){if(ev.key==="Escape")close()});
-  render();
+  fill($("d-stat"));window.addEventListener("hashchange",route);route();
 })();
-</script><script>(function(){var r=document.documentElement,b=document.getElementById("theme-toggle");if(!b)return;b.addEventListener("click",function(){var d=r.getAttribute("data-theme")==="dark"||(!r.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme: dark)").matches);r.setAttribute("data-theme",d?"light":"dark");});})();</script>
+</script><script>(function(){var r=document.documentElement,b=document.getElementById("theme-toggle");b.addEventListener("click",function(){var d=r.getAttribute("data-theme")==="dark"||(!r.getAttribute("data-theme")&&matchMedia("(prefers-color-scheme: dark)").matches);r.setAttribute("data-theme",d?"light":"dark");});})();</script>
 <script>if(window.top!==window){var b=document.getElementById("back-nav");if(b)b.hidden=true;}</script>
 </body></html>

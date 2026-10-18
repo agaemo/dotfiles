@@ -5,6 +5,8 @@
 
 対応する記法: 見出し(# 〜 ####)・段落・箇条書き(入れ子・継続行つき)・番号付きリスト・チェックボックス(- [ ] / - [x])・
 表・コードブロック(``` と ~~~)・引用(>)・水平線(---)・強調・コード・リンク。HTML コメントは出さない。
+mermaid のコードブロック(```mermaid / ~~~mermaid)は、図として描画する(CDN の mermaid を使う)。読み込めない
+(オフライン等の)ときは、図のソースをそのまま表示するので、内容の確認はできる。
 ユーザーストーリー(`## US-001: タイトル` の見出しを持つ文書)は、自動でカード表示にする
 (誰が・何をしたい・なぜ・受け入れ条件・サイズ・依存)。「未解決の疑問」は、回答済み/未回答を色と文言で区別する。
 """
@@ -57,11 +59,16 @@ def convert(md: str, prefix: str, nav: list, base_level: int = 0) -> str:
         elif FENCE.match(line):
             close_lists()
             fence = line[:3]
+            lang = line[3:].strip()
             buf, i = [], i + 1
             while i < len(lines) and not lines[i].startswith(fence):
                 buf.append(lines[i])
                 i += 1
-            out.append("<pre><code>" + html.escape("\n".join(buf)) + "</code></pre>")
+            code = html.escape("\n".join(buf))
+            if lang == "mermaid":
+                out.append(f'<figure class="diagram"><pre class="mermaid-src"><code>{code}</code></pre></figure>')
+            else:
+                out.append("<pre><code>" + code + "</code></pre>")
         elif re.match(r"^#{1,4} ", line):
             close_lists()
             level = len(line) - len(line.lstrip("#")) + base_level
@@ -217,6 +224,7 @@ th,td{border:1px solid var(--line);padding:6px 10px;text-align:left;vertical-ali
 code{background:var(--code);padding:1px 4px;border-radius:3px;font-size:.9em}
 pre{background:var(--code);padding:12px;border-radius:6px;overflow-x:auto}pre code{background:none;padding:0}
 blockquote{margin:12px 0;padding:4px 14px;border-left:3px solid var(--line);color:var(--mut)}
+.diagram{margin:16px 0;overflow-x:auto}.diagram-err{color:var(--open);font-size:.85rem;margin:0}.diagram svg{max-width:100%;height:auto}
 hr{border:0;border-top:1px solid var(--line);margin:20px 0}
 li.task{list-style:none;margin-left:-1.2em}li.task .box{display:inline-block;width:1.2em;font-weight:700}
 li.task.done .box{color:var(--ok)}li.task.open .box{color:var(--open)}
@@ -228,6 +236,38 @@ li.task.done{color:var(--mut)}
 .card dl{display:grid;grid-template-columns:7em 1fr;gap:2px 12px;margin:8px 0}.card dt{color:var(--mut)}.card dd{margin:0}
 .card h4{margin:10px 0 2px;font-size:.85rem;color:var(--mut)}.card ul{margin:0;padding-left:1.4em}.card .dep{margin:8px 0 0;font-size:.9rem;color:var(--mut)}
 @media (max-width:720px){body{display:block}nav{position:static;width:auto;height:auto;border-right:0;border-bottom:1px solid var(--line)}.card dl{grid-template-columns:1fr}}
+"""
+
+
+# mermaid(CDN。バージョンを固定)。読み込みや描画に失敗したら、ソースの <pre> をそのまま残す
+MERMAID_JS = r"""
+(function(){
+  var srcs=document.querySelectorAll('.mermaid-src'); if(!srcs.length) return;
+  var s=document.createElement('script');
+  s.src='https://cdn.jsdelivr.net/npm/mermaid@11.4.0/dist/mermaid.min.js';
+  s.onload=function(){
+    var dark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+    mermaid.initialize({startOnLoad:false,securityLevel:'strict',theme:dark?'dark':'default'});
+    // 失敗すると mermaid が画面にエラー表示を残すので片付ける
+    function clean(id){[id,'d'+id].forEach(function(x){var e=document.getElementById(x);if(e)e.remove();});}
+    // エッジのラベル |...| を引用符で囲む(括弧などを含むと構文エラーになるため。2回目の試行で使う)
+    function quoteEdges(t){return t.replace(/\|([^|"\n]+)\|/g,function(m,a){return '|"'+a+'"|';});}
+    srcs.forEach(function(pre,i){
+      var src=pre.textContent,id='mmd'+i;
+      function show(r){var d=document.createElement('div');d.className='mermaid-out';d.innerHTML=r.svg;pre.replaceWith(d);}
+      mermaid.render(id,src).then(show).catch(function(){
+        clean(id);
+        return mermaid.render(id+'q',quoteEdges(src)).then(show);
+      }).catch(function(){
+        clean(id);clean(id+'q');
+        var n=document.createElement('p');n.className='diagram-err';
+        n.textContent='図を描画できませんでした(構文の誤りの可能性があります)。ソースをそのまま表示します。';
+        pre.parentNode.insertBefore(n,pre);
+      });
+    });
+  };
+  document.head.appendChild(s);
+})();
 """
 
 
@@ -249,6 +289,7 @@ def main(argv: list) -> int:
         f'<nav><a id="back-nav" href="../index.html">&larr; 一覧へ</a>{nav_html}</nav>'
         f"<main>{'<hr>'.join(body)}</main>"
         '<script>if(window.top!==window){var b=document.getElementById("back-nav");if(b)b.hidden=true;}</script>'
+        f"<script>{MERMAID_JS}</script>"
         "</body></html>"
     )
     out_path.parent.mkdir(parents=True, exist_ok=True)
