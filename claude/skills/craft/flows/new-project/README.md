@@ -33,7 +33,7 @@ flowchart TD
         S45 --> S5
     end
 
-    S5["STEP 6: 統合設計書生成\n→ .craft/docs/01_requirements_doc.md\n→ .craft/docs/02_specifications_doc.md\n→ .craft/docs/03_basic_design_doc.md"]
+    S5["STEP 6: 統合設計書生成\n→ .craft/docs/01_requirements_doc.md\n→ .craft/docs/02_specifications_doc.md\n→ .craft/docs/03_basic_design_doc.md\n→ .craft/review/gates/06-spec.html（確認用。承認なし）"]
     S5 --> S6
 
     S6["STEP 7: build フローへ委譲\n開発ランタイム構築・実装（フェーズ1〜3）・実画面レビュー・\nレビューチェーン・CLAUDE.md/README.md生成"]

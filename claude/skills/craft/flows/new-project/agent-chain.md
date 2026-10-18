@@ -214,7 +214,7 @@ STEP 5: 理解度チェック（Early Stop）← 統合設計書生成前の確�
     ENDIF
   UNTIL ALL(score >= 4)
 
-STEP 6: 統合設計書生成 ← 承認ゲートなし（自動生成のみ）
+STEP 6: 統合設計書生成 ← 承認ゲートなし（自動生成と確認用ページのみ）
 
   目的: STEP 1〜4で既に承認済みの要求・要件・基本設計（DBスキーマ・API設計・
        セキュリティ設計・画面遷移を含む）を1つの整合した文書群として出力する。
@@ -240,9 +240,14 @@ STEP 6: 統合設計書生成 ← 承認ゲートなし（自動生成のみ）
   ASSERT EXISTS(.craft/docs/03_basic_design_doc.md)
 
   承認ゲートは設けない。3文書は、既に承認した STEP 1〜4 の内容の転記であり、新しい情報がないため
-  （承認を取ると、プレビューの作成と確認の手間に対して、得られるものが少ない）。
-  生成後に、3文書の場所（.craft/docs/）を一言知らせて、STEP 7 へ進む。
-  PROHIBITED: プレビューHTMLの作成と、生成物への承認ゲートの要求（矛盾の報告と確認は除く。下記 NOTE に従う）
+  （承認を取ると、確認の手間に対して、得られるものが少ない）。
+  ただし、読みやすく確認できるよう、3文書を1枚にまとめた確認用ページを出す（承認は求めない）:
+    python3 -I {SKILL_DIR}/flows/new-project/scripts/md2html.py .craft/review/gates/06-spec.html 統合設計書 \
+      .craft/docs/01_requirements_doc.md .craft/docs/02_specifications_doc.md .craft/docs/03_basic_design_doc.md
+    その後、preview-generation.md の「index.html の生成と更新」に従い、メニューの6番目に載せる
+    （id: spec / group: gate / 補足: 「要求・要件・基本設計(確認のみ。承認は不要)」）。
+  生成後に、3文書の場所（.craft/docs/）と、確認用ページ（.craft/review/index.html の 6番）を一言知らせて、STEP 7 へ進む。
+  PROHIBITED: 生成物への承認ゲートの要求（確認用ページを出すことは禁止しない。矛盾の報告と確認は除く。下記 NOTE に従う）
   NOTE: 文書の内容に矛盾が見つかった場合は、承認済みの元ドキュメントを自分で書き換えず、矛盾の内容と修正案を
         ユーザーに報告して確認を得る。確認後に、該当する元ドキュメント（requirements.md 等）を修正してから再生成する
 

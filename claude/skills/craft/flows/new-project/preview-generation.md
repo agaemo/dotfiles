@@ -1,6 +1,6 @@
 # プレビュー生成（共通ルール）
 
-craft の new-project・new-app フロー（agent-chain.md）・new-static フローの各GATE（design-brief・plan.md。統合設計書は承認ゲートなし）で、承認前にローカルHTMLで確認用ページを生成する際の共通手順。メインClaudeが行う。呼び出し元のSTEPからは、このファイルをプレビュー生成チェーン中に未読の場合のみ読み込み（セッションが変わった場合は再度READする）、対象ファイル・図解内容の差分のみを実行すること。
+craft の new-project・new-app フロー（agent-chain.md）・new-static フローの各GATE（design-brief・plan.md。統合設計書は承認ゲートなしで、確認用ページだけ出す）で、承認前にローカルHTMLで確認用ページを生成する際の共通手順。メインClaudeが行う。呼び出し元のSTEPからは、このファイルをプレビュー生成チェーン中に未読の場合のみ読み込み（セッションが変わった場合は再度READする）、対象ファイル・図解内容の差分のみを実行すること。
 
 ## Artifact を使わない理由
 
@@ -31,14 +31,14 @@ Artifact は外部ホストへのリクエストが厳格にブロックされ�
 .craft/review/
   index.html            入口。雛形から作り、メニューは PAGES 配列で定義する
   gates/                承認ゲートの資料。メニューの順に番号を付ける
-    01-requirements.html  02-stories.html  03-mock.html  04-design.html  05-plan.html
+    01-requirements.html  02-stories.html  03-mock.html  04-design.html  05-plan.html  06-spec.html（統合設計書）
   extras/               補助資料（承認ゲートではないもの）
     wireframe.html  icon.html など
 ```
 
 - 番号は枠として固定する。その案件で作らないページは欠番のままにし、PAGES 配列からも消す（例: HAS_FRONTEND == false なら 03・04 は無い）。
 - 承認ゲートでない資料（ワイヤー、アイコン案など）は `extras/` に置き、PAGES では `group: "extra"` にする。
-- 統合設計書（STEP 6）はプレビューを作らない（承認ゲートなしの方針）ため、`review/` には載せない。
+- 06-spec.html（統合設計書）はメニューの承認ゲート欄に載せるが、承認は求めない（確認のみ。補足にそう書く）。作り方は agent-chain.md の STEP 6。
 - `.craft/review/` 以外（旧 `.craft/previews/` 等）には出力しない。
 
 ## index.html の生成と更新
@@ -51,7 +51,7 @@ Artifact は外部ホストへのリクエストが厳格にブロックされ�
    （`<file>` は `index.html` からの相対パス。ファイルが無いと失敗する。同じ id は置き換わる。
    並びは、承認ゲートと補助資料をそれぞれファイル名の順にそろえる）。
    作らないことにしたページは `{SCRIPT} remove .craft/review/index.html <id>`、確認は `{SCRIPT} list .craft/review/index.html`。
-   id の例: requirements / stories / mock / design / plan / wireframe / icon。
+   id の例: requirements / stories / mock / design / plan / spec / wireframe / icon。
 3. 各ページには戻りリンクを入れる。`<body>` の直後に `<p id="back-nav"><a href="../index.html">&larr; 一覧へ</a></p>`、`</body>` の直前に
    `<script>if(window.top!==window){var b=document.getElementById("back-nav");if(b)b.hidden=true;}</script>`
    を置く（iframe の中では隠れ、単体で開いたときだけ出る）。Markdown 変換スクリプトの出力には入っている。

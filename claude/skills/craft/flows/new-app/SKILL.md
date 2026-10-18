@@ -208,6 +208,7 @@ STEP 3: designer       → .craft/docs/design-brief.md / design-system.md / desi
 STEP 4: planner        → .craft/docs/plan.md
 STEP 5: 理解度チェック
 STEP 6: 統合設計書生成  → .craft/docs/01_requirements_doc.md / 02_specifications_doc.md / 03_basic_design_doc.md
+                         + 確認用ページ .craft/review/gates/06-spec.html（承認なし。agent-chain.md の STEP 6 に従う）
 STEP 7: {SKILL_DIR}/flows/new-project/agent-chain.md の STEP 7 と同じロジックに従う（build フローへ委譲）
   ただし STACK識別子が plan.md に見つからない場合のデフォルト値のみ異なる:
     agent-chain.md の STEP 7 → "node" 固定
