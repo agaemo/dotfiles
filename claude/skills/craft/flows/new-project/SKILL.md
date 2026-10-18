@@ -39,7 +39,7 @@ ELSE:
 
 ### ステップ 2: ファイル書き出し（サブエージェントで実行）
 
-IMPORTANT: `.claude/settings.json`・`.claude/hooks/*.js` の書き出しはサブエージェントに
+IMPORTANT: `.claude/settings.json`・`.claude/hooks/*.sh` の書き出しはサブエージェントに
   含めないこと。これらのファイルパスを含むタスクをサブエージェントに渡すと、ハーネスの
   権限システムに「自己変更（Self-Modification）」と判定され、Agent 呼び出し自体が拒否される
   （実際に発生・再現済み）。git init・.gitignore・.mcp.json の書き出しのみをサブエージェントに
@@ -136,8 +136,8 @@ FOREACH row IN 以下の対応表:
 
   | src                        | dest                                    |
   |----------------------------|-----------------------------------------|
-  | hooks/on-session-start.js  | .claude/hooks/on-session-start.js       |
-  | hooks/pre-bash.js          | .claude/hooks/pre-bash.js               |
+  | hooks/on-session-start.sh  | .claude/hooks/on-session-start.sh       |
+  | hooks/pre-bash.sh          | .claude/hooks/pre-bash.sh               |
 
 READ TEMPLATE/settings.json
 REPLACE ALL: ".claude/hooks/" → "${CLAUDE_PROJECT_DIR}/.claude/hooks/"
@@ -151,12 +151,12 @@ IMPORTANT: CWDの実際の絶対パス（`<CWD>`のような形）を書き込�
 2つの問題がある。
 
 例:
-  変換前: "command": "node .claude/hooks/on-stop.js"
-  変換後: "command": "node ${CLAUDE_PROJECT_DIR}/.claude/hooks/on-stop.js"
+  変換前: "command": "sh .claude/hooks/on-stop.sh"
+  変換後: "command": "sh ${CLAUDE_PROJECT_DIR}/.claude/hooks/on-stop.sh"
 
 NOTE: `${CLAUDE_PROJECT_DIR}`のようなプレースホルダーを含むshell form（1つの文字列で
 コマンドを書く形式）の場合は、変数展開時にパスへ空白が含まれても壊れないようダブルクォートで
-囲む慣習がある（例: `node "${CLAUDE_PROJECT_DIR}"/.claude/hooks/on-stop.js`）。将来
+囲む慣習がある（例: `sh "${CLAUDE_PROJECT_DIR}"/.claude/hooks/on-stop.sh`）。将来
 このテンプレートの`command`をshell formのまま複雑化する場合は、この点に注意すること。
 
 ASSERT EXISTS(CWD/.claude/settings.json)

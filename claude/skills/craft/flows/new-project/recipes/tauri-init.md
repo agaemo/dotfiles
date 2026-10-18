@@ -60,6 +60,29 @@ mise exec -- cargo add --manifest-path src-tauri/Cargo.toml <クレート名>@<�
 
 Tauriのデフォルトscaffoldは`panic = "abort"`を含む。**アプリ内でパニック隔離（`catch_unwind`によるスレッド単位の防御等）を行う設計の場合、`panic = "abort"`はその防御を無効化する**（unwindせず即座にプロセスを終了させるため）。堅牢性を優先する場合はこの設定を外すこと（バイナリサイズとのトレードオフになるため、方針をplan.mdの「使用ライブラリ」または「リスク」セクションに明記する）。
 
+### ビルド設定の標準（ビルド時間への備え）
+
+Rust は依存のコンパイルに時間がかかる（初回数分、CI 1回で 2〜8 分、リリース 8 分前後。macOS・Windows で各々走る）。次を標準にする。
+
+```toml
+[profile.dev]
+debug = "line-tables-only"   # デバッグ情報を減らし、ビルドとリンクを速くする
+
+[profile.release]
+lto = "thin"                 # 既定の lto = true / codegen-units = 1 は最適化が強い代わりに遅い
+```
+
+release の方針（サイズ優先か、速度優先か）はユーザーに聞いて plan.md に書く。サイズ優先なら `lto = true` / `codegen-units = 1` に戻す。`panic = "abort"` の扱いは上記のとおり。
+
+CI のテンプレートは `{SKILL_DIR}/flows/new-project/recipes/ci-rust.md` を参照する。
+
+## 開発ビルドの署名（キーチェーンを使う場合）
+
+署名なしで OS のキーチェーンを使うアプリは、開発中の再ビルドごとに許可ダイアログが出る（バイナリが変わるたびに別アプリ扱いになる）。自己署名の証明書で開発ビルドに `codesign` し、署名を安定させる手順を Makefile のターゲット（例: `make dev-sign`）に入れる。
+
+NOTE: 効果は未検証。試してダイアログが減らなければ、planner が開発用に鍵の保管を切り替える設計を検討する。
+`make dev` の初回ビルド時間は、ユーザーに先に伝える。
+
 ## 開発コマンド（Makefile向け）
 
 | ターゲット | 実行コマンド |

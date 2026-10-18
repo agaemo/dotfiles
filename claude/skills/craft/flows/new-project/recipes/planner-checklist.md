@@ -163,7 +163,7 @@ IMPORTANT: plan.md の「開発ランタイム」節に書く内容を、plan.md
    | Flutter | `{SKILL_DIR}/flows/new-app/flutter-notes.md` を読み、`flutter create` コマンド・バージョン固定の注意点（`stable` 指定は404になる）を確認する |
    | React Native (Expo・既定) | `.mise.toml`（`node = "22"`, `pnpm = "latest"`）作成後、`pnpm create expo-app . --template blank-typescript && pnpm install` |
    | React Native (CLI) | ユーザーがCLI構成を明示的に希望した場合のみ選ぶ。同じ `.mise.toml` 作成後、`pnpm dlx @react-native-community/cli init <アプリ名> --directory . && pnpm install` |
-   | Tauri（Rust製デスクトップアプリ） | `{SKILL_DIR}/flows/new-project/recipes/tauri-init.md` を読み、scaffoldコマンド・マージ時の`.gitignore`衝突対策・`panic="abort"`の扱いを確認する |
+   | Tauri（Rust製デスクトップアプリ） | `{SKILL_DIR}/flows/new-project/recipes/tauri-init.md` を読み、scaffoldコマンド・マージ時の`.gitignore`衝突対策・`panic="abort"`の扱いを確認する。あわせて `{SKILL_DIR}/flows/new-project/recipes/ci-rust.md` も読む。技術選定の提示では、ビルド時間の目安を代替（Electron・Web）との比較表に必ず含め、ユーザーが時間コストを理解した上で選べるようにする |
 
    会話の文脈から Next.js / Vite + React / Hono / Express 等を推定する（UI有無を問わない）。判断できない場合はユーザーに確認する。
    リアルタイム通信（WebSocket・チャット・通知）が要件にある場合は
