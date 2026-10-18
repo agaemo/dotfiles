@@ -22,13 +22,13 @@ description: new-project セットアップ完了後の設計フェーズ・エ�
 # false → STEP 3・実画面レビューをスキップ
 ```
 
-NOTE: 各 GATE で承認を求める前に以下の形式で進捗を必ず表示すること（N はフロントあり5・なし4）:
+NOTE: 各 GATE で承認を求める前に以下の形式で進捗を必ず表示すること（N はフロントあり4・なし3）:
   ── 承認 [N/N]: <文書名> ──────────────────────
   ✅ STEP 1: requirements.md（承認済み）
   👉 STEP 2: stories.md（承認待ち）
   ⬜ STEP 3: デザイン（未着手）
   ──────────────────────────────────────────
-  NOTE: HAS_FRONTEND == false の場合は「STEP 3: デザイン」の行を省き、Nは4に読み替える
+  NOTE: HAS_FRONTEND == false の場合は「STEP 3: デザイン」の行を省き、Nは3に読み替える
 
 共通ルール（プレビュー生成）: 以下の各STEPで「プレビュー生成（共通ルール参照）」と書かれた箇所は、
   GATEの前に必ず次を実施する:
@@ -197,7 +197,7 @@ STEP 5: 理解度チェック（Early Stop）← 統合設計書生成前の確�
     ENDIF
   UNTIL ALL(score >= 4)
 
-STEP 6: 統合設計書生成 ← 理解度確認後の総合確認ゲート
+STEP 6: 統合設計書生成 ← 承認ゲートなし（自動生成のみ）
 
   目的: STEP 1〜4で既に承認済みの要求・要件・基本設計（DBスキーマ・API設計・
        セキュリティ設計・画面遷移を含む）を1つの整合した文書群として出力し、
@@ -222,35 +222,11 @@ STEP 6: 統合設計書生成 ← 理解度確認後の総合確認ゲート
   ASSERT EXISTS(.craft/docs/02_specifications_doc.md)
   ASSERT EXISTS(.craft/docs/03_basic_design_doc.md)
 
-  プレビュー生成（共通ルール参照）:
-    3文書（01_requirements_doc.md・02_specifications_doc.md・03_basic_design_doc.md）を
-    1枚のHTMLにまとめる。個別ファイルのまま提示すると3つを行き来して頭の中で
-    統合する手間が残るため、必ず1枚に統合すること。
-      - レイアウト: 左にセクションナビ（要求定義書 / 要件定義書 / 基本設計書 + 各文書内の見出しへのジャンプ）、
-        右に本文（読みやすい行長・見出し階層を維持したまま各Markdownの内容を反映する）
-      - 冒頭に「STEP 1〜4は承認済み、これが最終確認」であることが伝わる進捗表示を入れる
-      - 基本設計書の「画面遷移図」セクションは、plan.md の「基本設計 > 画面遷移図」をそのまま
-        転記して箱＋矢印で図解する（design.md へは戻らない。plan-preview.htmlと同様の方針）
-      - 治療は文書（読み物）: 長文を読ませる前提のタイポグラフィ・余白を優先し、装飾は最小限にする
-    出力先: .craft/previews/spec-review.html
-
-  GATE: 以下の形式でユーザーに一括提示し、承認を得ること:
-
-    ── 承認 [N/N]: 統合設計書（最終確認） ─────────────
-    ✅ STEP 1: requirements.md
-    ✅ STEP 2: stories.md
-    ✅ STEP 3: デザイン（HAS_FRONTEND == false の場合は省き、Nを4に読み替える）
-    ✅ STEP 4: plan.md
-    👉 STEP 5: 統合設計書（承認待ち）
-    ──────────────────────────────────────────────
-
-    以下の内容を確認してください（.craft/previews/spec-review.html）。これらの内容で開発を開始します。
-
-    承認いただけましたか？
-
-  PROHIBITED: 3文書の承認前に実装を開始すること
-  NOTE: 文書の内容に矛盾が見つかった場合は、該当する元ドキュメント（requirements.md 等）を修正してから再生成し、
-        .craft/previews/spec-review.html も再生成すること
+  承認ゲートは設けない。3文書は、既に承認した STEP 1〜4 の内容の転記であり、新しい情報がないため
+  （承認を取ると、プレビューの作成と確認の手間に対して、得られるものが少ない）。
+  生成後に、3文書の場所（.craft/docs/）を一言知らせて、STEP 7 へ進む。
+  PROHIBITED: プレビューHTMLの作成（spec-review.html）と、このSTEPでの承認の要求
+  NOTE: 文書の内容に矛盾が見つかった場合は、該当する元ドキュメント（requirements.md 等）を修正してから再生成する
 
 STEP 7: build フローへ委譲
 

@@ -49,6 +49,9 @@ IMPORTANT: .craft/docs/plan.md は呼び出し元フローで既にユーザー�
 ```
 READ .craft/docs/plan.md
 READ .craft/docs/design-system.md（存在すれば）
+  NOTE: plan.md が大きい（目安200行超）ときは、`grep -n '^#'` で見出しの位置を把握し、必要な節だけを
+    範囲指定（offset・limit）で読む。何度も全文を読み直さない（コンテキストを消費する）。
+    サブエージェントには、必要な節（と、その行番号）だけを案内する。
 
 REPORT TO USER: 完了状況
   - 完了済みのステップ（対応するコード・ファイルが存在するか確認）
@@ -279,6 +282,10 @@ ELSE （トラック設計なし・小規模、または static）:
   git commit -m "フェーズ1: クリティカルパス実装完了"
   # 実際に実装した内容に合わせてメッセージを調整すること
 
+各フェーズの完了コミットのたびに、`.craft/docs/resume-notes.md` を更新する（現在地・次にやること・テストとビルドの結果。
+下記「中断する場合」の内容に準じる）。会話が長くなったときは、区切りの良いところ（フェーズの境目など）で、
+ユーザーに中断を提案する（利用枠やコンテキストの上限に達する前に、安全に中断できる状態にしておくため）。
+
 --- フェーズ2: 並列フィーチャートラック（worktree 分離） ---
 
 .craft/docs/plan.md の「フェーズ2」に定義された各トラックを、
@@ -289,7 +296,7 @@ READ {SKILL_DIR}/flows/new-project/phase2-prompt.md  ← フェーズ2開始直�
 IF READ FAILED:
   REPORT: "phase2-prompt.md が見つかりません。フェーズ2を開始できません。"
   STOP
-（テンプレート内の [TRACK_NAME]・[ABSOLUTE_PATH] 等を実際の値に展開してから渡すこと）
+（テンプレート内の [TRACK_NAME]・[ABSOLUTE_PATH]・[ORIGINAL_ROOT]（元のプロジェクトルート）・{SKILL_DIR} 等を実際の値に展開してから渡すこと）
 各トラックの Agent 起動では、effort パラメータに medium を指定する。
   実装は中程度の推論で素早く出し、検証・レビュー系（ステップ1・5）は high で詰める分担にするため
   （検証とエッジケースの確認には高い effort が効き、実装そのものには過剰になりやすい）。
@@ -314,6 +321,10 @@ NOTE: ビルドや CI を待つ間は、メインが読み取りだけの作業�
        確認前にテストアカウントを作成し、メールアドレス・パスワード（またはログインURL）を
        ユーザーに提示すること。「ログインして確認してください」とだけ伝えて、
        ログイン可能なアカウントの提示を怠らないこと。
+     IF デスクトップアプリ（Tauri・Electron 等）:
+       ユーザーに実機確認を頼む前に、`{SKILL_DIR}/flows/new-project/recipes/desktop-verify.md` を Read し、
+       自動でできる範囲（ショートカット・ウィンドウ・トレイ・DB の確認）を済ませる。
+       自動で確認できなかった項目だけを、ユーザーに頼む。
   3. バグが見つかった場合は Bug-fix TDD 手順で修正すること:
      READ {SKILL_DIR}/flows/build/tdd-policy.md の「Bug-fix TDD 手順」
   4. `git commit` で統合完了を記録する

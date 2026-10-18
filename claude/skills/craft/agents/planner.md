@@ -379,6 +379,9 @@ project-root/
 ## 新規プロジェクト固有（該当する場合のみ）
 ### フォーマッタ・リンターhook（スタック確定後に記載）
 - post-write hook: [コマンド例]
+  IMPORTANT: 書いたファイルだけを整形する（例: `rustfmt <file>`、`oxfmt <file>`）。`cargo fmt --all` のような
+  全体整形は使わない（並列トラックが、担当外のファイルを書き換えてしまう）。対象ファイルは hook の入力
+  （`tool_input.file_path`）から取る
 - stop hook: [コマンド例]
 - settings.json への登録を実装ステップに含めること
 - IMPORTANT: コマンド内でプロジェクトのファイルパスを参照する場合、CWDの絶対パスを直書きしない。

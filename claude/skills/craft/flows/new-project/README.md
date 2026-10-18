@@ -34,8 +34,7 @@ flowchart TD
     end
 
     S5["STEP 6: 統合設計書生成\n→ .craft/docs/01_requirements_doc.md\n→ .craft/docs/02_specifications_doc.md\n→ .craft/docs/03_basic_design_doc.md"]
-    S5 --> S5P["プレビュー生成\n→ .craft/previews/spec-review.html（ローカル・3文書統合）"]
-    S5P -->|承認 5/N| S6
+    S5 --> S6
 
     S6["STEP 7: build フローへ委譲\n開発ランタイム構築・実装（フェーズ1〜3）・実画面レビュー・\nレビューチェーン・CLAUDE.md/README.md生成"]
     S6 --> END([完了])
