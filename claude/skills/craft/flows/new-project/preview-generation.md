@@ -49,6 +49,20 @@ Artifact は外部ホストへのリクエストが厳格にブロックされ�
 - 補助資料の例（推奨）: `wireframe`（UI あり）、`tech`（技術調査。`tech-research.md`）、`icon`（アイコン案）、`adr`（設計判断の記録）。増減は自由で、承認の対象ではない。
 - `.craft/review/` 以外（旧 `.craft/previews/` 等）には出力しない。
 
+### 各ページの作り方（形式は固定）
+
+| 番号 | 作り方 | 形式を決めているもの |
+|---|---|---|
+| 01 要件定義 | `md2html.py`（`requirements.md` を変換） | requirements.md の章立て（intake.md のテンプレート） |
+| 02 ストーリー | `md2html.py`（`stories.md` を変換。US をカード、疑問を回答済み/未回答で区別） | stories.md の書式（refiner.md） |
+| 03 画面モック | 骨組み（Web 型 / ウィンドウ型）をコピーして置き換える。UI なしは「利用イメージ」 | 骨組みの HTML |
+| 04 デザインシステム | `templates/review/design-system.html` をコピーして置き換える | 雛形の節構成（7節。並びは変えない） |
+| 05 実装計画 | `md2html.py`（`plan.md` を変換）+ 必要な図解の追記 | plan.md の章立て（planner.md） |
+| 06 統合設計書 | `md2html.py`（3文書を連結） | 3文書のテンプレート（templates.md） |
+
+- 内容の追加は自由。md に節を足すか（01・02・05・06）、雛形の「7 補足」に書く（04）。節の構成と並びは変えない。
+- ページの HTML を、毎回ゼロから手で書かない。
+
 ## index.html の生成と更新
 
 メニュー（`index.html` の `PROJECT`・`PAGES`）は、手で書き換えず、更新スクリプトで操作する。

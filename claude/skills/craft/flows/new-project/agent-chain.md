@@ -54,9 +54,9 @@ STEP 1: intake
   ASSERT EXISTS(.craft/docs/requirements.md)
 
   プレビュー生成（共通ルール参照）:
-    .craft/docs/requirements.md の内容から確認用HTMLを作成する
-      - プロジェクト概要・必須機能・スコープ外・完成の基準を中心に、読みやすい見出し階層で提示する
-      - 治療は実務資料（memo相当）: 誇張した装飾は避ける
+    python3 -I {SKILL_DIR}/flows/new-project/scripts/md2html.py .craft/review/gates/01-requirements.html 要件定義 .craft/docs/requirements.md
+      - 形式は固定（requirements.md の章立てを、そのまま共通の見た目で出す）。HTML を手で書かない
+      - 追加したい補足があれば、requirements.md に節を足す（足した節もそのまま表示される）
     出力先: .craft/review/gates/01-requirements.html
 
   GATE: 承認進捗を表示してからユーザーに内容を提示し、承認を得ること
@@ -72,9 +72,10 @@ STEP 2: refiner
               → **回答（YYYY-MM-DD）:** [回答内容]
 
   プレビュー生成（共通ルール参照）:
-    .craft/docs/stories.md の内容から確認用HTMLを作成する
-      - US一覧をカード形式で提示し、受け入れ条件・サイズ・依存を見やすく整理する
-      - 「未解決の疑問」セクションは回答済み(x)/未回答を視覚的に区別する
+    python3 -I {SKILL_DIR}/flows/new-project/scripts/md2html.py .craft/review/gates/02-stories.html ユーザーストーリー .craft/docs/stories.md
+      - 形式は固定。変換スクリプトが、US をカード（誰が・何をしたい・なぜ・受け入れ条件・サイズ・依存）にし、
+        「未解決の疑問」を回答済み（緑の✓）/未回答（□）で区別する。HTML を手で書かない
+      - 補足は stories.md に書く（カード以外の節は、通常の見出しと本文で表示される）
     出力先: .craft/review/gates/02-stories.html
 
   GATE: 承認進捗を表示してからユーザーに内容を提示し、承認を得ること
@@ -122,9 +123,10 @@ IF HAS_FRONTEND == true:
        出力先: .craft/review/extras/wireframe.html
 
     d. プレビュー生成（共通ルール参照）:
-       .craft/docs/design-brief.md・.craft/docs/design-system.md の内容から、
-       カラーパレット（実際のスウォッチ）・タイポグラフィスケール・ブランドアーキタイプ・
-       FEEL/ANTI-FEELワードを1枚にまとめる
+       {SKILL_DIR}/flows/new-project/templates/review/design-system.html を .craft/review/gates/04-design.html に
+       コピーし、.craft/docs/design-brief.md・.craft/docs/design-system.md の実際の値で置き換える
+       （節の構成と並びは固定。カラーパレット（実際のスウォッチ）・タイポグラフィスケール・
+       ブランドアーキタイプ・FEEL/ANTI-FEELワードが含まれる。補足は「7 補足」に書く）
          - ライト/ダーク両テーマに対応する場合、実際に切り替えて確認できるボタンをプレビュー右上に
            設置すること（例: `<html data-theme="light">` をJSでトグルする）。
            「両テーマに対応」と文書だけに書いて実物を見せない状態を禁止する
@@ -157,7 +159,9 @@ STEP 4: planner ← 基本設計を含む場合、このGATEが実質的な基�
         IF READ FAILED: REPORT "フローファイルが見つかりません: {SKILL_DIR}/flows/new-project/recipes/planner-checklist.md" → STOP
 
   プレビュー生成（共通ルール参照）:
-    .craft/docs/plan.md の内容から以下を作成する:
+    python3 -I {SKILL_DIR}/flows/new-project/scripts/md2html.py .craft/review/gates/05-plan.html 実装計画 .craft/docs/plan.md
+    （plan.md の章立てを、そのまま共通の見た目で出す。これを固定の土台にする）。
+    そのうえで、次の図解を、該当する節の近くに追記する:
 
     （「基本設計」セクションがある場合の追加提示。下記フィーチャートラックの有無とは独立に判定する）
     IF 「基本設計」セクションがある:

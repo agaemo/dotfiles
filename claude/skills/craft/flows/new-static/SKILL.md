@@ -130,7 +130,8 @@ UNTIL ALL(score >= 4)
   ASSERT/失敗時の代替導線が定義されている）
   .craft/docs/design-brief.md の内容から、カラーパレット（実際のスウォッチ）・
   タイポグラフィの印象・ブランドアーキタイプ・FEEL/ANTI-FEELワード・ページ構成を
-  1枚にまとめる（保存後、preview-generation.md の「index.html の生成と更新」に従って
+  1枚にまとめる。{SKILL_DIR}/../new-project/templates/review/design-system.html を
+  .craft/review/gates/04-design.html にコピーして置き換える（節の構成と並びは固定。ページ構成などの補足は「7 補足」に書く）（保存後、preview-generation.md の「index.html の生成と更新」に従って
   `review_index.py` で `.craft/review/index.html` を作り、`set` で 04 をページありにする。
   このフローが出すのはデザインだけなので、01・02・03・05・06 は `skip`（理由: 静的サイトはデザインブリーフのみ）にする。
   保存後に index.html を開いて提示する）
