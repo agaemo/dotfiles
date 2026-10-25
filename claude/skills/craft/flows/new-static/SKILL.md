@@ -30,6 +30,9 @@ IF NOT EXISTS(.craft/docs/):
   MKDIR .craft/docs/
 ENDIF
 
+# design-coach などで、デザインが先に固まっているか（この判定は、下のテンプレート書き出しより前に行う）
+SET DESIGN_READY = EXISTS(.craft/docs/design-brief.md) AND EXISTS(.craft/docs/design-system.md)
+
 IF NOT EXISTS(.craft/docs/design-brief.md):
   READ {SKILL_DIR}/design-brief-template.md
   WRITE .craft/docs/design-brief.md（内容: 上記テンプレートをそのまま。REQUIRE でカレントディレクトリ = プロジェクトルートが保証されているため相対パスで書く）
@@ -44,7 +47,19 @@ IF ここまでの会話の中で、何を作るか・核となる仕組み・�
   SELF: .craft/docs/design-brief.md の「0. コンセプト」に、その内容をそのまま記録する
   NOTE: 以下のヒアリングでは、ここに書いた内容を再度質問しないこと
 
---- ヒアリング（SELF = メインClaudeがユーザーに直接質問する） ---
+--- デザインが既に固まっている場合（DESIGN_READY） ---
+
+IF DESIGN_READY:
+  # 既存の design-brief.md・design-system.md の内容を再度質問しない。
+  # 以降の「ヒアリング」と「デザインブリーフ作成」は実行しない（「プロジェクト名・サービス名の決定」と
+  # 「サンプルデータのルール」は引き続き参照する）
+  CHECK: design-brief.md に「0. コンセプト」「9. 機能要件・完成条件」があるか。無い節は、既存の brief と
+    これまでの会話から補って追記する（節の見出し順は design-brief-template.md に合わせる。
+    「完成条件の実現可能性」欄は空欄でよい）
+  CHECK: 「9. 画面構成・核となる操作」「完成条件」が埋まっていなければ、不足分だけをユーザーに質問する
+  SELF: 補った内容を1〜2行でユーザーに伝え、ステップ2へ進む
+
+--- ヒアリング（DESIGN_READY でない場合のみ。SELF = メインClaudeがユーザーに直接質問する） ---
 
 SELF: 以下を 1つのメッセージ でユーザーに質問する
   （「0. コンセプト」に既に記録済みの項目があれば省略する）
@@ -133,10 +148,20 @@ UNTIL ALL(score >= 4)
   1枚にまとめる。{SKILL_DIR}/../new-project/templates/review/design-system.html を
   .craft/review/gates/04-design.html にコピーして置き換える（節の構成と並びは固定。ページ構成などの補足は「7 補足」に書く）（保存後、preview-generation.md の「index.html の生成と更新」に従って
   `review_index.py` で `.craft/review/index.html` を作り、`set` で 04 をページありにする。
-  このフローが出すのはデザインだけなので、01・02・03・05・06 は `skip`（理由: 静的サイトはデザインブリーフのみ）にする。
+  あわせて、次の確認用ページも出す（材料があるものだけ。無ければ作らない）:
+    - 03 画面モック（`gates/03-mock.html`）: design-brief.md の「9. 画面構成」の順に、全セクションを縦に並べた
+      ワイヤー（HTML/CSS。色・書体・余白は design-system.md の実トークン。文言は brief の仮文言かダミー。
+      ページ冒頭に「表示している内容はサンプル」と書く）。画面UIの骨組み（mock-skeleton-web.html）は合わないため、
+      戻りリンク・テーマ切替の型だけを借りる。`set` で登録する
+    - 補助 `brief`（`extras/brief.html`）: `md2html.py` で design-brief.md と design-system.md を1枚にし、`extra` で登録する
+    - 補助 `explore`（design-coach の探索モックがあるとき）: `.craft/docs/explore/mock-*.html` を
+      `extras/explore-<名前>.html` にコピーし、`extra` で登録する（採用理由は brief の「8.」）
+    - 01・02・06 は `skip`（理由: 静的サイトでは元の文書が無い）。05 は未作成のままにし、ステップ3.5で作る
   保存後に index.html を開いて提示する）
-    - artifact-design skillの既定方針（ライト/ダーク両テーマ対応）は維持したまま、
-      ヒアリングで確認した明暗の方針を初期表示（:root のデフォルト値）に反映する
+    - 明暗の方針で分岐する。両テーマ対応の案件は、artifact-design skill の既定方針（ライト/ダーク両テーマ対応）を
+      維持したまま、明暗の方針を初期表示（:root のデフォルト値）に反映する。
+      **ライトのみの案件（LP など。brief の「対応範囲」がライトのみ）は、右上の切替ボタンを「通常面 / 暗い面
+      （常に暗いヒーロー等）」の見え方の確認用に読み替え、テーマ切替は実装に含めない旨を「7 補足」に書く**
   出力先: .craft/review/gates/04-design.html
 
 GATE: ユーザー承認
@@ -168,6 +193,10 @@ IMPORTANT: researcherは「懸念なし」であっても客観的な差分（�
   新たなセキュリティリリース・破壊的変更・新たな既知の罠等）を報告に含めてくる。差分がある
   場合、その内容をそのままユーザーに提示してから次に進むこと（提示せず進めることを禁止する）。
   WAIT_FOR: ユーザーの回答（差分がある場合のみ）
+
+保存後（承認ゲートではない補助資料）:
+  `md2html.py` で `.craft/docs/tech-research.md` を `.craft/review/extras/tech.html` に変換し、
+  `review_index.py extra` で `tech`（技術調査）として登録する（手順は preview-generation.md の「index.html の生成と更新」）
 ```
 
 ---
@@ -201,7 +230,7 @@ IF サブエージェントが "完了しました" を報告しない（エラ�
 ### ステップ 3.4: hooks・settings.json の書き出し（メインClaude自身が実行）
 
 IMPORTANT: このステップはサブエージェントに委譲せず、メインClaude自身が直接 Read/Write すること。
-  `.claude/settings.json`・`.claude/hooks/*.js` の書き出しをサブエージェントに含めると、
+  `.claude/settings.json`・`.claude/hooks/*.sh` の書き出しをサブエージェントに含めると、
   ハーネスの権限システムに「自己変更（Self-Modification）」と判定され Agent 呼び出し自体が
   拒否される（実際に発生・再現済み）。ステップ3のAstroプロジェクト生成が完了した後（＝
   ディレクトリが非空になった後）に行うことで、STEP2の「非空ディレクトリ」誤判定問題も回避する。
@@ -209,16 +238,16 @@ IMPORTANT: このステップはサブエージェントに委譲せず、メイ
 ```
 TEMPLATE = {SKILL_DIR}/../..  # craftディレクトリの絶対パス
 
-READ  TEMPLATE/hooks/on-session-start.js → WRITE CWD/.claude/hooks/on-session-start.js
-READ  TEMPLATE/hooks/pre-bash.js         → WRITE CWD/.claude/hooks/pre-bash.js
+READ  TEMPLATE/hooks/on-session-start.sh → WRITE CWD/.claude/hooks/on-session-start.sh
+READ  TEMPLATE/hooks/pre-bash.sh         → WRITE CWD/.claude/hooks/pre-bash.sh
 
 READ TEMPLATE/settings.json
 REPLACE ALL: ".claude/hooks/" → "${CLAUDE_PROJECT_DIR}/.claude/hooks/"
 WRITE CWD/.claude/settings.json
 
 ASSERT EXISTS(CWD/.claude/settings.json)
-ASSERT EXISTS(CWD/.claude/hooks/on-session-start.js)
-ASSERT EXISTS(CWD/.claude/hooks/pre-bash.js)
+ASSERT EXISTS(CWD/.claude/hooks/on-session-start.sh)
+ASSERT EXISTS(CWD/.claude/hooks/pre-bash.sh)
 ASSERT: 書き出した CWD/.claude/settings.json に CWD の実際の絶対パス文字列が含まれていないこと
 IF いずれかの ASSERT が FAILED:
   REPORT: エラー内容を報告してユーザーに確認を求める
@@ -240,12 +269,18 @@ IF NOT EXISTS(.craft/docs/plan.md):
       - 完成条件（「9. 機能要件・完成条件」の内容をそのまま転記する）
       - セクション構成（ID・内容・実装状態の表）。各セクションは「未着手」で初期化する
       - ファイル構成の概要（.astro コンポーネントの配置方針）
+      - 「開発ランタイム」（STACK識別子・環境管理ツール・検証コマンド）と「開発コマンド」の表
+        （dev / build / test / fmt / lint。static で test・fmt が無いターゲットは `@echo '<名前>: 対象なし'`）。
+        build フローのステップ0.7 が、この表から Makefile を生成する
     NOTE: フィーチャートラック設計セクションは不要
           （static は build フロー内で常にシンプルループとして実装される）
     NOTE: 完成条件の達成が新規のロジック・アルゴリズム・独自フォーマット等（設計しながら
           決める核となる仕組み）に依存する場合は、それを担うセクションを最優先（先頭）に
           配置する。build フロー側で実装前に実現可能性を検証するため
   ASSERT EXISTS(.craft/docs/plan.md)
+
+保存後（承認は求めない）:
+  `md2html.py` で plan.md を `.craft/review/gates/05-plan.html` に変換し、`review_index.py set` で 05 をページありにする。
 ```
 
 ---

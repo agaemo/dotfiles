@@ -58,50 +58,48 @@ IF FAILED:
 
 --- STEP 2: Astro プロジェクト作成 ---
 
-NOTE: この時点で CWD/.craft/docs/design-brief.md と CWD/.mise.toml が既に存在する
-  （ステップ1で作成済み）。`pnpm create astro@latest .` はディレクトリが非空だと判定すると、
-  意図しない別名のサブディレクトリ（例: ランダムな2単語の名前）にプロジェクトを生成して
-  しまう既知の問題がある。これを避けるため、実行前に .craft/ と .mise.toml の両方を
-  一時退避し、実行後に戻す（.craft/ だけを退避しても .mise.toml が残っていれば
-  非空判定を回避できず同じ問題が再発する。実際に発生した事例あり）。
+NOTE: この時点で CWD には .craft/・.mise.toml のほか、design-coach の `test-record/`、`README.md` など、
+  既存のファイル・ディレクトリがある場合がある。`pnpm create astro@latest .` は、ディレクトリが非空だと
+  判定すると、意図しない別名のサブディレクトリ（例: `flaky-fusion`）にプロジェクトを生成してしまう
+  既知の問題がある（実際に発生。`.craft/` と `.mise.toml` だけ退避しても、他のファイルが残ると再発した）。
+  これを避けるため、**CWD 直下の既存のファイル・ディレクトリをすべて**（隠しファイル含む）退避してから実行し、
+  実行後に戻す。退避対象を「craft が作ったもの」に限定しないこと。
 
   IMPORTANT: .mise.toml を退避すると `mise exec -- <command>` はCWDに設定ファイルが
   無いためバージョンを解決できず失敗する。退避中のscaffoldコマンドに限り、
   `mise exec node@lts pnpm@latest -- <command>` のようにバージョンを明示指定し、
   .mise.toml の存在に依存しない形で実行すること。
 
-IF NOT EXISTS(CWD/.craft) AND NOT EXISTS(CWD/.mise.toml):
-  SKIP（退避不要。非空ディレクトリ問題も発生しない）
+IF CWD 直下に既存のファイル・ディレクトリが無い:
+  SKIP（退避不要）
 ELSE:
-  RUN（1回のBashツール呼び出しで実行すること。分割実行すると `$$`（シェルPID）が
-       呼び出しごとに変わり退避先を見失う。CWDのbasenameベースの固定名を使うことで、
-       この呼び出し中に何が起きても一意なパスを保つ。
-       退避対象（.craft/・.mise.toml）が存在しない場合、その mv は失敗するが
-       `|| true` で無視し、後続の `&&` 判定（scaffoldコマンドの成否）に影響させない
-       ようにする）:
-    ( mv CWD/.craft /tmp/craft-setup-tmp-<CWDのbasename> 2>/dev/null || true ) ; \
-    ( mv CWD/.mise.toml /tmp/mise-setup-tmp-<CWDのbasename> 2>/dev/null || true ) ; \
-    mise exec node@lts pnpm@latest -- pnpm create astro@latest . --template minimal --no-git --yes && \
-    ( mv /tmp/craft-setup-tmp-<CWDのbasename> CWD/.craft 2>/dev/null || true ) ; \
-    ( mv /tmp/mise-setup-tmp-<CWDのbasename> CWD/.mise.toml 2>/dev/null || true )
+  RUN（1回のBashツール呼び出しで実行すること。分割実行すると `$$`（シェルPID）が呼び出しごとに変わり
+       退避先を見失うため、退避先は CWD の basename ベースの固定名にする。
+       退避先は CWD の外（スクラッチパッド等。システムの一時ディレクトリを使う指定がある場合を除き /tmp は使わない）に置く）:
+    STASH=<CWD の外の固定パス>/craft-setup-stash-<CWDのbasename>
+    mkdir -p "$STASH" && for f in $(ls -A CWD); do mv "CWD/$f" "$STASH/"; done
+    mise exec node@lts pnpm@latest -- pnpm create astro@latest . --template minimal --no-git --no-ai --yes
+    復元: `$STASH` 内の各ファイルを CWD へ戻す。scaffold が同名のファイルを生成していた場合
+      （`README.md`・`.gitignore` 等）は、scaffold 側を残し、退避側は `<名前>.stashed` として CWD に残して
+      報告する（`.gitignore` は後の STEP 3 で追記するため、退避側の内容を末尾に追記してマージする）。
 
-  ASSERT: CWD/.craft/docs/design-brief.md が存在すること（退避・復元が正しく行われたか）
-  ASSERT: CWD/.mise.toml が存在すること（退避・復元が正しく行われたか）
+  ASSERT: 退避した全ファイルが CWD（または `.stashed` として）に戻っていること（`.craft/docs/design-brief.md`・`.mise.toml` を含む）
   ASSERT: package.json が CWD 直下に存在すること（サブディレクトリに生成されていないか）
   IF いずれかの ASSERT が FAILED:
-    REPORT: "Astroのプロジェクト作成でディレクトリがずれた可能性があります。
-      /tmp/craft-setup-tmp-<CWDのbasename> が残っていれば CWD/.craft への復元を試み、
-      それでも解決しなければ生成物の場所を確認してください。"
+    REPORT: "Astroのプロジェクト作成でディレクトリがずれた可能性があります。$STASH が残っていれば
+      CWD への復元を試み、それでも解決しなければ生成物の場所を確認してください。"
     STOP
+
+NOTE: `--no-ai` は create-astro が `AGENTS.md`（AI 向けの指示ファイル）を生成するのを抑止する。
 
 NOTE: `pnpm create astro@latest` は常に最新版をインストールする。
   メジャーバージョンが変わるとコンポーネント構文・設定ファイルの形式が変わる場合がある。
   インストール後、生成された package.json でバージョンを確認すること。
 
-NOTE(Astro v6): Content Collections の設定ファイルの場所が v5 以前と異なる。
+NOTE(Astro v6 以降。v7 でも有効。2026-10 時点で確認): Content Collections の設定ファイルの場所が v5 以前と異なる。
   - 正しい場所: `src/content.config.ts`（src 直下）
-  - 誤った場所: `src/content/config.ts`（v5 以前の形式。v6 では LegacyContentConfigError になる）
-  - v6 では `defineCollection` に `loader` オプション（`glob` 等）が必須:
+  - 誤った場所: `src/content/config.ts`（v5 以前の形式。v6 以降では LegacyContentConfigError になる）
+  - v6 以降は `defineCollection` に `loader` オプション（`glob` 等）が必須。`z` は `astro/zod` から import する:
     ```ts
     import { glob } from 'astro/loaders';
     const staff = defineCollection({
@@ -118,12 +116,12 @@ IF FAILED:
 --- STEP 2.5: Astro が生成した不要ディレクトリの削除 ---
 
 IF EXISTS(CWD/.vscode):
-  NOTE: Astro create が生成するファイル。settings.json 等の標準ファイルのみの場合は安全に削除できる。
-  IF CWD/.vscode に settings.json 以外のファイル（launch.json・extensions.json 等のカスタム設定）がある:
-    REPORT: 削除前にユーザーへ確認を求める
-    WAIT_FOR: ユーザーの承認
-    IF NOT CONFIRMED: SKIP（削除しない）
-  RUN: rm -rf CWD/.vscode
+  NOTE: Astro v7 の create は `.vscode/extensions.json`（Astro 拡張の推奨）と `launch.json`（dev サーバー起動）を
+    生成する（settings.json は無い）。これらは scaffold の標準ファイルで、利用者のカスタム設定ではない。
+  IF CWD/.vscode の中身が、上記の標準ファイル2つだけである（内容も scaffold 生成のまま）:
+    SKIP（削除しない。エディタ利用者に有用なため残す。報告に1行書く）
+  ELIF それ以外のファイル・内容がある:
+    REPORT: 削除する場合はユーザーに確認を求める（デフォルトは削除しない）
 ENDIF
 
 --- STEP 3: 残ファイルの書き出し ---
@@ -182,6 +180,7 @@ IF FAILED:
 RUN:
   mise exec -- pnpm approve-builds --all
 NOTE: esbuild・sharp などの postinstall を承認しないと dev サーバー起動時にエラーになる
+NOTE: 承認待ちが無い場合は "There are no packages awaiting approval" と出力するが、エラーではない（そのまま続行）
 
 IF FAILED:
   REPORT: エラー内容を報告してユーザーに確認を求める

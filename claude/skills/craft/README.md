@@ -106,8 +106,8 @@ agents・guidelines は craft から直接参照するためコピーしない�
 | `gitignore` | `.gitignore` |
 | `mcp.json` | `.mcp.json` |
 | `settings.json` | `.claude/settings.json`（絶対パス埋め込み） |
-| `hooks/on-session-start.js` | `.claude/hooks/on-session-start.js` |
-| `hooks/pre-bash.js` | `.claude/hooks/pre-bash.js` |
+| `hooks/on-session-start.sh` | `.claude/hooks/on-session-start.sh` |
+| `hooks/pre-bash.sh` | `.claude/hooks/pre-bash.sh` |
 
 ---
 

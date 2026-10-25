@@ -425,6 +425,9 @@ ELSE （フロントエンドあり）:
     b. デザインブリーフ・デザインシステムとの差異を確認・修正する
 
 IF Puppeteer MCP が使えない（未起動・未承認等）:
+  NOTE: Chrome 拡張は、ウィンドウ幅を変えても表示幅が変わらない。狭い幅は、同一オリジンの `iframe`（幅 390px、
+    `position:fixed`）に dev サーバーのページを読み込み、`contentDocument` の `scrollWidth` と `clientWidth`、
+    見出しの左端、文字サイズ・コントラストを JS で測る（static の最終確認の代替になる）。
   NOTE: Chrome 拡張（claude-in-chrome）はウィンドウ幅を変えても表示幅（viewport）が変わらず、
     スマホ幅（400px 前後）やダークモード（prefers-color-scheme）の確認に使えない。
     これらの確認が必要なときは、拡張に頼らず、次の Playwright 代替を使う。
@@ -548,8 +551,8 @@ IF NOT EXISTS(CLAUDE.md) OR （EXISTS するが プロジェクト名・目的�
 
 --- README.md ---
 
-IF NOT EXISTS(README.md):
-  WRITE README.md based on actual session context.
+IF NOT EXISTS(README.md) OR （EXISTS するが scaffold の汎用 README のまま。例: Astro の "Astro Starter Kit"、プロジェクト名・目的の記載なし）:
+  WRITE README.md based on actual session context（汎用 README は置き換える）。
 
   INCLUDE:
     - 概要（1〜2文）
@@ -636,6 +639,8 @@ REPORT TO USER:
     IF 認証機能を含む:
       - テストユーザー: ユーザー名 / パスワード（make seed の出力をそのまま掲載）
     - 停止方法を明記すること（例: 「Ctrl+Cで終了」「`pkill -f <プロセス名>`」等、実際に有効な手段）。
+      停止を頼まれたら、停止コマンドの後に `lsof -ti :<ポート>` でポートが空いたことを確認する（`astro dev stop` の後もプロセスが残ることがあった）。
+      なお、完了報告の時点でサーバーを止めたままにしないこと（上の ENSURE。ユーザーが確認する前に停止しない）。
       IMPORTANT: デスクトップアプリ（Tauri/Electron等）でウィンドウを閉じてもプロセスが
       常駐し続ける設計の場合は特に必須。「ウィンドウを閉じれば終わる」と誤解されないよう、
       実際に必要な操作（アプリメニューから終了・プロセスをkill等）を伝えること

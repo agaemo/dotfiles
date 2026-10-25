@@ -80,7 +80,7 @@ ENDIF
 
 ### ステップ 3: ファイル書き出し（サブエージェントで実行）
 
-IMPORTANT: `.claude/settings.json`・`.claude/hooks/*.js` の書き出しはサブエージェントに
+IMPORTANT: `.claude/settings.json`・`.claude/hooks/*.sh` の書き出しはサブエージェントに
   含めないこと。これらのファイルパスを含むタスクをサブエージェントに渡すと、ハーネスの
   権限システムに「自己変更（Self-Modification）」と判定され、Agent 呼び出し自体が拒否される
   （実際に発生・再現済み）。git init・.gitignore・.mcp.json の書き出しのみをサブエージェントに
@@ -151,11 +151,11 @@ IMPORTANT: このステップはサブエージェントに委譲せず、メイ
 （理由はステップ3冒頭のIMPORTANT参照）。
 
 ```
-READ  TEMPLATE/hooks/on-session-start.js → WRITE CWD/.claude/hooks/on-session-start.js
-READ  TEMPLATE/hooks/pre-bash.js         → WRITE CWD/.claude/hooks/pre-bash.js
+READ  TEMPLATE/hooks/on-session-start.sh → WRITE CWD/.claude/hooks/on-session-start.sh
+READ  TEMPLATE/hooks/pre-bash.sh         → WRITE CWD/.claude/hooks/pre-bash.sh
 
-ASSERT EXISTS(CWD/.claude/hooks/on-session-start.js)
-ASSERT EXISTS(CWD/.claude/hooks/pre-bash.js)
+ASSERT EXISTS(CWD/.claude/hooks/on-session-start.sh)
+ASSERT EXISTS(CWD/.claude/hooks/pre-bash.sh)
 
 READ TEMPLATE/settings.json
 REPLACE ALL: ".claude/hooks/" → "${CLAUDE_PROJECT_DIR}/.claude/hooks/"
