@@ -159,6 +159,22 @@ ELSE:
 
 ```
 # 選定カテゴリ.委譲先フロー は、ステップ3の対応表「委譲先フロー」列の値（例: new-static）を指す
+
+# 画面UIを持つ新規構築では、環境構築より先にデザインを固める（デザイン → ユーザー確認 → 環境構築の順）
+IF 委譲先フロー が new-static / new-project / new-app のいずれか
+   かつ 画面UIがある（new-static は常に該当。new-project / new-app はステップ2の「フロントエンドUI: あり」）
+   かつ .craft/docs/design-brief.md が存在しない:
+  ASK USER: 実装や環境構築の前に、デザインを先に固めますか？
+    1. design-coach でデザインを先に行う（探索 → 仕様化。design-brief.md / design-system.md を作成し、確認してから続ける）
+    2. デザインは委譲先フローの designer に任せる（今のまま進める）
+    3. 自由記述
+  WAIT_FOR: ユーザーの回答
+  IF 1:
+    INVOKE: Skill ツールで design-coach を起動する。引数には、ステップ1の「依頼の要約」とステップ2のヒアリング結果（再質問させない）を渡す
+    WAIT_FOR: design-coach の仕様化の完了と、ユーザーの確認（.craft/docs/design-brief.md と design-system.md が作成されたこと）
+    # 以降の委譲先フローの designer は、両ファイルを検出して実画面レビューから始める
+ENDIF
+
 READ {SKILL_DIR}/flows/<選定カテゴリ.委譲先フロー>/SKILL.md
 IF READ FAILED:
   REPORT: "フローファイルが見つかりません。SKILL_DIR の導出を確認してください。"
