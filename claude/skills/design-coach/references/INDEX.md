@@ -49,6 +49,7 @@
 |---------|-----------|------|
 | `system/tokens-handoff.md` | トークン、コンポーネント分割、実装への引き渡し | ◎（トークン仕様はドラフト） |
 | `process/evaluation.md` | ヒューリスティック評価、ユーザビリティテスト | ◎ |
+| `process/handoff-template.md` | 批評の結果を craft に渡す改善指示書の形式 | ○ |
 | `process/measure.md` | 画面の実測（フォント、ターゲット、コントラスト、320px）の手順 | ○（経験則） |
 | `recipes/screens.md` | 管理画面・入力画面・ダッシュボード・LP・モバイルの組み合わせ方 | ○ |
 
