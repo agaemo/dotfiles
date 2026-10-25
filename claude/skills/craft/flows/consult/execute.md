@@ -225,6 +225,18 @@ FOREACH phase IN 計画:
   EXECUTE: そのフェーズの変更を適用する
   VERIFY:
     ビルド・lint・型チェックのうち利用可能なものを実行する
+    IF 画面の見た目を変更した場合:
+      # 実画面の計測は design-coach の references/process/measure.md と audit.js を使う
+      # （文字の監査・孤立行・ナビの現在地・狭い幅は同ファイルの手順に従う）
+      NOTE: 狭い幅（390px 等）は resize_window では測れない（ウィンドウに最小幅がある）。
+        measure.md の iframe 手順を使う
+      NOTE: dev サーバーの CSS がブラウザに古いまま残り、変更が表示に反映されないことがある。
+        computed style が編集と食い違うときは、別ポートで dev サーバーを起こし直して確認する
+        （オリジンが変わるため localStorage は空になる。計測スクリプトは貼り直す）
+  IF 計画が「項目ごとに commit」を指定している場合:
+    1項目を適用するごとに commit する。同じファイルを触る項目は、1項目ずつ適用して commit する
+    （先にまとめて編集すると、項目単位に分けて commit できなくなる）
+  NOTE: macOS の `sed -i` は `-i ''` が必要。複数行の置換は Edit か python で行う
   IF 検証失敗:
     ROLLBACK: git checkout -- .
     REPORT: 失敗内容と原因をユーザーに報告する
