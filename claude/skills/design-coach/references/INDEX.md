@@ -40,7 +40,7 @@
 ## 日本語 ja/ ・視覚 visual/
 | ファイル | いつ読むか | 状況 |
 |---------|-----------|------|
-| `ja/typesetting.md` | 日本語のサイズ・行高・組版（デジタル庁DS の数値） | ○（JLReq は冒頭のみ） |
+| `ja/typesetting.md` | 日本語のサイズ・行高・組版（デジタル庁DS の数値）、基準から外してよい場面（経験則） | ○（JLReq は冒頭のみ。外してよい場面は経験則） |
 | `ja/ux-writing.md` | ボタン・エラー・空状態の文言 | △（日本語固有は未検証） |
 | `visual/color-theory.md` | OKLCH、パレットの構成、役割と比率 | ◎ |
 
@@ -50,7 +50,7 @@
 | `system/tokens-handoff.md` | トークン、コンポーネント分割、実装への引き渡し | ◎（トークン仕様はドラフト） |
 | `process/evaluation.md` | ヒューリスティック評価、ユーザビリティテスト | ◎ |
 | `process/handoff-template.md` | 批評の結果を craft に渡す改善指示書の形式 | ○ |
-| `process/measure.md` | 画面の実測（フォント、ターゲット、コントラスト、320px）の手順 | ○（経験則） |
+| `process/measure.md` | 画面の実測（フォント、ターゲット、コントラスト、320px）、パレットの一括実測、探索モックの全セクション確認の手順 | ○（経験則） |
 | `recipes/screens.md` | 管理画面・入力画面・ダッシュボード・LP・モバイルの組み合わせ方 | ○ |
 
 ## ビジュアル・表現（直下。コントラストとタップ領域以外は未検証）
@@ -59,9 +59,9 @@
 | `typography.md` | 欧文と和文のフォント選定、スケール | △（サイズ・行高は `ja/typesetting.md` を優先） |
 | `color.md` | 配色の実践、ダーク対応 | △（基準値は `a11y/wcag.md`、構成は `visual/color-theory.md`） |
 | `spacing-layout.md` | 余白、グリッド、レスポンシブ | △ |
-| `expression.md` | LP・ブランドサイトの表現 | △ |
+| `expression.md` | LP・ブランドサイトの表現、製品UIの再現、LP の部品の判断（テーマ切替・比較表・数字） | △ |
 | `business-ui.md` | 業務系の概要（食い違いは `patterns/` が正） | △ |
-| `anti-generic.md` | AIっぽさの点検 | △ |
+| `anti-generic.md` | AIっぽさの点検（交互配置の前提、抑制の偏りを含む） | △ |
 | `brand-system.md` | モチーフ、一貫性 | △ |
 | `motion-interaction.md` | 動き（時間は NN/g で確認済み） | ○ |
 | `benchmarks.md` | 参考サイトの分解（コクヨの観察例） | ○ |
