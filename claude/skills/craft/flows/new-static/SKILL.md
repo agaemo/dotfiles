@@ -156,13 +156,23 @@ UNTIL ALL(score >= 4)
     - 補助 `brief`（`extras/brief.html`）: `md2html.py` で design-brief.md と design-system.md を1枚にし、`extra` で登録する
     - 補助 `explore`（design-coach の探索モックがあるとき）: `.craft/docs/explore/mock-*.html` を
       `extras/explore-<名前>.html` にコピーし、`extra` で登録する（採用理由は brief の「8.」）
-    - 01・02・06 は `skip`（理由: 静的サイトでは元の文書が無い）。05 は未作成のままにし、ステップ3.5で作る
+    - 01 要件定義・02 ユーザーストーリー（承認の前に出す。作り方は、下の「01・02 の作成」）。
+      05 は未作成のままにし、ステップ3.5で作る。06 もステップ3.5で作る
   保存後に index.html を開いて提示する）
     - 明暗の方針で分岐する。両テーマ対応の案件は、artifact-design skill の既定方針（ライト/ダーク両テーマ対応）を
       維持したまま、明暗の方針を初期表示（:root のデフォルト値）に反映する。
       **ライトのみの案件（LP など。brief の「対応範囲」がライトのみ）は、右上の切替ボタンを「通常面 / 暗い面
       （常に暗いヒーロー等）」の見え方の確認用に読み替え、テーマ切替は実装に含めない旨を「7 補足」に書く**
   出力先: .craft/review/gates/04-design.html
+
+01・02 の作成（GATE の前。メインClaude自身が直接作る。intake・refiner エージェントは呼ばない）:
+  .craft/docs/design-brief.md の「0. コンセプト」「9. 機能要件・完成条件」から、次の2つを書く。
+    - .craft/docs/requirements.md（{SKILL_DIR}/../../agents/intake.md の「出力」の形式）
+    - .craft/docs/stories.md（{SKILL_DIR}/../../agents/refiner.md の「出力」の形式。US は画面・セクション単位）
+  ヒアリングはしない。brief に無い項目は、仮定で埋めず、requirements.md の「未確定事項」と、
+  stories.md の「未解決の疑問」に残す。
+  md2html.py で、gates/01-requirements.html と gates/02-stories.html に変換し、
+  `review_index.py set` で登録する（変換の手順は preview-generation.md）。
 
 GATE: ユーザー承認
   SHOW USER:
@@ -281,6 +291,15 @@ IF NOT EXISTS(.craft/docs/plan.md):
 
 保存後（承認は求めない）:
   `md2html.py` で plan.md を `.craft/review/gates/05-plan.html` に変換し、`review_index.py set` で 05 をページありにする。
+
+06 統合設計書の作成（承認は求めない。メインClaude自身が直接作る）:
+  READ {SKILL_DIR}/../new-project/templates.md
+  次の3つを、そのテンプレートで書く（入力: requirements.md・stories.md・design-brief.md・plan.md・design-system.md）。
+    - .craft/docs/01_requirements_doc.md
+    - .craft/docs/02_specifications_doc.md
+    - .craft/docs/03_basic_design_doc.md（入力は plan.md と design-system.md）
+  該当しない章（認証・DB・API・セキュリティなど）は、省略せず「対象外（理由）」と書く（章立ては変えない）。
+  `md2html.py` で、3つを連結して `.craft/review/gates/06-spec.html` に変換し、`review_index.py set` で 06 を登録する。
 ```
 
 ---
@@ -307,7 +326,8 @@ NOTE: セクション単位の実装・モバイルファースト対応・Puppe
 
 ## 注意事項
 
-- `intake` / `planner` / `security-reviewer` / `qa` は不要
+- `intake` / `planner` / `security-reviewer` / `qa` は不要（エージェントとしては呼ばない）。
+  ただし 01 要件定義・02 ユーザーストーリー・06 統合設計書は、brief と plan.md から、メインClaudeが直接作る
 - 単一 HTML ファイルで実装しない（メンテナンス性が著しく低下するため）
 - フレームワークのインストール手順は必ず公式ドキュメントを確認すること
 
