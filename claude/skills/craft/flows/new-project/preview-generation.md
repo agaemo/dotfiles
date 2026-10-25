@@ -32,7 +32,7 @@ Artifact は外部ホストへのリクエストが厳格にブロックされ�
 |---|---|---|---|---|---|
 | 01 | requirements | `gates/01-requirements.html` | 要件定義 | `requirements.md` | 常に |
 | 02 | stories | `gates/02-stories.html` | ユーザーストーリー | `stories.md` | 常に |
-| 03 | mock | `gates/03-mock.html` | 画面モック | `design.md`・`design-system.md` | UI あり。UI なしは「利用イメージ」（下記） |
+| 03 | mock | `gates/03-mock.html` | 画面モック | `design.md`・`design-system.md` | UI あり。UI なしは対象外（`skip`。下記） |
 | 04 | design | `gates/04-design.html` | デザインシステム | `design-brief.md`・`design-system.md` | UI あり。UI なしは対象外 |
 | 05 | plan | `gates/05-plan.html` | 実装計画 | `plan.md`（基本設計・テスト・リスクを含む） | 常に |
 | 06 | spec | `gates/06-spec.html` | 統合設計書 | `01_`〜`03_` の3文書 | 常に（承認は求めない。確認のみ） |
@@ -45,7 +45,7 @@ Artifact は外部ホストへのリクエストが厳格にブロックされ�
 ```
 
 - メニューには6スロットを常に並べ、状態を3つで示す: ページあり（リンク）/ 対象外（灰色。理由つき）/ 未作成（灰色）。欠番にして番号を詰めない。メニューの番号は、ファイル名の番号と同じ。
-- UI なしの案件: 04 は「対象外（UI なし）」、03 は **「利用イメージ」** にする（タイトルを置き換える）。API なら、リクエストとレスポンスの例（`curl` の実行例を含む）、CLI なら、コマンドと出力例を、HTML にまとめる。内容は plan.md の API・CLI の設計から作り、05 の承認ゲートで一緒に提示する（planner の後に作る）。ワイヤーフレームは作らない。
+- UI なしの案件: 03 と 04 は「対象外（UI なし）」で `skip` にする（画面がないので画面モックは出さない。ゲートのタイトルは書き換えない）。API・CLI の使い方を見せたいときは、承認ゲートではなく補助資料 `usage`（`extras/usage.html`、タイトル「利用イメージ」）として出す。API なら、リクエストとレスポンスの例（`curl` の実行例を含む）、CLI なら、コマンドと出力例を、HTML にまとめる。内容は plan.md の API・CLI の設計から作り、05 の承認ゲートで一緒に提示する（planner の後に作る。承認の対象ではない）。ワイヤーフレームは作らない。
 - 補助資料の例（推奨）: `wireframe`（UI あり）、`tech`（技術調査。`tech-research.md`）、`icon`（アイコン案）、`adr`（設計判断の記録）。増減は自由で、承認の対象ではない。
 - `.craft/review/` 以外（旧 `.craft/previews/` 等）には出力しない。
 
@@ -55,7 +55,7 @@ Artifact は外部ホストへのリクエストが厳格にブロックされ�
 |---|---|---|
 | 01 要件定義 | `md2html.py`（`requirements.md` を変換） | requirements.md の章立て（intake.md のテンプレート） |
 | 02 ストーリー | `md2html.py`（`stories.md` を変換。US をカード、疑問を回答済み/未回答で区別） | stories.md の書式（refiner.md） |
-| 03 画面モック | 骨組み（Web 型 / ウィンドウ型）をコピーして置き換える。UI なしは「利用イメージ」 | 骨組みの HTML |
+| 03 画面モック | 骨組み（Web 型 / ウィンドウ型）をコピーして置き換える。UI なしは作らない（`skip`） | 骨組みの HTML |
 | 04 デザインシステム | `templates/review/design-system.html` をコピーして置き換える | 雛形の節構成（7節。並びは変えない） |
 | 05 実装計画 | `md2html.py`（`plan.md` を変換）+ 必要な図解の追記 | plan.md の章立て（planner.md） |
 | 06 統合設計書 | `md2html.py`（3文書を連結） | 3文書のテンプレート（templates.md） |
@@ -70,7 +70,7 @@ Artifact は外部ホストへのリクエストが厳格にブロックされ�
 
 1. 初回: `{SCRIPT} init {INDEX} <プロジェクト名>`（雛形をコピーし、6スロットを「未作成」で作る。既にあれば何もしない）。
 2. ページを保存するたびに: `{SCRIPT} set {INDEX} <スロットid> [補足 [タイトル]]`
-   （タイトルは、UI なしの `mock` を「利用イメージ」にするときだけ指定する。ファイルが無いと失敗する）。
+   （ゲートのタイトルは変えないので、通常はタイトルを指定しない。ファイルが無いと失敗する）。
 3. 対象外のスロット: `{SCRIPT} skip {INDEX} <スロットid> <理由>`（例: `skip {INDEX} design "UI なし"`）。
    UI なしの案件では、承認ゲートの最初（STEP 1 の保存時）に `design` を対象外にしておく。
 4. 補助資料: `{SCRIPT} extra {INDEX} <id> extras/<名前>.html <タイトル> [補足]`、消すときは `{SCRIPT} remove {INDEX} <id>`。

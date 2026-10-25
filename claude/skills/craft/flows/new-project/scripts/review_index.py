@@ -4,7 +4,7 @@
 
   01 requirements  gates/01-requirements.html  要件定義
   02 stories       gates/02-stories.html       ユーザーストーリー
-  03 mock          gates/03-mock.html          画面モック(UI なしの案件は「利用イメージ」)
+  03 mock          gates/03-mock.html          画面モック(UI なしの案件は対象外)
   04 design        gates/04-design.html        デザインシステム
   05 plan          gates/05-plan.html          実装計画
   06 spec          gates/06-spec.html          統合設計書(承認は求めない)
@@ -20,8 +20,8 @@
   python3 -I review_index.py list   <index.html>
 
 init   雛形をコピーし、6つのスロットを pending で作る。既にあれば何もしない(--force で作り直す)。
-set    スロットを ready にする。ページのファイルが実在しないと失敗する。タイトルは、UI なしの 03 を
-       「利用イメージ」にするときだけ指定する。
+set    スロットを ready にする。ページのファイルが実在しないと失敗する。タイトルは、固定スロットの
+       タイトルを変えないため、通常は指定しない。
 skip   スロットを対象外にする(例: skip index.html design "UI なし")。
 extra  補足のページを追加する(同じ id は置き換え)。<file> は extras/ 配下の、実在するファイル。
 remove 補足のページを消す。

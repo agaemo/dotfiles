@@ -147,7 +147,7 @@ IF HAS_FRONTEND == true:
     NOTE: デザインによってAPIの形・DBフィールドが変わる場合があるため、planner より前に確定させること
 ELSE:
   STEP 3 をスキップし STEP 4 へ進む（design-brief.md・design-system.md・design.md は生成しない）
-  確認用ページでは、04 を「UI なし」で対象外にし、03 は「利用イメージ」にする（STEP 4 の後に作る。下記）
+  確認用ページでは、03 と 04 を「UI なし」で対象外（`skip`）にする。API・CLI の使い方は補助資料 `usage`（利用イメージ）として、STEP 4 の後に作る（下記）
 ENDIF
 
 STEP 4: planner ← 基本設計を含む場合、このGATEが実質的な基本設計承認になる（DBスキーマ・API設計・セキュリティ設計を含む）
@@ -199,15 +199,15 @@ STEP 4: planner ← 基本設計を含む場合、このGATEが実質的な基�
     出力先: .craft/review/gates/05-plan.html
 
     IF HAS_FRONTEND == false:
-      利用イメージ（03）を作る: plan.md の API・CLI の設計から、実際に使う様子を HTML にまとめる。
+      利用イメージ（補助資料 `usage`）を作る: plan.md の API・CLI の設計から、実際に使う様子を HTML にまとめる。
         - API: エンドポイントごとのリクエストとレスポンスの例（`curl` の実行例を含む。正常系とエラーの両方）
         - CLI: 主要なコマンドと、その出力例
         - 画像でなく HTML/CSS（ターミナル風の等幅表示）で作る。ダミーデータは実在の情報にしない
-      出力先: .craft/review/gates/03-mock.html（`review_index.py set` のとき、タイトルに「利用イメージ」を指定する）
+      出力先: .craft/review/extras/usage.html（`review_index.py extra` で `usage`・タイトル「利用イメージ」として登録する。承認ゲートではない）
       ワイヤーフレームは作らない
     ENDIF
 
-  GATE: 承認進捗を表示してからユーザーに計画を提示し、承認を得ること（UI なしの場合は、03 利用イメージも一緒に提示する）
+  GATE: 承認進捗を表示してからユーザーに計画を提示し、承認を得ること（UI なしの場合は、補助資料の利用イメージも一緒に提示する）
     この承認は、統合設計書の自動生成と実装の開始（STEP 6・7）に進む合意を兼ねる。提示時にその旨を一言添えること
     NOTE: DB・API・認証を伴う場合、ここでDBスキーマ・API設計・セキュリティ設計が確定する。
           以降のSTEP6は、この内容を文書として整形するのみで新たな設計判断は行わない。
