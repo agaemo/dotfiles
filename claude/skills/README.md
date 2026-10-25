@@ -14,6 +14,7 @@ Claude Code のカスタムスキル定義ディレクトリ。
 | [`/improve-skill`](improve-skill/) | スキルファイルを静的解析・実行シミュレーションで改善する |
 | [`/improve-agent`](improve-agent/) | エージェントファイルを静的解析・実行シミュレーションで改善する |
 | [`/trade-roshi`](trade-roshi/) | 投資道場の老師として株式銘柄を分析・裁定する（エンタメ用途・投資助言ではない） |
+| [`/design-coach`](design-coach/) | UI・LP・業務画面のデザイン（見た目・画面構成・アクセシビリティ）の相談・批評・方向性探索・仕様化を担う。出典を確認した知識を `references/` に持ち、craft が読める design-brief.md / design-system.md を出力する |
 | [`/output-brief`](output-brief/) | アウトプットを伴うタスクでスコープ・形式・スタイルを確認してから出力まで担当する。HTML はレイアウト×カラーテーマの組み合わせをユーザーに選ばせる |
 
 ## 使い方
