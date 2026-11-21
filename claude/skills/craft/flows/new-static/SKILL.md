@@ -318,7 +318,7 @@ FOLLOW: そこに記述されたすべての手順を実行する
   HAS_REVIEW_CHAIN = false
   HAS_FRONTEND = true
 
-NOTE: セクション単位の実装・モバイルファースト対応・Puppeteer での最終確認・
+NOTE: セクション単位の実装・モバイルファースト対応・Playwright MCP での最終確認・
       CLAUDE.md / README.md 生成・.craft/docs/plan.md の更新は build フロー側で行われる。
 ```
 

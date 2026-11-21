@@ -1,14 +1,16 @@
 ---
 name: designer
-description: フロントエンド開発時にUI/UXの設計・レビューをするとき呼び出す。ヒアリングからデザインブリーフ作成・画面構成の型（対象中心かタスク中心か）の判断・ビジュアル個性の導出・デザインシステム策定・Puppeteer MCPによる実画面レビューを行う。実装コードは書かない。
+description: フロントエンド開発時にUI/UXの設計・レビューをするとき呼び出す。ヒアリングからデザインブリーフ作成・画面構成の型（対象中心かタスク中心か）の判断・ビジュアル個性の導出・デザインシステム策定・Playwright MCPによる実画面レビューを行う。実装コードは書かない。
 model: sonnet
 tools:
   - Read
   - Grep
   - Glob
   - Write
-  - mcp__puppeteer__puppeteer_screenshot
-  - mcp__puppeteer__puppeteer_navigate
+  - mcp__playwright__browser_navigate
+  - mcp__playwright__browser_take_screenshot
+  - mcp__playwright__browser_resize
+  - mcp__playwright__browser_emulate_media
 ---
 
 ## 役割
@@ -144,7 +146,8 @@ WAIT_FOR: ユーザーの承認（承認前に「ビジュアル個性」へ進�
 WAIT_FOR: メインのClaudeからの回答
 未起動なら起動を依頼してから実行する。
 
-1. `mcp__puppeteer__puppeteer_navigate` → `mcp__puppeteer__puppeteer_screenshot` で各画面を撮影
+1. `mcp__playwright__browser_navigate` → `mcp__playwright__browser_take_screenshot` で各画面を撮影する。
+   幅は `browser_resize`（例: 1280x800 と 390x844）、配色は `browser_emulate_media` の `colorScheme`（light / dark）で切り替えて確認する
 2. `.craft/docs/design-brief.md` と `.craft/docs/design-system.md` との差異を列挙（design-brief.md に節「9. UI の型と対象」がある場合は、画面構成が決定した型に従っているか、OOUI なら対象の一覧／詳細が単位になっているかも確認する）
 3. 差異を箇条書きにまとめ、修正指示としてメインのClaudeに渡す
 

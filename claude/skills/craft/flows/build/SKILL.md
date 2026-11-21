@@ -289,6 +289,13 @@ NOTE（A・B 共通。再開用のメモ）: トラック設計ありは各フ�
 .craft/docs/plan.md の「フェーズ2」に定義された各トラックを、
 **isolation: "worktree" + run_in_background: true** でバックグラウンド並列実行する。
 
+worktree は新しいチェックアウトのため、`.env` など gitignore 対象のファイルは存在しない（依存関係も未インストール）。
+  IF トラックの実装・テストに gitignore 対象のファイル（`.env`・ローカル設定等）が必要:
+    リポジトリのルートの `.worktreeinclude` に列挙する（構文は `.gitignore` と同じ。作成する worktree にコピーされる）。
+    小さいファイルだけにする（`node_modules` のような大きいディレクトリは入れない）。
+    依存のインストールコマンドは CLAUDE.md（または plan.md の開発コマンド）に書かれているものを、各トラックが最初に実行する。
+    PROHIBITED: 本番の認証情報・APIキーを `.worktreeinclude` に載せること
+
 各トラックに渡すプロンプト:
 READ {SKILL_DIR}/flows/new-project/phase2-prompt.md  ← フェーズ2開始直前に読む
 IF READ FAILED:
@@ -386,7 +393,7 @@ REPEAT:
 
   IF STACK == "static" かつ 今回のステップでユーザーが直接目にする画面要素
      （新規ページ・大きな新規コンポーネント・見た目や操作が変わる変更）を実装した:
-    IF Puppeteer MCP が使える:
+    IF Playwright MCP が使える:
       スクリーンショットを撮影してユーザーに共有する
     ELSE:
       dev サーバーが未起動なら起動してから（既に起動中ならそのまま使う）、URLと
@@ -416,15 +423,15 @@ UNTIL 未着手のステップがなくなる
 
 ```
 IF STACK == "static":
-  全セクション完了後、Puppeteer MCP が使える場合はスクリーンショットで最終確認する
+  全セクション完了後、Playwright MCP が使える場合はスクリーンショットで最終確認する
 ELSE （フロントエンドあり）:
   RUN: designer エージェントを呼び出す
     NOTE: designer は Agent ツール（サブエージェント）で起動禁止。メインClaudeが直接担当する
       （ユーザーとの対話・デザイン判断の連続性が必要なため。intake と同じ扱い）。
-    a. Puppeteer MCP でスクリーンショットを撮影
+    a. Playwright MCP でスクリーンショットを撮影
     b. デザインブリーフ・デザインシステムとの差異を確認・修正する
 
-IF Puppeteer MCP が使えない（未起動・未承認等）:
+IF Playwright MCP が使えない（未起動・未承認等）:
   NOTE: Chrome 拡張は、ウィンドウ幅を変えても表示幅が変わらない。狭い幅は、同一オリジンの `iframe`（幅 390px、
     `position:fixed`）に dev サーバーのページを読み込み、`contentDocument` の `scrollWidth` と `clientWidth`、
     見出しの左端、文字サイズ・コントラストを JS で測る（static の最終確認の代替になる）。
@@ -445,14 +452,15 @@ IF Puppeteer MCP が使えない（未起動・未承認等）:
     テストアカウントを作成し、メールアドレス・パスワードをユーザーに提示してから確認すること
 ```
 
-### ステップ 4: /ultrareview（オプション、HAS_REVIEW_CHAIN == true の場合のみ）
+### ステップ 4: 深いレビューの案内（オプション、HAS_REVIEW_CHAIN == true の場合のみ）
 
 ```
-IF /ultrareview が利用可能:
-  RUN: /ultrareview
-ELSE:
-  SKIP → ステップ5へ
-CHECK: コンポーネント設計・アクセシビリティ・型安全性
+NOTE: `/code-review ultra`（旧 `/ultrareview`）は、ユーザーだけが起動できる課金コマンドで、
+  Claude からは起動できない。ここでは実行せず、完了報告に1行で案内するだけにする。
+SET ULTRA_HINT = true
+  # ステップ6の完了報告に「より深いレビューが必要なら `/code-review ultra` を実行できます
+  # （課金あり・ユーザー操作）。観点: コンポーネント設計・アクセシビリティ・型安全性」と1行添える
+CONTINUE: ステップ5へ（待たない）
 ```
 
 ### ステップ 5: レビューチェーン（HAS_REVIEW_CHAIN == true の場合のみ）
@@ -515,6 +523,11 @@ IF いずれかのエージェントの判定が、review-common.md の「判定
 ### ステップ 6: CLAUDE.md・README.md 生成 + クリーンアップ
 
 ```
+# Stop フック（.claude/hooks/on-stop-complete.sh）の対象にするため、完了処理の開始を記録する。
+# このマーカーがある間、CLAUDE.md・README.md・plan.md が欠けたままではターンを終えられない
+# （フックが差し戻す。連続の差し戻しは Claude Code 側の上限で打ち切られる）
+RUN: mkdir -p .craft/docs && touch .craft/docs/.completing
+
 --- CLAUDE.md ---
 
 NOTE(STACK == "static"): `pnpm create astro@latest` はCLAUDE.md（AGENTS.mdへのsymlink）を
@@ -617,6 +630,7 @@ IF 引き金が現在のセッションから直接発火できない:
 --- 完了報告 ---
 
 ASSERT: CLAUDE.md・README.md・.craft/docs/plan.md が全て存在すること（自己検証。いずれか欠けている場合は該当セクションに戻って再実行する）
+RUN: rm -f .craft/docs/.completing   # Stop フックの確認対象から外す（以降は通常の会話）
 
 IF HAS_FRONTEND == true:
   ENSURE: 開発サーバーが起動中であること
@@ -646,6 +660,8 @@ REPORT TO USER:
       実際に必要な操作（アプリメニューから終了・プロセスをkill等）を伝えること
   NOTE: サーバー状態（起動中 or 停止中）を必ず明記すること。
     「動作確認できます」だけでは不十分。
+  IF ULTRA_HINT（ステップ4で設定）:
+    1行添える: 「より深いレビューが必要なら `/code-review ultra` を実行できます（課金あり・ユーザー操作）」
   IF 上記「検証の真正性」で未検証の項目があった:
     「検証済み」と「未検証（本番の引き金からの動作）」を項目ごとに分けて明記し、
     未検証分の具体的な確認手順（誰が・何をすればよいか）を併記すること。

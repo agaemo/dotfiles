@@ -220,8 +220,26 @@ IF BRANCH != DEFAULT_BRANCH:
   ASSERT: ブランチが作成されて切り替わっていること（`git branch --show-current` = {BRANCH}）
   IF FAILED: REPORT "ブランチ作成に失敗しました。既存ブランチと競合している可能性があります。" → STOP
 
+# 着手前ベースライン: 既存の失敗と今回の変更による失敗を切り分けるため、最初のフェーズの前に1回だけ取る
+BASELINE: 利用可能なビルド・lint・型チェック・テストを実行し、結果（成否・件数・失敗の抜粋）を記録する
+  （Makefile があれば `make build` / `make test` / `make lint`。無ければ CLAUDE.md・README の記載に従う）
+  IF 失敗がある:
+    REPORT: 既存の失敗としてユーザーに共有する（今回の変更の対象外として扱う）
+    NOTE: 以降の VERIFY の合否は、このベースラインとの差分で判定する（既存の失敗は今回の失敗に数えない）
+
 FOREACH phase IN 計画:
   REPORT: 「フェーズ N を開始します」と通知
+
+  # 戻る先を作る: ROLLBACK は「このフェーズで加えた変更だけ」を戻す。
+  # 戻る先（直前のコミット）が無い状態でフェーズを始めない
+  CHECKPOINT: `git status --short` で未コミットの変更を確認する
+    IF 未コミットの変更がある（今回の作業とは無関係な、ユーザー自身の変更を含みうる）:
+      PRESENT: 未コミットの変更の一覧
+      ASK USER: 1. コミットしてから進める / 2. stash してから進める / 3. 中止する
+      WAIT_FOR: ユーザーの回答
+      PROHIBITED: 確認なしにユーザーの未コミットの変更を commit・stash・破棄すること
+    SET PHASE_BASE = `git rev-parse HEAD`（このフェーズの戻る先）
+
   EXECUTE: そのフェーズの変更を適用する
   VERIFY:
     ビルド・lint・型チェックのうち利用可能なものを実行する
@@ -237,10 +255,17 @@ FOREACH phase IN 計画:
     1項目を適用するごとに commit する。同じファイルを触る項目は、1項目ずつ適用して commit する
     （先にまとめて編集すると、項目単位に分けて commit できなくなる）
   NOTE: macOS の `sed -i` は `-i ''` が必要。複数行の置換は Edit か python で行う
-  IF 検証失敗:
-    ROLLBACK: git checkout -- .
+  IF 検証失敗（ベースラインに無かった失敗が出た場合）:
+    ROLLBACK: このフェーズで変更・作成したファイルだけを PHASE_BASE の状態に戻す
+      - 変更したファイル: `git restore --source=PHASE_BASE -- <このフェーズで変更したファイル>`
+      - 作成したファイル: このフェーズで自分が作成したものだけを削除する
+      - 戻す前に `git status --short` で対象を確認し、このフェーズ以外の変更が含まれていないことを確かめる
+      PROHIBITED: `git checkout -- .`・`git clean`・`git reset --hard` など、リポジトリ全体の変更を一括で破棄するコマンド
     REPORT: 失敗内容と原因をユーザーに報告する
     STOP: ユーザーの判断を仰ぐ
+  IF 検証成功:
+    COMMIT: このフェーズの変更を commit する（次フェーズの戻る先になる。メッセージは日本語。
+      「項目ごとに commit」を計画で指定している場合は、その単位で commit 済みのためここでは重ねない）
   GATE: 次フェーズへの進行承認を得る
 ```
 
@@ -282,7 +307,9 @@ CREATE PR:
 
   # PR 作成後にレビュースキルで自動レビューを実行する
   PR_NUMBER = 作成した PR の番号
-  INVOKE SKILL: /review {PR_NUMBER}  ← Skill ツールで review スキルを呼び出す（bash RUN ではない）
+  INVOKE SKILL: code-review（引数: {PR_NUMBER}）  ← Skill ツールで code-review スキルを呼び出す（bash RUN ではない）
+    NOTE: `--comment`（PR へのインラインコメント投稿）は付けない。外向きの投稿になるため、
+      指摘はユーザーに共有してから、投稿するかをユーザーが決める
   IF レビューで重大な指摘がある:
     REPORT: 指摘内容をユーザーに共有し、対応するか確認する
     WAIT_FOR: ユーザーの判断

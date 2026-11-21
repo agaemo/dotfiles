@@ -92,7 +92,7 @@ craft/
 ├── guidelines/   # 開発ガイドライン（アーキテクチャ・設計手法・DB設計）
 ├── hooks/        # ツール実行前後に自動で動くスクリプト
 ├── gitignore     # プロジェクトの .gitignore ひな形
-├── mcp.json      # MCP サーバー設定（Puppeteer など）
+├── mcp.json      # MCP サーバー設定（Playwright など）
 └── settings.json # Claude Code 設定（権限・フック登録など）
 ```
 
@@ -123,14 +123,14 @@ craft テンプレートに置かれ、Claude が状況に応じて自律呼び�
 | `ideator` | — | アイデア探索・プロジェクト方向性の提案。intake の前段。 |
 | `intake` | `.craft/docs/requirements.md` | 新機能・曖昧な依頼のヒアリングと要件定義。 |
 | `refiner` | `.craft/docs/stories.md` | requirements.md をユーザーストーリーと受け入れ条件に分解。 |
-| `designer` | `.craft/docs/design-brief.md`<br>`.craft/docs/design-system.md` | UI/UX 設計・デザインブリーフ作成・Puppeteer での実画面レビュー。 |
+| `designer` | `.craft/docs/design-brief.md`<br>`.craft/docs/design-system.md` | UI/UX 設計・デザインブリーフ作成・Playwright MCP での実画面レビュー。 |
 | `planner` | `.craft/docs/plan.md` | 実装計画の立案。requirements.md / stories.md を読んでから動く。 |
 
-### 完了チェック（STEP 9 / 自動・順次）
+### 完了チェック（build フロー ステップ5 / 自動・順次）
 
 | エージェント | 確認観点 | 役割 |
 |---|---|---|
-| `verify` | 要件適合 | 要件定義と実装の照合。要件漏れ・スコープ外の混入を検出。 |
+| `verify` | 要件適合 | 要件定義と実装の照合。要件漏れ・スコープ外の混入を検出。組み込みの `/verify`（アプリを実行して動作を確認するコマンド）とは別物。 |
 | `security-reviewer` | セキュリティ | 認証・認可・OWASP Top 10 の観点でのセキュリティレビュー。 |
 | `qa` | ユーザー観点 | テスト戦略・E2E シナリオの網羅性・ユーザー観点での動作検証。 |
 | `code-reviewer` | コード品質 | バグ・セキュリティ問題・規約違反の検出。 |
@@ -216,12 +216,15 @@ Claude Code のスキルとしては認識されず、メインの SKILL.md か�
 
 ## hooks/
 
-`settings.json` に登録され、ツール実行の前後に自動で動く Node.js スクリプト。
+`settings.json` に登録され、ツール実行の前後などに自動で動くシェルスクリプト（`sh` で実行）。
 
 | ファイル | タイミング | 役割 |
 |---|---|---|
-| `pre-bash.js` | Bash 実行前 | 危険なコマンドのブロック・警告。 |
-| `on-session-start.js` | セッション開始時 | git状態表示・`.mise.toml` が存在する場合のみ `mise install` 実行。 |
+| `pre-bash.sh` | Bash 実行前 | `deny` で表せない危険なコマンド（`rm -rf /`・`DROP TABLE`・`> .env`）のブロック。 |
+| `on-session-start.sh` | セッション開始時 | git状態表示・`.mise.toml` が存在する場合のみ `mise install` 実行。 |
+| `on-stop-complete.sh` | 停止時 | build フローの完了処理中（`.craft/docs/.completing` がある間）だけ、CLAUDE.md・README.md・plan.md の存在を確認し、欠けていれば差し戻す（終了コード2。連続の差し戻しは Claude Code 側の上限で打ち切られる）。 |
 
-`post-write.js`（フォーマッタ）と `on-stop.js`（型チェック・リント）は技術スタックによって内容が変わるため、テンプレートには含めない。
-新規プロジェクト作成時に `planner` エージェントが技術スタックに応じて生成する。
+`git reset --hard`・`git push --force` などの破壊的な git 操作と、`.env`・`secrets/` の読み取りは、フックではなく `settings.json` の `permissions.deny` で禁止している（`deny` はどの権限モードでも有効で、フックより迂回されにくい）。
+
+フォーマッタ（PostToolUse）と型チェック・リント（Stop）は技術スタックによって内容が変わるため、テンプレートには含めない。
+新規プロジェクト作成時に `planner` エージェントが技術スタックに応じて生成する（上記の `on-stop-complete.sh` とは別のファイル名にすること）。

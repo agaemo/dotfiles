@@ -31,14 +31,14 @@ flowchart TD
     LOOP --> S3
 
     S3{HAS_FRONTEND?}
-    S3 -->|Yes・static| S3B["Puppeteerで最終確認"]
+    S3 -->|Yes・static| S3B["Playwright MCPで最終確認"]
     S3 -->|Yes・node/flutter| S3A["designerエージェントで\n実画面レビュー"]
     S3 -->|No| S4
     S3A --> S4
     S3B --> S4
 
     S4{HAS_REVIEW_CHAIN?}
-    S4 -->|Yes| S4A["/ultrareview（オプション）"]
+    S4 -->|Yes| S4A["/code-review ultra の案内（オプション・ユーザー操作）"]
     S4A --> S5{plan.mdの\nレビュートラック}
     S5 -->|A 軽量| S5A["verify→code-reviewer"]
     S5 -->|B 標準| S5B["verify→qa→code-reviewer"]

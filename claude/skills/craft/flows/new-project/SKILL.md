@@ -89,7 +89,7 @@ NOTE: .mcp.json への Write は settings.json の permissions.allow に登録�
   「はい」を選択して続行すること。
 
 PROHIBITED: CLAUDE.md および AGENTS.md を生成すること
-  理由: CLAUDE.md は実装完了後のステップ11で正しい内容を書く。早期生成すると不完全な内容が残る。
+  理由: CLAUDE.md は実装完了後の build フロー（ステップ6）で正しい内容を書く。早期生成すると不完全な内容が残る。
 
 --- STEP 1: git 初期化 ---
 
@@ -138,6 +138,7 @@ FOREACH row IN 以下の対応表:
   |----------------------------|-----------------------------------------|
   | hooks/on-session-start.sh  | .claude/hooks/on-session-start.sh       |
   | hooks/pre-bash.sh          | .claude/hooks/pre-bash.sh               |
+  | hooks/on-stop-complete.sh  | .claude/hooks/on-stop-complete.sh       |
 
 READ TEMPLATE/settings.json
 REPLACE ALL: ".claude/hooks/" → "${CLAUDE_PROJECT_DIR}/.claude/hooks/"
@@ -204,6 +205,4 @@ FOLLOW: そこに記述された STEP 1〜7 をそのまま実行する
    実装・テスト戦略・フェーズ2/3・CLAUDE.md生成は {SKILL_DIR}/flows/build/SKILL.md が担当する）
   NOTE: HAS_FRONTEND はステップ1で設定済みの値をそのまま持ち越して使うこと
 ```
-
-## 標準エージェントチェーン・オプションエージェント・再開時注意点
 

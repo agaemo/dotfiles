@@ -288,7 +288,7 @@ STEP 7: build フローへ委譲
     HAS_FRONTEND = <このチェーン冒頭で設定済みの変数>
 
   NOTE: 実装（フェーズ1〜3 or シンプルループ）・designerによる実画面レビュー・
-        /ultrareview・レビューチェーン（構成は plan.mdのレビュートラックと build フローに従う）・
+        深いレビュー（`/code-review ultra`）の案内・レビューチェーン（構成は plan.mdのレビュートラックと build フローに従う）・
         CLAUDE.md/README.md生成は build フロー側で実行される。
 ```
 

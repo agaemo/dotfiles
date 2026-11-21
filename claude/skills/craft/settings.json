@@ -10,14 +10,30 @@
       "Bash(git add*)",
       "Bash(git commit*)",
       "Bash(mise*)",
-      "Bash(make*)",
+      "Bash(make dev)",
+      "Bash(make build*)",
+      "Bash(make test*)",
+      "Bash(make e2e*)",
+      "Bash(make lint*)",
+      "Bash(make fmt*)",
       "Write(.mcp.json)",
       "Write(.claude/**)",
       "Write(agents/**)",
       "Write(guidelines/**)",
       "Write(docs/**)"
     ],
-    "deny": []
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.local)",
+      "Read(./secrets/**)",
+      "Bash(git reset --hard*)",
+      "Bash(git push --force*)",
+      "Bash(git push * --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * -f*)",
+      "Bash(git checkout -- .)",
+      "Bash(git clean -f*)"
+    ]
   },
 
   "hooks": {
@@ -43,6 +59,15 @@
       }
     ],
     "PostToolUse": [],
-    "Stop": []
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/on-stop-complete.sh"
+          }
+        ]
+      }
+    ]
   }
 }
