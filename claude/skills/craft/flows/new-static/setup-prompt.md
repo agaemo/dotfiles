@@ -71,23 +71,28 @@ NOTE: この時点で CWD には .craft/・.mise.toml のほか、design-coach �
   .mise.toml の存在に依存しない形で実行すること。
 
 IF CWD 直下に既存のファイル・ディレクトリが無い:
-  SKIP（退避不要）
+  RUN: mise exec node@lts pnpm@latest -- pnpm create astro@latest . --template minimal --no-git --no-ai --yes
 ELSE:
-  RUN（1回のBashツール呼び出しで実行すること。分割実行すると `$$`（シェルPID）が呼び出しごとに変わり
-       退避先を見失うため、退避先は CWD の basename ベースの固定名にする。
-       退避先は CWD の外（スクラッチパッド等。システムの一時ディレクトリを使う指定がある場合を除き /tmp は使わない）に置く）:
-    STASH=<CWD の外の固定パス>/craft-setup-stash-<CWDのbasename>
-    mkdir -p "$STASH" && for f in $(ls -A CWD); do mv "CWD/$f" "$STASH/"; done
-    mise exec node@lts pnpm@latest -- pnpm create astro@latest . --template minimal --no-git --no-ai --yes
-    復元: `$STASH` 内の各ファイルを CWD へ戻す。scaffold が同名のファイルを生成していた場合
-      （`README.md`・`.gitignore` 等）は、scaffold 側を残し、退避側は `<名前>.stashed` として CWD に残して
-      報告する（`.gitignore` は後の STEP 3 で追記するため、退避側の内容を末尾に追記してマージする）。
+  # 既存のファイルは動かさない。CWD 内のサブディレクトリ `_scaffold` に生成してから、中身を CWD へ移す。
+  # （退避方式は、退避先が CWD の外になり、変数・&&・for を含む複合コマンドが必要で、権限の確認が増える。
+  #   `_scaffold` 方式は、tauri-init.md と同じ考え方で、既存の `.craft/`・`.mise.toml` を動かさない）
+  IMPORTANT: Bash は1コマンドずつ実行する。シェル変数（`STASH=...`）・`&&`・`;`・`for`・`$(...)` でつなげない。
+    ファイルの読み取りは Read、一覧は `ls -A <ディレクトリ>` を単体で実行する。
+  1. RUN: mise exec -- pnpm create astro@latest _scaffold --template minimal --no-git --no-ai --yes
+       （.mise.toml を動かさないため、`mise exec node@lts pnpm@latest --` のバージョン明示は不要）
+  2. RUN: ls -A _scaffold で一覧を取り、各エントリ（`node_modules`・`.gitignore`・`.vscode` を含む）を
+       `mv _scaffold/<名前> .` で CWD へ移す。
+       同名のファイルが CWD に既にある場合（`README.md`・`.gitignore` 等）:
+         `.gitignore` は、scaffold 側の内容に既存側の内容を追記してマージする。
+         それ以外は、scaffold 側を残し、既存側は `<名前>.stashed` として CWD に残して報告する。
+  3. RUN: rmdir _scaffold
+  4. package.json の `name` が `_scaffold` になっているため、CWD の basename（または plan.md のプロジェクト名）に直す。
 
-  ASSERT: 退避した全ファイルが CWD（または `.stashed` として）に戻っていること（`.craft/docs/design-brief.md`・`.mise.toml` を含む）
-  ASSERT: package.json が CWD 直下に存在すること（サブディレクトリに生成されていないか）
+  ASSERT: package.json が CWD 直下に存在し、`name` が `_scaffold` ではないこと
+  ASSERT: `_scaffold` ディレクトリが残っていないこと
+  ASSERT: 既存のファイル（`.craft/docs/design-brief.md`・`.mise.toml` を含む）が CWD に残っていること
   IF いずれかの ASSERT が FAILED:
-    REPORT: "Astroのプロジェクト作成でディレクトリがずれた可能性があります。$STASH が残っていれば
-      CWD への復元を試み、それでも解決しなければ生成物の場所を確認してください。"
+    REPORT: "Astroのプロジェクト作成で問題が起きました。`_scaffold` が残っていれば、中身を確認してください。"
     STOP
 
 NOTE: `--no-ai` は create-astro が `AGENTS.md`（AI 向けの指示ファイル）を生成するのを抑止する。
