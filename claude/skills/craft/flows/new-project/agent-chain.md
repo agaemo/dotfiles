@@ -85,6 +85,9 @@ IF HAS_FRONTEND == true:
   STEP 3: designer ← 省略禁止・planner より先に実施すること
     a. READ {SKILL_DIR}/agents/designer.md → メインClaude自身が「テンプレート: デザインブリーフ」に従い実行する → .craft/docs/design-brief.md
     b. 同様に「テンプレート: デザインシステム」に従い実行する → .craft/docs/design-system.md
+    b2. 実装前のアンチジェネリック点検: designer.md の「フェーズ 3」の表を、design-brief.md・design-system.md の値
+        （色・見出しフォント・スケール差・レイアウト）に当てはめ、理由のない既定値は直す。結果は design-brief.md の
+        「8. 懸念・調整事項」に1〜2行で記録する
     c. 画面構成・コンポーネント構成を .craft/docs/design.md に記録
        INCLUDE: 画面遷移（どの画面からどの画面へ・何をトリガーに遷移するか）を
                 表または箇条書きで明記すること（例: 一覧画面 → [詳細を開く] → 詳細画面）
