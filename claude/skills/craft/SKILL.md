@@ -106,6 +106,9 @@ ENDIF
 # .craft/docs/plan.md がそもそも存在しない場合も、そのまま下記のscope読み込みへ継続する
 
 READ {SKILL_DIR}/flows/scope/SKILL.md
+  NOTE: 読み込みは、Read ツールで、このパスを直接指定して行う。ディレクトリの一覧を、
+        Bash の ls で先に取らない（Bash では、許可された作業ディレクトリの外を一覧できないことがある）。
+        Read を試さずに、「読めない」と判断して、進行管理を省略し、直接実装に切り替えない。
 IF READ FAILED:
   REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/scope/SKILL.md。SKILL_DIR の導出を確認してください。"
   STOP
@@ -132,6 +135,9 @@ NOTE: FOLLOW 実行中にエラーや予期しない STOP が発生した場合�
 
 ```
 READ {SKILL_DIR}/flows/build/SKILL.md
+  NOTE: 読み込みは、Read ツールで、このパスを直接指定して行う。ディレクトリの一覧を、
+        Bash の ls で先に取らない（Bash では、許可された作業ディレクトリの外を一覧できないことがある）。
+        Read を試さずに、「読めない」と判断して、進行管理を省略し、直接実装に切り替えない。
 IF READ FAILED:
   REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/build/SKILL.md。SKILL_DIR の導出を確認してください。"
   STOP
