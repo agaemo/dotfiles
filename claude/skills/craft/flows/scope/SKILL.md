@@ -160,6 +160,22 @@ ELSE:
 ```
 # 選定カテゴリ.委譲先フロー は、ステップ3の対応表「委譲先フロー」列の値（例: new-static）を指す
 
+# 進め方の選択（new-project で、画面UIがない場合のみ）
+IF 委譲先フロー == new-project かつ 画面UIがない:
+  ASK USER: 進め方を選んでください。
+    1. 軽量（業務ルールの確認と層構造の方針だけで実装する。要件定義書・ストーリー・計画なし。PoC・小さな新規システム向け）
+    2. 標準（要件定義書・ストーリー・計画・レビューを、承認しながら進める。継続運用・大きな案件・文書管理が必要な場合向け）
+    推奨: ステップ2の「PoC・お試しか、継続運用か」の回答が PoC・お試しなら 1、継続運用なら 2。
+      ユーザーが「軽く」「きちんと」と宣言していれば、それに従う。
+  WAIT_FOR: ユーザーの回答
+  IF 1:
+    READ {SKILL_DIR}/flows/light/SKILL.md
+    IF READ FAILED:
+      REPORT: "フローファイルが見つかりません: {SKILL_DIR}/flows/light/SKILL.md。SKILL_DIR の導出を確認してください。"
+      STOP
+    FOLLOW: そこに記述された手順を実行する。SUMMARY を前提として渡す。
+    STOP
+
 # 画面UIを持つ新規構築では、環境構築より先にデザインを固める（デザイン → ユーザー確認 → 環境構築の順）
 IF 委譲先フロー が new-static / new-project / new-app のいずれか
    かつ 画面UIがある（new-static は常に該当。new-project / new-app はステップ2の「フロントエンドUI: あり」）

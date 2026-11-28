@@ -177,6 +177,7 @@ Claude Code のスキルとしては認識されず、メインの SKILL.md か�
 |---|---|---|
 | `scope` | 種別（kind）の推定・確認・振り分けを一括で担当する。ヒアリング後、対応表と照合して new-static / new-project / new-app / new-runtime / iac / consult のいずれかへ委譲する。対応レシピがない技術（GAS等）はTODOとして報告し、consultへの相談・近いカテゴリでの妥協・終了を選んでもらう。 | [README](flows/scope/README.md) |
 | `new-project` | Webアプリ（言語は問わない）のセットアップ手順（ハーネス構築〜設計フェーズ）。実装フェーズは `build` に委譲する。 | [README](flows/new-project/README.md) |
+| `light` | 軽量経路。scope から、new-project で画面UIがなく「軽量」が選ばれたときだけ読み込まれる。業務ルールの確認（8観点、5問前後を1回）と、層構造の方針（入口・業務ロジック・データアクセス。依存は内側へ）だけで実装する。要件定義書・ストーリー・計画は省く。 | [SKILL](flows/light/SKILL.md) |
 | `new-static` | 静的サイト（LP・PoC）のセットアップ手順。ヒアリング・デザインブリーフ・初期plan.md生成までを担当し、実装フェーズは `build` に委譲する。 | [README](flows/new-static/README.md) |
 | `new-app` | クロスプラットフォームアプリ（Flutter・React Native・Expo等）のセットアップ手順（ハーネス構築〜設計フェーズ）。Firebase 未取得時のモック実装分岐・`riverpod_generator` + `hive_generator` 競合の注記を含む。実装フェーズは `build` に委譲する。 | （README未作成） |
 | `new-runtime` | 特定の言語・ランタイム自体の学習・検証用環境構築（サイト・アプリの制作が目的ではない軽量フロー）。ヒアリング→開発ランタイム確定（researcher呼び出し含む）→plan.md作成→`build`委譲。 | （README未作成） |
